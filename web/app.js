@@ -189,7 +189,7 @@ function sisKutu() {
   SIS.araclar.forEach(a => { if (!a.komut) a.komut = "winget install --id " + a.winget; });
   const satir = a => `<div class="sis-s"><span class="d ${a.var ? "ok" : "yok"}"></span><b>${esc(a.ad)}</b><span>${a.var ? esc(a.surum || "kurulu") : "kurulu değil"} · ${esc(a.ne)}</span></div>`;
   return `<div class="kutu" id="sisKutu"><h3>Sistem durumu</h3>
-   <p>Çalmak için hiçbir şey gerekmez. YouTube'dan indirmek için aşağıdaki araçlar gerekir. Bunlar <b style="color:var(--txt)">uygulamaya dahil değildir</b>; ${SIS.os === "linux" ? "Linux'ta <code>kurulum.sh</code> ile bilgisayarına kurulur (yt-dlp ve deno kendi klasörüne, ffmpeg paket yöneticinle)" : "Windows'un resmi paket yöneticisi (winget) ile bilgisayarına kurulur"}.</p>
+   <p>Çalmak için hiçbir şey gerekmez. YouTube'dan indirmek için aşağıdaki araçlar gerekir. Bunlar <b style="color:var(--txt)">uygulamaya dahil değildir</b>; ${SIS.os === "linux" ? "Linux'ta <code>kurulum.sh</code> ile bilgisayarına kurulur (yt-dlp ve deno kendi klasörüne, ffmpeg paket yöneticinle)" : "Windows'un resmi paket yöneticisi (winget) ile kurulur; winget yoksa resmi sürüm sayfalarından uygulamanın kendi <code>araclar</code> klasörüne indirilir"}.</p>
    <div style="margin:12px 0 4px">${SIS.araclar.map(satir).join("")}</div>
    ${eksik.length ? `<p class="not">“Eksikleri kur” şunları yapar: ${eksik.map(a => `<code>${esc(a.komut)}</code>`).join(" · ")}. Betik açık kaynaktır: <code>${SIS.os === "linux" ? "kurulum.sh" : "kurulum.ps1"}</code>. Başka hiçbir şey indirilmez.</p>` : ""}
    ${k.calisiyor ? `<p class="not" style="color:var(--ak)">Kuruluyor… ${esc((k.log || []).slice(-1)[0] || "")}</p>` : ""}

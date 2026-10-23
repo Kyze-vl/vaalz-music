@@ -39,7 +39,7 @@ Vaalz Music, sevdiğin parçaları kendi bilgisayarına indirip sade bir arayüz
 
 ### Şeffaflık: ne indirilir, ne gönderilir?
 
-Bu depoda **yt-dlp, ffmpeg ya da başka bir üçüncü taraf program yoktur.** İndirme özelliği için bu araçlar gerekir ve senin bilgisayarına **Windows'un resmi paket yöneticisi `winget`** ile kurulur:
+Bu depoda **yt-dlp, ffmpeg ya da başka bir üçüncü taraf program yoktur.** İndirme özelliği için bu araçlar gerekir ve senin bilgisayarına **Windows'un resmi paket yöneticisi `winget`** ile kurulur (winget yoksa aynı araçlar resmi sürüm sayfalarından indirilir, aşağıya bak):
 
 | Araç | winget kimliği | Ne için |
 |---|---|---|
@@ -47,7 +47,7 @@ Bu depoda **yt-dlp, ffmpeg ya da başka bir üçüncü taraf program yoktur.** �
 | [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | FLAC'a dönüştürme, kapak ve ses analizi |
 | [Deno](https://deno.com) | `DenoLand.Deno` | yt-dlp'nin YouTube JavaScript doğrulaması |
 
-- Kurulumu yapan betik tamamen açıktır: [`kurulum.ps1`](kurulum.ps1) (kısa ve okunabilir bir betik). Yalnızca yukarıdaki üç paketi `winget install` ile kurar; başka hiçbir şey indirmez ve çalıştırmaz.
+- Kurulumu yapan betik tamamen açıktır: [`kurulum.ps1`](kurulum.ps1) (kısa ve okunabilir bir betik). Yalnızca yukarıdaki üç paketi `winget install` ile kurar. **winget yoksa** (örneğin Windows Server) aynı üç aracı yalnızca şu resmi adreslerden uygulamanın yanındaki `araclar\` klasörüne indirir: yt-dlp ve deno için `github.com/yt-dlp/yt-dlp` ile `github.com/denoland/deno` sürüm sayfaları, ffmpeg için `gyan.dev/ffmpeg/builds`. Bu yolda indirmeler winget'in yaptığı gibi sağlama toplamıyla doğrulanmaz. Betik başka hiçbir şey indirmez ve çalıştırmaz.
 - Betik **yalnızca sen düğmeye bastığında** çalışır. İstersen kendin de kurabilirsin: `winget install --id yt-dlp.yt-dlp` · `winget install --id Gyan.FFmpeg` · `winget install --id DenoLand.Deno`
 - Hiçbir kişisel veri toplanmaz, hiçbir yere gönderilmez. Telemetri, hesap, reklam yok. Sunucu yalnızca `127.0.0.1`'de (bu bilgisayarda) dinler.
 - İnternet **yalnızca** şu durumlarda kullanılır: playlist senkronu, Spotify/Deezer liste okuma (Spotify'ın herkese açık gömme sayfası, Deezer'ın açık API'si; giriş ya da anahtar gerekmez), indirme, Ana Sayfa önerileri (sayfa açıkken, 24 saatte bir), "Benzer" sekmesi (parça başına bir kez), uzak kapaklar, YouTube araması (arama kutusu, her arama ~0,5 MB) ve (isteğe bağlı) söz arama. Ayarlar'daki sayaç tahmini kullanımı gösterir.
@@ -121,7 +121,7 @@ This repository contains **no yt-dlp, ffmpeg or any other third-party program.**
 | [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | FLAC conversion, cover art and audio analysis |
 | [Deno](https://deno.com) | `DenoLand.Deno` | JavaScript challenge solving for yt-dlp |
 
-- The installer script is fully open: [`kurulum.ps1`](kurulum.ps1) (a short, readable script). It only runs `winget install` for the three packages above — nothing else is downloaded or executed.
+- The installer script is fully open: [`kurulum.ps1`](kurulum.ps1) (a short, readable script). It only runs `winget install` for the three packages above. **Without winget** (e.g. Windows Server) it downloads the same three tools only from these official addresses into an `araclar\` folder next to the app: the `github.com/yt-dlp/yt-dlp` and `github.com/denoland/deno` release pages for yt-dlp and deno, and `gyan.dev/ffmpeg/builds` for ffmpeg. On this path the downloads are not checksum-verified the way winget does. The script downloads and executes nothing else.
 - It runs **only when you click the button**. You can also install them yourself: `winget install --id yt-dlp.yt-dlp` · `winget install --id Gyan.FFmpeg` · `winget install --id DenoLand.Deno`
 - No personal data is collected or sent anywhere. No telemetry, accounts or ads. The server listens only on `127.0.0.1`.
 - The internet is used **only** for: playlist sync, reading Spotify/Deezer lists (Spotify's public embed page and Deezer's open API; no login or key needed), downloads, home-page suggestions (while the page is open, once per 24 h), the "Similar" tab (once per track), remote covers, and YouTube search (each search ~0.5 MB) and (optional) lyrics. A counter in Settings shows the estimated usage.

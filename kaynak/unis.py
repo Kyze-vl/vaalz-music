@@ -20,7 +20,7 @@ NOWIN = 0x08000000 if os.name == "nt" else 0
 DETACHED = 0x00000008 if os.name == "nt" else 0
 
 # Things the app creates in its own folder (nothing else is ever deleted)
-APP_ITEMS = ["VaalzMusic.exe", "_vaalz", "web", "kurulum.ps1", "README.md", "LICENSE", "logs"]
+APP_ITEMS = ["VaalzMusic.exe", "_vaalz", "web", "kurulum.ps1", "README.md", "LICENSE", "logs", "araclar"]   # araclar: winget olmadan indirilen yt-dlp/ffmpeg/deno
 DATA_DIR = "veri"                    # playlists, likes, settings, caches, the app's own Edge profile
 MUSIC_DIR = "Indirilenler"           # default music folder
 DATA_KEEP_FILES = ("config.json", "tracks.json", "playlists.json", "stats.json", "oneriler.json", "benzer.json", "coz.json")
