@@ -347,3 +347,8 @@ body.odakAcik #content,body.odakAcik #rail{visibility:hidden;transition:visibili
 .kq .mt b,.kq .mt span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kq .ib,.kq>.not{flex:none}
 #benzerKutu{overflow-x:hidden}
+
+/* kapak ekrani yan paneli: icerigin (uzun basliklarin) genisligi paneli 440px disina tasimasin, dugmeler gorunur kalsin */
+#oSag{min-width:0}
+#kuyruk.gomulu{min-width:0;max-width:100%;overflow:hidden}
+#kuyruk.gomulu #kuyrukListe,#kuyruk.gomulu #benzerKutu,#kuyruk.gomulu #sozKutu{min-width:0}
