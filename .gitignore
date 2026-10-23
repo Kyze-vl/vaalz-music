@@ -1,0 +1,23 @@
+# Kullanici verisi (API anahtari, playlist linkleri, dinleme gecmisi) - ASLA depoya girmemeli
+veri/
+logs/
+Indirilenler/
+
+# Derlenmis uygulama (GitHub Releases'e zip olarak konur)
+_vaalz/
+_vm/
+VaalzMusic.exe
+unis.exe
+kaynak/build-unis/
+kaynak/build/
+kaynak/icon.ico
+
+# Test / gecici
+kaynak/test/vaalz-test/
+__pycache__/
+*.pyc
+*.bozuk
+*.bak
+
+# Kisisel devir notlari
+DEVIR_NOTU.md

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaalz Music</title>
+<link rel="icon" href="/s/icon.png">
+<link rel="stylesheet" href="/s/style.css">
+</head>
+<body>
+<aside id="rail">
+  <a class="marka" href="#/"><img src="/s/icon.png" alt=""><span>Vaalz Music</span></a>
+  <nav>
+    <a class="nv" href="#/" data-nav="home"><i data-i="home"></i>Ana Sayfa</a>
+    <a class="nv" href="#/kitaplik" data-nav="kitaplik"><i data-i="library"></i>Kütüphane</a>
+  </nav>
+  <div class="rbas"><span>Playlistlerim</span><button class="ib kc" data-act="yeniListe" title="Yeni playlist"><i data-i="plus"></i></button></div>
+  <div id="railListe"></div>
+  <div class="rfoot">
+    <div id="agKutu" title="Yaklaşık internet kullanımı"></div>
+    <a class="nv" href="#/ayarlar" data-nav="ayarlar"><i data-i="sliders"></i>Ayarlar</a>
+  </div>
+</aside>
+
+<section id="content">
+  <header id="ust">
+    <form id="aramaForm" autocomplete="off">
+      <i data-i="search"></i>
+      <input id="arama" placeholder="Parça, sanatçı, albüm veya playlist ara" spellcheck="false">
+      <kbd>/</kbd>
+    </form>
+    <button id="durumChip" class="chip" data-act="git" data-to="#/kitaplik" hidden></button>
+  </header>
+  <main id="main"></main>
+</section>
+
+<footer id="dock">
+  <div class="d-sol">
+    <div class="cv" id="dKapak" data-act="odakAc" title="Tam ekran kapak"></div>
+    <div class="mt"><b id="dBaslik">Bir şarkı seç</b><span id="dSanatci"></span></div>
+    <button class="ib" id="btnBegen" data-act="begenCal" title="Beğen"></button>
+  </div>
+  <div class="d-orta">
+    <div class="kont">
+      <button class="ib" id="btnKaris" data-act="karistir"></button>
+      <button class="ib" data-act="onceki" title="Önceki (P)"><i data-i="prev"></i></button>
+      <button class="ib cal" id="btnCal" data-act="calDur" title="Çal / Duraklat (Boşluk)"></button>
+      <button class="ib" data-act="sonraki" title="Sonraki (N)"><i data-i="next"></i></button>
+      <button class="ib" id="btnTekrar" data-act="tekrar"></button>
+    </div>
+    <div class="seekrow"><span id="tGec">0:00</span><canvas id="dalga" tabindex="0" aria-label="İlerleme"></canvas><span id="tTop">0:00</span></div>
+  </div>
+  <div class="d-sag">
+    <button class="ib" id="btnSes" data-act="sessiz" title="Sessiz (M)"></button>
+    <div class="sesk"><input id="ses" type="range" min="0" max="200" value="80" title="Ses (↑ ↓) — %100 üstü yükseltme"><div class="isaret"></div></div>
+    <span id="sesYuzde">80%</span>
+    <button class="ib" data-act="uyku" id="btnUyku" title="Uyku zamanlayıcısı"><i data-i="moon"></i></button>
+    <button class="ib" data-act="sozAc" title="Sözler"><i data-i="mic"></i></button>
+    <button class="ib" data-act="kuyrukAc" title="Sıradakiler"><i data-i="queue"></i></button>
+    <button class="ib" data-act="odakAc" title="Tam ekran kapak (F)"><i data-i="expand"></i></button>
+  </div>
+</footer>
+
+<section id="odak" hidden>
+  <div id="odakBg"></div>
+  <div class="o-ust">
+    <button class="ib" data-act="oPanel" title="Yan paneli aç / kapat"><i data-i="queue"></i></button>
+    <button class="ib" data-act="odakKapat" title="Kapat (Esc)"><i data-i="x"></i></button>
+  </div>
+  <div class="o-ana">
+    <div class="o-sol">
+      <div class="cv buyuk" id="oKapak"></div>
+      <div class="o-meta"><b id="oBaslik"></b><span id="oSanatci"></span></div>
+      <div class="seekrow o"><span id="oGec">0:00</span><canvas id="oDalga" tabindex="0" aria-label="İlerleme"></canvas><span id="oTop">0:00</span></div>
+      <div class="kont o">
+        <button class="ib" id="oKaris" data-act="karistir"></button>
+        <button class="ib" data-act="onceki"><i data-i="prev"></i></button>
+        <button class="ib cal" id="oCal" data-act="calDur"></button>
+        <button class="ib" data-act="sonraki"><i data-i="next"></i></button>
+        <button class="ib" id="oTekrar" data-act="tekrar"></button>
+      </div>
+    </div>
+    <div id="oSag"></div>
+  </div>
+</section>
+
+<aside id="kuyruk" hidden>
+  <div class="k-bas"><div class="kts"><button class="kt-b on" data-act="kTab" data-k="sira">Sıradakiler</button><button class="kt-b" data-act="kTab" data-k="soz">Sözler</button><button class="kt-b" data-act="kTab" data-k="benzer">Benzer</button></div><button class="ib kc" data-act="kuyrukKapat"><i data-i="x"></i></button></div>
+  <div id="kuyrukListe"></div>
+  <div id="sozKutu" hidden></div>
+  <div id="benzerKutu" hidden></div>
+</aside>
+
+<div id="modal" hidden></div>
+<div id="menu" hidden></div>
+<div id="toast" hidden></div>
+<div id="ipucu" hidden></div>
+<audio id="audio" preload="auto"></audio>
+<audio id="audio2" preload="auto"></audio>
+<script src="/s/app.js"></script>
+</body>
+</html>
