@@ -277,7 +277,7 @@ function sayfaListe(id) {
   const p = sabit ? { id, title: "Beğendiklerim", tracks: L.liked, local: false, sabit: true } : listeBul(id);
   if (!p) { main.innerHTML = `<div class="bos"><h2>Playlist bulunamadı</h2></div>`; return; }
   const ids = p.tracks.filter(T), sn = ids.reduce((a, i) => a + (T(i).duration || 0), 0);
-  const eksik = ids.filter(i => !T(i).var), mb = eksik.reduce((a, i) => a + (T(i).duration || 210) / 60 * (L.veri_tasarrufu ? 1 : 2) + (i.startsWith("q_") ? .5 : 0), 0);
+  const eksik = ids.filter(i => !T(i).var), mb = eksik.reduce((a, i) => a + (T(i).duration || 210) / 60 * (L.veri_tasarrufu ? 1 : 1.5) + (i.startsWith("q_") ? .5 : 0), 0);
   main.innerHTML = `<div class="sy"><div class="ph">${mozaik(ids)}<div><span class="eyebrow">${sabit ? "Otomatik playlist" : p.local ? "Senin playlistin" : "YouTube Music playlisti"}</span><h1 class="b">${esc(p.title)}</h1>
    <p>${ids.length} parça${sn ? " · " + uzunSure(sn) : ""}${eksik.length ? ` · <span style="color:var(--ak)">${eksik.length} tanesi indirilmedi</span>` : ""}</p>
    <div class="bt"><button class="btn on" data-act="listeCal" data-liste="${esc(p.id)}">${I("play")}Çal</button><button class="btn" data-act="listeKaristir" data-liste="${esc(p.id)}">${I("shuffle")}Karıştır</button>
@@ -350,9 +350,9 @@ async function sayfaAyarlar() {
    <label class="f" style="margin-top:34px">YouTube araması <small>hesap ya da API anahtarı gerekmez</small></label><p class="not" style="margin-top:0">Arama kutusuna yazıp “YouTube'da ara”ya basınca yt-dlp ile aranır; sonuçlardan indirip playlistine ekleyebilirsin.</p>
    <label class="f">Playlistler <small>her satıra bir link</small></label><textarea class="inp" id="aListe">${esc(a.playlists.join("\n"))}</textarea>
    <h2 class="b" style="margin-top:34px">İndirme</h2>
-   <p class="not" style="margin-top:0">Varsayılan bicim <b>FLAC</b> (kayıpsız, hızlı). Biçim seçmene gerek yok.</p>
+   <p class="not" style="margin-top:0">İndirilen ses, kaynağın <b>en iyi hâli</b> olarak, yeniden kodlanmadan saklanır (YouTube için genelde Opus ya da AAC). YouTube kayıplı olduğundan FLAC'a çevirmek kaliteyi artırmaz, yalnızca dosyayı büyütür. Biçim seçmene gerek yok.</p>
    <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="aTasarruf" ${a.veri_tasarrufu ? "checked" : ""}> Veri tasarrufu modu</label>
-   <p class="not" style="margin-top:0">Açıkken YouTube'un en küçük ses akışı (~130 kbps AAC) indirilir ve <b>M4A</b> olarak saklanır; dönüştürme yapılmaz. Premium 256 kbps akışına göre yaklaşık yarı kadar internet harcar, kalite biraz düşer. İnterneti belirleyen kaynak akıştır: FLAC'a ya da MP3'e çevirmek veri miktarını değiştirmez.</p>
+   <p class="not" style="margin-top:0">Açıkken YouTube'un en küçük ses akışı (~130 kbps AAC) indirilir ve olduğu gibi (genelde <b>M4A</b>) saklanır; dönüştürme yapılmaz. Premium 256 kbps akışına göre yaklaşık yarı kadar internet harcar, kalite biraz düşer. İnterneti belirleyen kaynak akıştır: FLAC'a ya da MP3'e çevirmek veri miktarını değiştirmez.</p>
    <label class="f">Aynı anda indirme <small id="esN">${a.es_zamanli} parça</small></label><input type="range" id="aEs" min="1" max="8" step="1" value="${a.es_zamanli}" style="width:260px;accent-color:var(--ak)">
    <p class="not">Her parçanın başlangıcı birkaç saniye sürer (YouTube'un doğrulaması); asıl indirme ~1 sn. Eşzamanlı indirme bu bekleyişi paylaştırır. 4 önerilir; YouTube yavaşlatırsa (çok istek uyarısı) düşür.</p>
    <label class="f">Çerezler için tarayıcı <small>Premium 256 kbps ses için YouTube'a girişli tarayıcı; boş = kapalı</small></label><input class="inp" id="aCerez" value="${esc(a.cookies_browser)}" placeholder="firefox">
@@ -426,6 +426,7 @@ function sesUygula() {
   try { localStorage.setItem("ses", yuz); } catch { }
 }
 const ileriIndeks = () => { if (S.qi + 1 < S.queue.length) return S.qi + 1; if (S.tekrar === 1) { if (S.karisik) S.queue = karistirDizi(S.base); return 0; } return -1; };
+const durdurHepsi = () => { for (const e of ELEM) { try { e.pause(); } catch { } } };   // crossfade sirasinda iki eleman da calabilir
 function gecisBaslat(ni) {              // crossfade: iki ses elemani, esit guc egrisi
   const id = S.queue[ni]; if (!ctx || gecisV || !id || !T(id) || !T(id).var) return false;
   gecisV = true;
@@ -667,7 +668,7 @@ for (const el of ELEM) {
 }
 if ("mediaSession" in navigator) {
   const ms = navigator.mediaSession;
-  ms.setActionHandler("play", () => audio.play()); ms.setActionHandler("pause", () => audio.pause());
+  ms.setActionHandler("play", () => audio.play()); ms.setActionHandler("pause", () => durdurHepsi());
   ms.setActionHandler("previoustrack", onceki); ms.setActionHandler("nexttrack", () => sonraki(false));
   ms.setActionHandler("seekto", e => { audio.currentTime = e.seekTime; });
 }
@@ -677,7 +678,7 @@ let uykuZ = null;
 function uykuKur(dk) {
   clearTimeout(uykuZ); $("#btnUyku").classList.toggle("ac", !!dk); if (!dk) return toast("Uyku zamanlayıcısı kapalı");
   toast(`${dk} dakika sonra müzik duracak`);
-  uykuZ = setTimeout(() => { const v = V; let n = 20; const z = setInterval(() => { V = Math.max(0, v * (--n / 20)); sesUygula(); if (n <= 0) { clearInterval(z); audio.pause(); V = v; sesUygula(); $("#btnUyku").classList.remove("ac"); } }, 150); }, dk * 60000);
+  uykuZ = setTimeout(() => { const v = V; let n = 20; const z = setInterval(() => { V = Math.max(0, v * (--n / 20)); sesUygula(); if (n <= 0) { clearInterval(z); durdurHepsi(); V = v; sesUygula(); $("#btnUyku").classList.remove("ac"); } }, 150); }, dk * 60000);
 }
 
 // =============================================================== kuyruk / modal / menu
@@ -838,7 +839,7 @@ sesAyarOlaylari();
 let odakZ = 0;
 const H = {
   git: t => { location.hash = t.dataset.to; },
-  calDur: () => { if (S.qi < 0) { const son = L.recent.filter(i => T(i) && T(i).var); return kuyrukKur(tumIndirilenler(), son[0] || null, "__indirilenler", false); } if (audio.paused) { sesZinciri(); if (ctx && ctx.state === "suspended") ctx.resume(); sesUygula(); audio.play(); } else audio.pause(); },
+  calDur: () => { if (S.qi < 0) { const son = L.recent.filter(i => T(i) && T(i).var); return kuyrukKur(tumIndirilenler(), son[0] || null, "__indirilenler", false); } if (audio.paused) { sesZinciri(); if (ctx && ctx.state === "suspended") ctx.resume(); sesUygula(); audio.play(); } else durdurHepsi(); },
   onceki, sonraki: () => sonraki(false),
   tekrar: () => { S.tekrar = (S.tekrar + 1) % 3; butonlar(); toast(["Döngü kapalı", "Tüm liste döngüde", "Tek parça döngüde"][S.tekrar]); oturumKaydet(audio.currentTime); },
   karistir: () => {

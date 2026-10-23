@@ -9,7 +9,7 @@
 
 ## Türkçe
 
-Vaalz Music, sevdiğin parçaları kendi bilgisayarına indirip sade bir arayüzde dinlemeni sağlayan, Windows için yazılmış hafif bir müzik çalardır. **Üyelik, hesap ya da giriş gerektirmez.** Parçaları bir arama kutusundan bulabilir ya da bir playlist linki (YouTube Music, Spotify, Deezer) yapıştırarak toplu indirebilirsin; indirdiklerin kendi arşivinde (FLAC) durur ve **çalma ile "İndirilenler" hiçbir zaman internet kullanmaz.** Kendi müzik dosyalarını da klasöre atıp aynı arayüzde çalabilirsin.
+Vaalz Music, sevdiğin parçaları kendi bilgisayarına indirip sade bir arayüzde dinlemeni sağlayan, Windows için yazılmış hafif bir müzik çalardır. **Üyelik, hesap ya da giriş gerektirmez.** Parçaları bir arama kutusundan bulabilir ya da bir playlist linki (YouTube Music, Spotify, Deezer) yapıştırarak toplu indirebilirsin; indirdiklerin kendi arşivinde (kaynağın en iyi ses akışı, yeniden kodlanmadan) durur ve **çalma ile "İndirilenler" hiçbir zaman internet kullanmaz.** Kendi müzik dosyalarını da klasöre atıp aynı arayüzde çalabilirsin.
 
 ### Özellikler
 - Koyu/sade arayüz, 11 tema (gradyan temalar dahil) ve albüm kapağından otomatik vurgu rengi
@@ -44,7 +44,7 @@ Bu depoda **yt-dlp, ffmpeg ya da başka bir üçüncü taraf program yoktur.** �
 | Araç | winget kimliği | Ne için |
 |---|---|---|
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | `yt-dlp.yt-dlp` | YouTube Music'ten indirme |
-| [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | FLAC'a dönüştürme, kapak ve ses analizi |
+| [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | Ses ayıklama, kapak ve ses analizi |
 | [Deno](https://deno.com) | `DenoLand.Deno` | yt-dlp'nin YouTube JavaScript doğrulaması |
 
 - Kurulumu yapan betik tamamen açıktır: [`kurulum.ps1`](kurulum.ps1) (kısa ve okunabilir bir betik). Yalnızca yukarıdaki üç paketi `winget install` ile kurar. **winget yoksa** (örneğin Windows Server) aynı üç aracı yalnızca şu resmi adreslerden uygulamanın yanındaki `araclar\` klasörüne indirir: yt-dlp ve deno için `github.com/yt-dlp/yt-dlp` ile `github.com/denoland/deno` sürüm sayfaları, ffmpeg için `gyan.dev/ffmpeg/builds`. Bu yolda indirmeler winget'in yaptığı gibi sağlama toplamıyla doğrulanmaz. Betik başka hiçbir şey indirmez ve çalıştırmaz.
@@ -83,7 +83,7 @@ Vaalz Music yalnızca **hakkın olan içerik / kişisel kullanım** içindir. Yo
 
 ## English
 
-Vaalz Music is a light Windows music player that lets you download the tracks you like and play them in a simple interface. **No membership, account or login is required.** Find tracks with the search box, or paste a playlist link (YouTube Music, Spotify, Deezer) to download in bulk; what you download stays in your own archive (FLAC), and **playback and the "Downloads" library never use the internet.** You can also drop your own music files into the folder and play them in the same interface.
+Vaalz Music is a light Windows music player that lets you download the tracks you like and play them in a simple interface. **No membership, account or login is required.** Find tracks with the search box, or paste a playlist link (YouTube Music, Spotify, Deezer) to download in bulk; what you download stays in your own archive (the best audio stream the source offers, not re-encoded), and **playback and the "Downloads" library never use the internet.** You can also drop your own music files into the folder and play them in the same interface.
 
 ### Features
 - Clean dark UI, 11 themes (including gradient themes), automatic accent colour from album art
@@ -118,7 +118,7 @@ This repository contains **no yt-dlp, ffmpeg or any other third-party program.**
 | Tool | winget id | Purpose |
 |---|---|---|
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | `yt-dlp.yt-dlp` | Downloading from YouTube Music |
-| [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | FLAC conversion, cover art and audio analysis |
+| [ffmpeg](https://www.gyan.dev/ffmpeg/builds/) | `Gyan.FFmpeg` | Audio extraction, cover art and audio analysis |
 | [Deno](https://deno.com) | `DenoLand.Deno` | JavaScript challenge solving for yt-dlp |
 
 - The installer script is fully open: [`kurulum.ps1`](kurulum.ps1) (a short, readable script). It only runs `winget install` for the three packages above. **Without winget** (e.g. Windows Server) it downloads the same three tools only from these official addresses into an `araclar\` folder next to the app: the `github.com/yt-dlp/yt-dlp` and `github.com/denoland/deno` release pages for yt-dlp and deno, and `gyan.dev/ffmpeg/builds` for ffmpeg. On this path the downloads are not checksum-verified the way winget does. The script downloads and executes nothing else.

@@ -59,12 +59,20 @@ mimari() {
 }
 
 kur_ytdlp() {
-  if command -v yt-dlp >/dev/null 2>&1 && [ "$GUNCELLE" = 0 ]; then say "OK: yt-dlp already installed ($(yt-dlp --version 2>/dev/null))"; return 0; fi
+  if command -v yt-dlp >/dev/null 2>&1 && [ "$GUNCELLE" = 0 ]; then
+    if yt-dlp --version >/dev/null 2>&1; then say "OK: yt-dlp already installed ($(yt-dlp --version 2>/dev/null))"; return 0; fi
+    say "yt-dlp is installed but does not run; reinstalling the official release"
+  fi
   if ! command -v python3 >/dev/null 2>&1; then say "ERROR: python3 is needed to run yt-dlp."; return 1; fi
   say "Installing yt-dlp -> $BIN/yt-dlp"
   run mkdir -p "$BIN" || return 1
   indir "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp" "$BIN/yt-dlp" || return 1
   run chmod +x "$BIN/yt-dlp" || return 1
+  if [ "$KURU" = 0 ] && ! "$BIN/yt-dlp" --version >/dev/null 2>&1; then
+    say "ERROR: yt-dlp was installed but cannot run with your Python ($(python3 -V 2>&1)). Current yt-dlp needs a newer Python;"
+    say "       update Python (e.g. sudo apt install python3) or install yt-dlp from your package manager."
+    return 1
+  fi
   say "Done: yt-dlp"
 }
 
@@ -102,12 +110,13 @@ kur_ffmpeg() {
   if [ -z "$komut" ]; then say "ERROR: no supported package manager. Please install ffmpeg yourself."; return 1; fi
   say "Installing ffmpeg with your package manager: $komut"
   if [ "$(id -u)" = 0 ]; then
-    run $komut
+    run $komut || { say "ERROR: '$komut' failed."; return 1; }
   elif command -v pkexec >/dev/null 2>&1; then
-    run pkexec $komut
+    run pkexec $komut || { say "ERROR: '$komut' failed or was cancelled."; return 1; }
   else
     say "ERROR: cannot ask for a password here. Run in a terminal:  sudo $komut"; return 1
   fi
+  if [ "$KURU" = 0 ] && ! { ffmpeg -version >/dev/null 2>&1 && ffprobe -version >/dev/null 2>&1; }; then say "ERROR: ffmpeg/ffprobe are still not usable after install."; return 1; fi
   say "Done: ffmpeg"
 }
 

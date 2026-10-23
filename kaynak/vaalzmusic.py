@@ -270,7 +270,7 @@ def tara_arkada():
 # (ad, aranan komut(lar), winget paket kimligi, ne icin)
 ARACLAR = [
     ("yt-dlp", ("yt-dlp",), "yt-dlp.yt-dlp", "YouTube Music'ten indirme"),
-    ("ffmpeg", ("ffmpeg",), "Gyan.FFmpeg", "FLAC'a donusturme, kapak ve ses analizi"),
+    ("ffmpeg", ("ffmpeg",), "Gyan.FFmpeg", "ses ayiklama, kapak ve ses analizi"),
     ("deno", ("deno",), "DenoLand.Deno", "YouTube'un JavaScript dogrulamasi (yt-dlp icin)"),
 ]
 KURULUM_BETIGI = os.path.join(BASE, "kurulum.sh" if LINUX else "kurulum.ps1")
@@ -573,7 +573,7 @@ def sorgu_coz(q_id):
         raise RuntimeError("YouTube'da bulunamadi")
     if sure:
         yakin = [e for e in adaylar if abs(e["duration"] - sure) <= max(8, sure * 0.08)]
-        secilen = (yakin or adaylar)[0]
+        secilen = min(yakin or adaylar, key=lambda e: abs(e["duration"] - sure))   # esitlikte arama sirasi korunur
     else:
         secilen = adaylar[0]
     kimlik_degistir(q_id, secilen["id"])
@@ -641,7 +641,7 @@ def kare_kapak(ham, hedef):
 
 
 def indirme_formati():
-    return "m4a" if cfg.get("veri_tasarrufu") else "flac"
+    return "m4a" if cfg.get("veri_tasarrufu") else "best"
 
 
 def parca_indir(vid):
@@ -650,11 +650,15 @@ def parca_indir(vid):
     fmt = indirme_formati()
     if cfg.get("veri_tasarrufu"):
         # internet harcamasini belirleyen sey kaynak akistir (donusturme degil): kucuk AAC akisi sec, yeniden kodlama yok
-        bicim = ["-f", "bestaudio[ext=m4a][abr<=140]/bestaudio[abr<=140]/worstaudio/bestaudio", "-x", "--audio-format", "m4a"]
+        bicim = ["-f", "bestaudio[ext=m4a][abr<=140]/bestaudio[abr<=140]/worstaudio/bestaudio", "-x", "--audio-format", "best"]   # secilen akis Opus ise AAC'ye cevrilmez
     else:
-        bicim = ["-f", "bestaudio/best", "-x", "--audio-format", "flac"]
+        # kaynagin en iyi akisi, yeniden kodlama yok ("best": kaynak kodegi korunur, yalnizca kapsayici duzeltilir).
+        # YouTube kaynaklari zaten kayiplidir; FLAC'a cevirmek kaliteyi artirmaz, yalnizca dosyayi sisirir.
+        bicim = ["-f", "bestaudio/best", "-x", "--audio-format", "best"]
+    yolf = os.path.join(ham, vid + ".yol.txt")           # yt-dlp'nin bildirdigi gercek cikti yolu
     args = bicim + ["--write-info-json", "--write-thumbnail", "--convert-thumbnails", "jpg",
                     "--no-playlist", "--no-warnings", "--newline", "--windows-filenames",
+                    "--print-to-file", "after_move:filepath", yolf,
                     "-o", os.path.join(kl, "%(title).120B [%(id)s].%(ext)s"),
                     "-o", "infojson:" + os.path.join(ham, "%(id)s"),
                     "-o", "thumbnail:" + os.path.join(ham, "%(id)s"),
@@ -664,6 +668,10 @@ def parca_indir(vid):
         cikti = []
         if IPTAL.is_set():
             raise RuntimeError("iptal")
+        try:
+            os.remove(yolf)
+        except OSError:
+            pass
         p = subprocess.Popen(ytdlp_komutu() + ek + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                              text=True, encoding="utf-8", errors="replace", creationflags=NOWIN | DUSUK, **YENI_OTURUM)
         CALISAN.add(p)
@@ -695,8 +703,21 @@ def parca_indir(vid):
     if kod != 0:
         raise RuntimeError(hata_ozeti("\n".join(cikti)))
 
-    dosya = next((f for f in os.listdir(kl) if f.endswith(f"[{vid}]." + fmt)), None) or \
-        next((f for f in os.listdir(kl) if f"[{vid}]." in f and f.lower().endswith(SES_UZ)), None)
+    dosya = None
+    try:
+        with open(yolf, "r", encoding="utf-8") as f:
+            bildirilen = [s.strip() for s in f if s.strip()][-1]
+        if os.path.isfile(bildirilen) and os.path.normcase(os.path.dirname(os.path.abspath(bildirilen))) == os.path.normcase(os.path.abspath(kl)):
+            dosya = os.path.basename(bildirilen)
+    except (OSError, IndexError):
+        pass
+    try:
+        os.remove(yolf)
+    except OSError:
+        pass
+    if not dosya:       # yol bildirilmediyse: ayni kimlikli dosyalardan en son yazilani al
+        adaylar = [f for f in os.listdir(kl) if f"[{vid}]." in f and f.lower().endswith(SES_UZ)]
+        dosya = max(adaylar, key=lambda f: os.path.getmtime(os.path.join(kl, f)), default=None)
     if not dosya:
         raise RuntimeError("Dosya olusmadi")
     info = {}
@@ -896,7 +917,7 @@ def indirmeye_ekle(idler):
 
 def tahmini_mb(idler):
     sn = sum((tracks.get(i, {}).get("duration") or 210) for i in idler)
-    return round(sn / 60 * (1.0 if cfg.get("veri_tasarrufu") else 2.0), 1)
+    return round(sn / 60 * (1.0 if cfg.get("veri_tasarrufu") else 1.5), 1)
 
 
 def listeyi_cek(url):
@@ -1215,7 +1236,9 @@ def soz_oku(vid):
 
 
 def soz_kaydet(vid, metin):
-    p = os.path.join(vm_klasoru("soz"), vid + ".lrc")
+    if not isinstance(vid, str) or not re.fullmatch(r"[A-Za-z0-9_-]{6,20}", vid):
+        raise ValueError("Gecersiz parca kimligi")
+    p =os.path.join(vm_klasoru("soz"), vid + ".lrc")
     if metin and metin.strip():
         with open(p, "w", encoding="utf-8") as f:
             f.write(metin)
@@ -1380,7 +1403,7 @@ class Istek(BaseHTTPRequestHandler):
                 return self._404()
             if p == "/api/ping":
                 son_ping[0] = time.time()
-                return self._json({"ok": True})
+                return self._json({"ok": True, "app": "vaalz-music", "api_version": 1})
             if p == "/api/kutuphane":
                 return self._json(kutuphane_json())
             if p == "/api/durum":
@@ -1842,8 +1865,10 @@ def pencere_ac(url):
 
 def zaten_calisiyor(port):
     try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ping", timeout=2):
-            return True
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ping", timeout=2) as r:
+            y = json.loads(r.read(200))
+            # "app" alani olmayan yanit = kimlik eklenmeden onceki Vaalz surumu; baska bir "app" adi yabanci hizmettir
+            return isinstance(y, dict) and y.get("ok") is True and y.get("app", "vaalz-music") == "vaalz-music"
     except Exception:
         return False
 
@@ -1866,11 +1891,53 @@ def bekci():
             os._exit(0)
 
 
+KILIT_DOSYA = []
+
+
+def kilit_al():
+    """Veri klasorune ozel isletim sistemi kilidi: ayni anda iki ornek baslarsa yalnizca biri sunucu acar."""
+    try:
+        os.makedirs(VERI, exist_ok=True)
+        f = open(os.path.join(VERI, ".kilit"), "a+")
+    except OSError:
+        return True                                  # kilit dosyasi acilamiyorsa eski davranisa don
+    try:
+        if os.name == "nt":
+            import msvcrt
+            f.seek(0)
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        f.close()
+        return False
+    KILIT_DOSYA.append(f)                            # surec bitene kadar acik kalir
+    return True
+
+
+def mevcut_ornek(port):
+    for p in range(port, port + 12):             # ilk port doluyken baslayan onceki ornek siradaki portlardan birinde olabilir
+        if zaten_calisiyor(p):
+            return p
+    return None
+
+
 def main():
     port = cfg["port"]
-    if zaten_calisiyor(port):
+    if not kilit_al():                           # baska ornek su an basliyor ya da calisiyor: onun hazir olmasini bekle
+        for _ in range(30):
+            p = mevcut_ornek(port)
+            if p:
+                if not os.environ.get("VAALZ_TEST"):
+                    pencere_ac(f"http://127.0.0.1:{p}/")
+                return
+            time.sleep(0.5)
+        return
+    p = mevcut_ornek(port)                       # kilitsiz eski surumlerin calisan ornegi
+    if p:
         if not os.environ.get("VAALZ_TEST"):
-            pencere_ac(f"http://127.0.0.1:{port}/")
+            pencere_ac(f"http://127.0.0.1:{p}/")
         return
     srv = None
     for deneme in range(port, port + 12):        # baska bir program portu tutuyorsa siradakini dene
