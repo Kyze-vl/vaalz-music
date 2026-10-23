@@ -291,6 +291,9 @@ def yol_yenile():
         if ek:
             os.environ["PATH"] = os.pathsep.join(mevcut + ek)
         return
+    arac_dir = os.path.join(BASE, "araclar")          # kurulum.ps1, winget yoksa araclari buraya indirir
+    if os.path.isdir(arac_dir) and arac_dir not in os.environ.get("PATH", "").split(os.pathsep):
+        os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + arac_dir
     try:
         import winreg
         parcalar = []
@@ -333,14 +336,14 @@ def sistem_durumu(zorla=False):
     for ad, komutlar, winget, ne in ARACLAR:
         yol = next((shutil.which(k) for k in komutlar if shutil.which(k)), None)
         araclar.append({"ad": ad, "var": bool(yol), "surum": arac_surum(yol) if yol else "", "winget": winget, "ne": ne,
-                        "komut": LINUX_KOMUT[ad] if LINUX else f"winget install --id {winget}"})
+                        "komut": LINUX_KOMUT[ad] if LINUX else (f"winget install --id {winget}" if shutil.which("winget") else f"{ad} (resmi sürüm sayfasından → araclar klasörü)")})
     if LINUX:
         pencere = bool(chromium_bul())
         kurulabilir = bool(shutil.which("bash")) and os.path.isfile(KURULUM_BETIGI)
     else:
         pencere = any(os.path.exists(p) for p in (r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
                                                   r"C:\Program Files\Microsoft\Edge\Application\msedge.exe"))
-        kurulabilir = bool(shutil.which("winget")) and os.path.isfile(KURULUM_BETIGI)
+        kurulabilir = os.path.isfile(KURULUM_BETIGI)           # winget yoksa betik dogrudan indirir
     d = {"araclar": araclar, "pencere": pencere, "eksik": [a["ad"] for a in araclar if not a["var"]],
          "os": "linux" if LINUX else "windows", "kurulabilir": kurulabilir,
          "winget": bool(shutil.which("winget")), "betik": os.path.isfile(KURULUM_BETIGI)}
@@ -1731,7 +1734,7 @@ def gorev_cubugu_kimligi():
     iid = guid("{886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99}")        # IPropertyStore
     fmt = guid("{9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3}")        # System.AppUserModel.*
     exe = sys.executable
-    degerler = {5: "VaalzMusic.App", 2: f'"{exe}"', 3: f"{exe},0", 4: "Vaalz Music"}   # ID, RelaunchCommand, RelaunchIconResource, RelaunchDisplayNameResource
+    degerler = {5: "Vaalz.Music.Player.v2", 2: f'"{exe}"', 3: f"{exe},0", 4: "Vaalz Music"}   # ID, RelaunchCommand, RelaunchIconResource, RelaunchDisplayNameResource
     yapildi = set()
     PROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
 
@@ -1778,7 +1781,7 @@ def gorev_cubugu_kimligi():
     cb = PROC(tara)
     while True:
         user32.EnumWindows(cb, 0)
-        time.sleep(1.0 if not yapildi else 2.0)
+        time.sleep(0.25 if not yapildi else 2.0)        # pencere gorunur olur olmaz kimlik ve ikon atansin (Windows ilk gordugu ikonu AUMID icin onbellege alir)
 
 
 def chromium_bul():
