@@ -159,6 +159,76 @@
     new MutationObserver(() => { if (!odak.classList.contains("acik")) kapatPencere(); else guncelle(); }).observe(odak, { attributes: true, attributeFilter: ["class", "hidden"] });
   }
 
+  // ---- Alt hap: basili tutup sekmeler uzerinde surukleyince secim parmagi izler, birakinca gecilir ----
+  const hap = document.getElementById("rail");
+  if (hap) {
+    let bas = null, uz = null, surukleHap = false, bx = 0;
+    const nvAl = e => { const t = e.touches[0] || e.changedTouches[0]; const el = document.elementFromPoint(t.clientX, t.clientY); return el && el.closest("#rail .nv"); };
+    hap.addEventListener("touchstart", e => {
+      const el = e.target.closest(".nv"); bas = el || null; uz = el || null; surukleHap = false; bx = e.touches[0].clientX;
+    }, { passive: true });
+    hap.addEventListener("touchmove", e => {
+      if (!bas) return;
+      if (!surukleHap && Math.abs(e.touches[0].clientX - bx) < 10) return;
+      const el = nvAl(e); surukleHap = true; hap.classList.add("ay-surukle");
+      if (el && el !== uz) { uz = el; hap.querySelectorAll(".nv").forEach(n => n.classList.toggle("ay-uz", n === el)); try { navigator.vibrate && navigator.vibrate(6); } catch (x) { } }
+      else if (!uz) hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
+      if (uz) uz.classList.add("ay-uz");
+    }, { passive: true });
+    const hapBitir = e => {
+      if (!bas) return;
+      const git = surukleHap && uz && uz !== bas ? uz : null;
+      hap.classList.remove("ay-surukle"); hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
+      if (surukleHap && e.cancelable) e.preventDefault();          // surukleme sonrasi sahte tiklama olmasin
+      if (git) git.click();
+      bas = uz = null; surukleHap = false;
+    };
+    hap.addEventListener("touchend", hapBitir); hap.addEventListener("touchcancel", hapBitir);
+  }
+
+  // ---- "Simdi caliyor" karti: sag/sola kaydirinca onceki / sonraki, ayrica kucuk onceki-sonraki dugmeleri ----
+  const kk = document.getElementById("ayKart");
+  if (kk) {
+    const dugme = (act, ic, baslik) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "ay-kd"; b.dataset.act = act; b.title = baslik;
+      b.innerHTML = typeof I === "function" ? I(ic) : ""; return b;
+    };
+    const sagKapsul = document.createElement("div"); sagKapsul.className = "ay-kdler";
+    sagKapsul.append(dugme("onceki", "prev", "Önceki"), dugme("sonraki", "next", "Sonraki"));
+    kk.querySelector(".d-sol").appendChild(sagKapsul);
+    let x0 = null, y0k = null, dxk = 0, yatay = false, hareketEtti = false;
+    kk.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0k = e.touches[0].clientY; dxk = 0; yatay = false; hareketEtti = false; }, { passive: true });
+    kk.addEventListener("touchmove", e => {
+      if (x0 === null) return;
+      const dx = e.touches[0].clientX - x0, dy = e.touches[0].clientY - y0k;
+      if (!yatay && Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.4) { yatay = true; kk.style.transition = "none"; }
+      if (!yatay) return;
+      hareketEtti = true; dxk = dx;
+      kk.style.transform = "translateX(" + (dx * 0.6) + "px)"; kk.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 420));
+    }, { passive: true });
+    const kBit = () => {
+      if (x0 === null) return;
+      const dx = dxk; x0 = null;
+      if (!yatay) return;
+      yatay = false;
+      const ileri = dx < -70, geri = dx > 70;
+      if (ileri || geri) {
+        // kart kenara kayar, sarki degisir, kart karsi taraftan geri gelir
+        kk.style.transition = "transform .14s ease-in, opacity .14s ease-in"; kk.style.transform = "translateX(" + (ileri ? -90 : 90) + "px)"; kk.style.opacity = "0";
+        setTimeout(() => {
+          try { if (ileri) sonraki(false); else onceki(); } catch (x) { }
+          kk.style.transition = "none"; kk.style.transform = "translateX(" + (ileri ? 90 : -90) + "px)";
+          requestAnimationFrame(() => requestAnimationFrame(() => { kk.style.transition = "transform .22s cubic-bezier(.22,1,.36,1), opacity .22s"; kk.style.transform = ""; kk.style.opacity = ""; setTimeout(() => { kk.style.transition = ""; }, 260); }));
+        }, 150);
+      } else {
+        kk.style.transition = "transform .2s ease-out, opacity .2s"; kk.style.transform = ""; kk.style.opacity = "";
+        setTimeout(() => { kk.style.transition = ""; }, 240);
+      }
+    };
+    kk.addEventListener("touchend", kBit); kk.addEventListener("touchcancel", kBit);
+    kk.addEventListener("click", e => { if (hareketEtti) { e.stopPropagation(); e.preventDefault(); hareketEtti = false; } }, true);   // kaydirma sonrasi tam ekran acilmasin
+  }
+
   if (!gercek) return;
 
   function gonder() {

@@ -215,3 +215,15 @@ html.android .ay-perde{position:fixed;inset:0;z-index:39;background:#000;opacity
 html.android #odak.ay-sheet .ay-perde{opacity:.5;pointer-events:auto}
 
 html.android #odak{border-bottom:0;box-shadow:none}
+
+/* hapta surukleme: parmagin altindaki sekme vurgulanir */
+html.android #rail.ay-surukle .nv.on:not(.ay-uz){background:none;color:var(--mut);font-weight:500}
+html.android #rail.ay-surukle .nv.on:not(.ay-uz) .ic{stroke-width:1.7}
+html.android #rail .nv.ay-uz{background:var(--hv3);color:var(--txt);font-weight:700}
+html.android #rail .nv.ay-uz .ic{stroke-width:2.6}
+/* kart: onceki / sonraki dugmeleri (hapin cal dugmesiyle ayni yumusak zemin) */
+html.android .ay-kdler{display:flex;gap:6px;flex:none}
+html.android .ay-kd{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--hv2);color:var(--txt)}
+html.android .ay-kd .ic{width:18px;height:18px}
+html.android #ayKart #btnBegen{width:40px;height:40px}
+html.android #ayKart .d-sol{gap:8px}
