@@ -90,9 +90,9 @@ const TEMALAR = [
   ["sistem", "Sistem", null], ["koyu", "Kömür", ["#0a0a0b", "#17171a", "#ececea"]], ["onyx", "Onyx", ["#000", "#111113", "#ececea"]],
   ["ash", "Kül", ["#1a1b1f", "#282a30", "#eceef3"]], ["acik", "Açık", ["#f5f4f1", "#efeee9", "#19191c"]],
   // gradyan temalar: [önizleme arka planı, panel, yazı]; GRAD listesindekiler data-grad alır
-  ["gece", "Gece mavimor", ["linear-gradient(48.17deg,#5348ca 11.21%,#140730 61.92%)", "#0000004d", "#f1f0f5"]], ["retro", "Retro yağmur bulutu", ["linear-gradient(148.71deg,#3a7ca1 5.64%,#58579a 26.38%,#58579a 49.92%,#3a7ca1 73.12%)", "#0000004d", "#f1f0f5"]],
-  ["lofi", "Lofi ortamı", ["linear-gradient(179.52deg,#a4c0f7 7.08%,#a9e4e8 34.94%,#b0e2b8 65.12%,#cfdfa2 96.23%)", "#0000004d", "#f1f0f5"]], ["elma", "Yeşil elma", ["linear-gradient(180deg,#56b69f 6.15%,#63bc61 48.7%,#9eca67 93.07%)", "#0000004d", "#f1f0f5"]],
-  ["mavimor", "Mavimor alacakaranlık", ["linear-gradient(47.61deg,#2c3fe7 11.18%,#261d83 64.54%)", "#0000004d", "#f1f0f5"]], ["alaca", "Alacakaranlık", ["linear-gradient(160deg,#69426a 0%,#111731 100%)", "#0000004d", "#f1f0f5"]],
+  ["gece", "Mor gece", ["linear-gradient(48.17deg,#5348ca 11.21%,#140730 61.92%)", "#0000004d", "#f1f0f5"]], ["retro", "Fırtına bulutu", ["linear-gradient(148.71deg,#3a7ca1 5.64%,#58579a 26.38%,#58579a 49.92%,#3a7ca1 73.12%)", "#0000004d", "#f1f0f5"]],
+  ["lofi", "Sakin gökyüzü", ["linear-gradient(179.52deg,#a4c0f7 7.08%,#a9e4e8 34.94%,#b0e2b8 65.12%,#cfdfa2 96.23%)", "#0000004d", "#f1f0f5"]], ["elma", "Çayır", ["linear-gradient(180deg,#56b69f 6.15%,#63bc61 48.7%,#9eca67 93.07%)", "#0000004d", "#f1f0f5"]],
+  ["mavimor", "Derin mavi", ["linear-gradient(47.61deg,#2c3fe7 11.18%,#261d83 64.54%)", "#0000004d", "#f1f0f5"]], ["alaca", "Gün batımı", ["linear-gradient(160deg,#69426a 0%,#111731 100%)", "#0000004d", "#f1f0f5"]],
 ];
 const GRAD = new Set(["gece", "retro", "lofi", "elma", "mavimor", "alaca"]);
 const VURGULAR = [["Kum", 35, 38], ["Mercan", 10, 70], ["Adaçayı", 105, 26], ["Gök", 210, 65], ["Lavanta", 260, 60], ["Gül", 335, 60]];
