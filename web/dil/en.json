@@ -36,33 +36,33 @@
   },
   {
     "file": "web/app.js",
-    "old": "[\"gece\", \"Gece mavimor\",",
-    "new": "[\"gece\", \"Midnight indigo\","
+    "old": "[\"gece\", \"Mor gece\",",
+    "new": "[\"gece\", \"Violet night\","
   },
   {
     "file": "web/app.js",
-    "old": "[\"retro\", \"Retro yağmur bulutu\",",
-    "new": "[\"retro\", \"Retro raincloud\","
+    "old": "[\"retro\", \"Fırtına bulutu\",",
+    "new": "[\"retro\", \"Storm cloud\","
   },
   {
     "file": "web/app.js",
-    "old": "[\"lofi\", \"Lofi ortamı\",",
-    "new": "[\"lofi\", \"Lofi vibes\","
+    "old": "[\"lofi\", \"Sakin gökyüzü\",",
+    "new": "[\"lofi\", \"Calm sky\","
   },
   {
     "file": "web/app.js",
-    "old": "[\"elma\", \"Yeşil elma\",",
-    "new": "[\"elma\", \"Green apple\","
+    "old": "[\"elma\", \"Çayır\",",
+    "new": "[\"elma\", \"Meadow\","
   },
   {
     "file": "web/app.js",
-    "old": "[\"mavimor\", \"Mavimor alacakaranlık\",",
-    "new": "[\"mavimor\", \"Indigo twilight\","
+    "old": "[\"mavimor\", \"Derin mavi\",",
+    "new": "[\"mavimor\", \"Deep blue\","
   },
   {
     "file": "web/app.js",
-    "old": "[\"alaca\", \"Alacakaranlık\",",
-    "new": "[\"alaca\", \"Twilight\","
+    "old": "[\"alaca\", \"Gün batımı\",",
+    "new": "[\"alaca\", \"Sunset\","
   },
   {
     "file": "web/app.js",

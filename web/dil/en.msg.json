@@ -51,5 +51,6 @@
   {"file": "kaynak/vaalzmusic.py", "old": " izinli listede yok.", "new": " is not on the allowed list."},
   {"file": "kaynak/vaalzmusic.py", "old": "zip icinde bulunamadi", "new": "not found in the zip"},
   {"file": "kaynak/vaalzmusic.py", "old": "indirme yarim kaldi", "new": "download incomplete"},
-  {"file": "kaynak/vaalzmusic.py", "old": "MB/sn)", "new": "MB/s)"}
+  {"file": "kaynak/vaalzmusic.py", "old": "MB/sn)", "new": "MB/s)"},
+  {"file": "kaynak/vaalzmusic.py", "old": "Bilinmeyen hata", "new": "Unknown error"}
 ]

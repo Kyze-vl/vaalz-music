@@ -85,14 +85,14 @@ function kapakAyar(el, id) {
 }
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.z); toast.z = setTimeout(() => t.hidden = true, 2200); }
 
-// ---- tema + vurgu rengi (Discord'daki gibi: taban tema + ozel renk; ek olarak kapaktan otomatik renk)
+// ---- tema + vurgu rengi (taban tema + ozel renk; ek olarak kapaktan otomatik renk)
 const TEMALAR = [
   ["sistem", "Sistem", null], ["koyu", "Kömür", ["#0a0a0b", "#17171a", "#ececea"]], ["onyx", "Onyx", ["#000", "#111113", "#ececea"]],
   ["ash", "Kül", ["#1a1b1f", "#282a30", "#eceef3"]], ["acik", "Açık", ["#f5f4f1", "#efeee9", "#19191c"]],
   // gradyan temalar: [önizleme arka planı, panel, yazı]; GRAD listesindekiler data-grad alır
-  ["gece", "Gece mavimor", ["linear-gradient(48.17deg,#5348ca 11.21%,#140730 61.92%)", "#0000004d", "#f1f0f5"]], ["retro", "Retro yağmur bulutu", ["linear-gradient(148.71deg,#3a7ca1 5.64%,#58579a 26.38%,#58579a 49.92%,#3a7ca1 73.12%)", "#0000004d", "#f1f0f5"]],
-  ["lofi", "Lofi ortamı", ["linear-gradient(179.52deg,#a4c0f7 7.08%,#a9e4e8 34.94%,#b0e2b8 65.12%,#cfdfa2 96.23%)", "#0000004d", "#f1f0f5"]], ["elma", "Yeşil elma", ["linear-gradient(180deg,#56b69f 6.15%,#63bc61 48.7%,#9eca67 93.07%)", "#0000004d", "#f1f0f5"]],
-  ["mavimor", "Mavimor alacakaranlık", ["linear-gradient(47.61deg,#2c3fe7 11.18%,#261d83 64.54%)", "#0000004d", "#f1f0f5"]], ["alaca", "Alacakaranlık", ["linear-gradient(160deg,#69426a 0%,#111731 100%)", "#0000004d", "#f1f0f5"]],
+  ["gece", "Mor gece", ["linear-gradient(52deg,#4a2fa8 8%,#12062b 70%)", "#0000004d", "#f1f0f5"]], ["retro", "Fırtına bulutu", ["linear-gradient(140deg,#2f6f8f 0%,#4b4f8c 45%,#2f6f8f 100%)", "#0000004d", "#f1f0f5"]],
+  ["lofi", "Sakin gökyüzü", ["linear-gradient(175deg,#9db4ee 0%,#a2d8e6 38%,#b9e0c4 68%,#dfe3ac 100%)", "#0000004d", "#f1f0f5"]], ["elma", "Çayır", ["linear-gradient(185deg,#4aa88f 0%,#5fb554 50%,#a6c95a 100%)", "#0000004d", "#f1f0f5"]],
+  ["mavimor", "Derin mavi", ["linear-gradient(40deg,#1f3fd0 5%,#1a1470 70%)", "#0000004d", "#f1f0f5"]], ["alaca", "Gün batımı", ["linear-gradient(155deg,#7a3a58 0%,#0d1430 100%)", "#0000004d", "#f1f0f5"]],
 ];
 const GRAD = new Set(["gece", "retro", "lofi", "elma", "mavimor", "alaca"]);
 const VURGULAR = [["Kum", 35, 38], ["Mercan", 10, 70], ["Adaçayı", 105, 26], ["Gök", 210, 65], ["Lavanta", 260, 60], ["Gül", 335, 60]];
@@ -137,12 +137,14 @@ function vurgu(id) {
 }
 
 // =============================================================== yan liste
+let railSon = "";
 function railCiz() {
   const aktif = (location.hash.match(/^#\/liste\/(.+)$/) || [])[1];
   const sirali = [...L.playlists].sort((a, b) => (L.lists[b.id] || 0) - (L.lists[a.id] || 0) || a.title.localeCompare(b.title, "tr"));
   const satir = (id, ad, alt, ids) => `<a class="rl ${aktif === id ? "on" : ""}" href="#/liste/${esc(id)}">${cv(ids.find(i => T(i) && T(i).kapak) || id)}<div class="mt"><b>${esc(ad)}</b><span>${esc(alt)}</span></div></a>`;
-  $("#railListe").innerHTML = satir("__begenilen", "Beğendiklerim", `${L.liked.length} parça`, L.liked) +
+  const html = satir("__begenilen", "Beğendiklerim", `${L.liked.length} parça`, L.liked) +
     sirali.map(p => satir(p.id, p.title, `${p.tracks.length} parça${p.local ? "" : " · YouTube"}`, p.tracks)).join("");
+  if (html !== railSon) { railSon = html; $("#railListe").innerHTML = html; }
 }
 function navIsaretle(ad) { document.querySelectorAll("[data-nav]").forEach(a => a.classList.toggle("on", a.dataset.nav === ad)); }
 async function agGuncelle(ag) {
@@ -328,7 +330,8 @@ async function apiAra(q) {
 
 async function sayfaAyarlar() {
   navIsaretle("ayarlar");
-  const a = await api("/api/ayarlar"), ag = await api("/api/ag");
+  const [a, ag] = await Promise.all([api("/api/ayarlar"), api("/api/ag")]);
+  agGuncelle(ag);
   if (decodeURIComponent(location.hash) !== "#/ayarlar") return;
   main.innerHTML = `<div class="sy" style="max-width:720px"><div class="bas"><span class="eyebrow">Tercihler</span><h1 class="b">Ayarlar</h1></div>
    <div class="ip" style="margin:0 0 18px"><label class="f" style="margin:0">Dil / Language</label><select class="inp" id="aDil" style="width:160px"><option value="tr" ${a.dil !== "en" ? "selected" : ""}>Türkçe</option><option value="en" ${a.dil === "en" ? "selected" : ""}>English</option></select></div>

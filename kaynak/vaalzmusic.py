@@ -102,8 +102,24 @@ def yaz(ad, veri):
     os.replace(yol + ".tmp", yol)
 
 
+def sistem_dili():
+    """Isletim sistemi dili Turkce ise "tr", degilse "en" (kullanici Ayarlar'dan degistirene kadar varsayilan)."""
+    try:
+        if sys.platform == "win32":
+            import ctypes
+            tam = ctypes.create_unicode_buffer(85)
+            ad = tam.value if ctypes.windll.kernel32.GetUserDefaultLocaleName(tam, 85) else ""
+        else:
+            ad = next((os.environ[k] for k in ("LC_ALL", "LC_MESSAGES", "LANG") if os.environ.get(k)), "")
+        return "tr" if ad.lower().startswith("tr") else "en"
+    except Exception:
+        return "tr"
+
+
 cfg = dict(VARSAYILAN)
 cfg.update(oku("config.json", {}))
+if "dil" not in oku("config.json", {}):
+    cfg["dil"] = sistem_dili()
 tracks = oku("tracks.json", {})
 playlists = oku("playlists.json", {})
 stats = oku("stats.json", {})
