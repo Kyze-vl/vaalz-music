@@ -79,7 +79,17 @@
       if (kaydet && id !== "dil" && id !== "ag") sayfalar[id].appendChild(kaydet);
       document.getElementById("main").scrollTop = 0;
     };
-    ayGeri = () => { if (aktif) { kapat(); return true; } return false; };
+    ayGeri = () => {
+      if (!sy.isConnected) { ayGeri = null; return false; }      // sayfa degisti: eski alt sayfa geri tusunu tuketmesin
+      if (aktif) { kapat(); return true; }
+      return false;
+    };
+    // her degisiklik kendiliginden kaydedilir (alt sayfadan baska sekmeye gecilse de kayip olmasin)
+    let kaydetZ = 0;
+    sy.addEventListener("change", () => {
+      clearTimeout(kaydetZ);
+      kaydetZ = setTimeout(() => { const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (sy.isConnected && kb && aktif && aktif !== "dil" && aktif !== "ag") kb.click(); }, 500);
+    });
     satirlar.forEach(s => {
       if (s.bolum) { const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = s.bolum; ayListe.appendChild(et); }
       const b = document.createElement("button"); b.type = "button"; b.className = "ay-satir"; b.dataset.ayId = s.id;
@@ -87,7 +97,7 @@
       b.addEventListener("click", () => ac(s.id)); ayListe.appendChild(b);
       const sp = document.createElement("div"); sp.className = "ay-sayfa"; sp.hidden = true;
       const ust = document.createElement("div"); ust.className = "ay-ust2";
-      const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
+      const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.setAttribute("aria-label", en ? "Back" : "Geri"); geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
       const bs = document.createElement("h2"); bs.textContent = s.baslik; ust.append(geri, bs);
       const ic = document.createElement("div"); ic.className = "ay-ic"; s.dugumler.forEach(n => ic.appendChild(n));
       sp.append(ust, ic); sy.appendChild(sp); sayfalar[s.id] = sp;
@@ -145,7 +155,17 @@
     const cubuk = document.createElement("div"); cubuk.className = "ay-cubuk";
     cubuk.innerHTML = "<i></i><b></b>"; seek.insertBefore(cubuk, seek.querySelector("canvas"));
     const dolgu = cubuk.querySelector("i"), top = cubuk.querySelector("b");
-    const yaz = o => { dolgu.style.width = top.style.left = (o * 100) + "%"; };
+    // erisilebilirlik: kaydirici rolu, deger bildirimi ve klavye / ekran okuyucu ile ilerletme
+    cubuk.setAttribute("role", "slider"); cubuk.tabIndex = 0;
+    cubuk.setAttribute("aria-label", document.documentElement.lang === "en" ? "Progress" : "İlerleme");
+    cubuk.setAttribute("aria-valuemin", "0"); cubuk.setAttribute("aria-valuemax", "100"); cubuk.setAttribute("aria-valuenow", "0");
+    const yaz = o => { dolgu.style.width = top.style.left = (o * 100) + "%"; cubuk.setAttribute("aria-valuenow", String(Math.round(o * 100))); };
+    cubuk.addEventListener("keydown", e => {
+      const d = isFinite(audio.duration) ? audio.duration : 0;
+      if (!d) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") { audio.currentTime = Math.min(d, audio.currentTime + 5); e.preventDefault(); }
+      else if (e.key === "ArrowLeft" || e.key === "ArrowDown") { audio.currentTime = Math.max(0, audio.currentTime - 5); e.preventDefault(); }
+    });
     const sureVar = () => isFinite(audio.duration) && audio.duration > 0;
     const guncelle = () => yaz(sureVar() ? Math.min(1, audio.currentTime / audio.duration) : 0);
     for (const el of ELEM) el.addEventListener("timeupdate", e => { if (e.target === audio && !surukleniyor) guncelle(); });
@@ -217,16 +237,14 @@
       if (!bas) return;
       if (!surukleHap && Math.abs(e.touches[0].clientX - bx) < 10) return;
       const el = nvAl(e); surukleHap = true; hap.classList.add("ay-surukle");
-      if (el && el !== uz) { uz = el; hap.querySelectorAll(".nv").forEach(n => n.classList.toggle("ay-uz", n === el)); try { navigator.vibrate && navigator.vibrate(6); } catch (x) { } }
+      if (el && el !== uz) { uz = el; hap.querySelectorAll(".nv").forEach(n => n.classList.toggle("ay-uz", n === el)); try { navigator.vibrate && navigator.vibrate(6); } catch (x) { } el.click(); }   // parmak hangi sekmedeyse o ekran hemen acilir
       else if (!uz) hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
       if (uz) uz.classList.add("ay-uz");
     }, { passive: true });
     const hapBitir = e => {
       if (!bas) return;
-      const git = surukleHap && uz && uz !== bas ? uz : null;
       hap.classList.remove("ay-surukle"); hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
       if (surukleHap && e.cancelable) e.preventDefault();          // surukleme sonrasi sahte tiklama olmasin
-      if (git) git.click();
       bas = uz = null; surukleHap = false;
     };
     hap.addEventListener("touchend", hapBitir); hap.addEventListener("touchcancel", hapBitir);
@@ -281,6 +299,39 @@
     if (o && o.classList.contains("acik")) { if (o.classList.contains("ay-sheet")) o.classList.remove("ay-sheet"); else H.odakKapat(); return true; }
     return ayGeri ? ayGeri() : false;
   };
+
+  // ---- Sekme gecisi anlik olsun: sik okunan GET verileri (ayarlar, internet sayaci) onbellekten hemen verilir, arkada tazelenir ----
+  // (api() degismez bir sabit; istekleri yapan fetch'i sararak ayni etkiyi elde ederiz.) Yazma (POST) olunca onbellek bosalir ve arkada yeniden doldurulur.
+  const SWR = ["/api/ayarlar", "/api/ag"], swrOnbellek = new Map();
+  const fetch0 = window.fetch.bind(window);
+  const tazele = yol => fetch0(yol).then(r => (r.ok ? r.text() : null)).then(t => { if (t !== null) swrOnbellek.set(yol, t); }).catch(() => { });
+  window.fetch = function (girdi, secenek) {
+    const yol = typeof girdi === "string" ? girdi : (girdi && girdi.url) || "";
+    const get = !secenek || !secenek.method || String(secenek.method).toUpperCase() === "GET";
+    if (get && SWR.includes(yol) && swrOnbellek.has(yol)) {
+      const ham = swrOnbellek.get(yol);
+      tazele(yol);                                           // arkada tazele; sonraki gorunum guncel olur
+      return Promise.resolve(new Response(ham, { status: 200, headers: { "Content-Type": "application/json; charset=utf-8" } }));
+    }
+    if (!get) { swrOnbellek.clear(); setTimeout(() => SWR.forEach(tazele), 600); }
+    return fetch0(girdi, secenek).then(r => { if (get && SWR.includes(yol) && r.ok) r.clone().text().then(t => swrOnbellek.set(yol, t)); return r; });
+  };
+  setTimeout(() => SWR.forEach(tazele), 2500);                // acilistan hemen sonra isit
+
+  // ---- Dokunmatik ekranda :hover ilk dokunulan ogede takili kaliyor (iz birakiyor); stil dosyalarindaki :hover kurallari Android'de kaldirilir ----
+  function hoverTemizle(liste) {
+    for (let i = liste.length - 1; i >= 0; i--) {
+      const r = liste[i];
+      try {
+        if (r.cssRules && !r.selectorText) { hoverTemizle(r.cssRules); continue; }       // @media / @supports
+        if (!r.selectorText || r.selectorText.indexOf(":hover") < 0) continue;
+        const kalan = r.selectorText.split(",").filter(x => x.indexOf(":hover") < 0);
+        if (kalan.length) r.selectorText = kalan.join(","); else liste.deleteRule ? liste.deleteRule(i) : r.parentStyleSheet.deleteRule(i);
+      } catch (x) { }
+    }
+  }
+  const hoverHepsi = () => { for (const sh of Array.from(document.styleSheets)) { try { hoverTemizle(sh.cssRules); } catch (x) { } } };
+  hoverHepsi(); addEventListener("load", hoverHepsi);
 
   if (!gercek) return;
 

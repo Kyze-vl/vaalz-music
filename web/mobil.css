@@ -246,3 +246,7 @@ html.android .ay-ust2 h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
 html.android .sy.ay-ic-acik>.bas,html.android .sy.ay-ic-acik>.ay-liste{display:none}
 html.android .ay-sayfa .ay-ic{border-top:0;padding:0 0 14px}
 html.android .sy>.ay-kaydet{display:none}
+
+/* dokunmatikte :hover ilk dokunulan sekmede takili kaliyordu (surukleme sonrasi iz) */
+html.android #rail .nv:not(.on):not(.ay-uz):hover{background:none;color:var(--mut)}
+html.android #rail .nv:not(.on):not(.ay-uz):hover .ic{stroke-width:1.7}

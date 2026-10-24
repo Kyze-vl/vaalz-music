@@ -124,8 +124,31 @@ def _id3_oku(veri):
     return None
 
 
+YEDEK_MAKS_DOSYA = 8 * 1024 * 1024          # sikistirilmis yedek dosyasi
+YEDEK_MAKS_JSON = 64 * 1024 * 1024          # acilmis JSON
+
+
+def _yedek_coz(b64):
+    """base64 -> zlib -> JSON; acilmis boyut sinirli (zlib bombasina karsi)."""
+    d = zlib.decompressobj()
+    ham = d.decompress(base64.b64decode(b64, validate=True), YEDEK_MAKS_JSON + 1)
+    if len(ham) > YEDEK_MAKS_JSON or d.unconsumed_tail:
+        raise ValueError("yedek cok buyuk")
+    return json.loads(ham.decode("utf-8"))
+
+
+def _yedek_gecerli(v):
+    """Beklenen sema: surum 1; tracks/playlists/stats/cfg sozluk (cfg yoksa bos)."""
+    if not isinstance(v, dict) or v.get("surum") != 1:
+        return False
+    for ad in ("tracks", "playlists", "stats"):
+        if not isinstance(v.get(ad), dict):
+            return False
+    return isinstance(v.get("cfg", {}), dict)
+
+
 def yedek_oku():
-    """Paylasilan depolamadaki en yeni yedegi dondurur (yoksa/okunamazsa None)."""
+    """Paylasilan depolamadaki en yeni GECERLI yedegi dondurur (yoksa/okunamazsa None)."""
     adaylar = []
     for k in YEDEK_ARAMA:
         try:
@@ -135,19 +158,20 @@ def yedek_oku():
     sirali = []
     for y in adaylar:
         try:
-            sirali.append((os.path.getmtime(y), y))
+            if os.path.getsize(y) <= YEDEK_MAKS_DOSYA:
+                sirali.append((os.path.getmtime(y), y))
         except OSError:
             pass
     for _, y in sorted(sirali, reverse=True):
         try:
             with open(y, "rb") as f:
-                b64 = _id3_oku(f.read())
+                b64 = _id3_oku(f.read(YEDEK_MAKS_DOSYA))
             if b64:
-                veri = json.loads(zlib.decompress(base64.b64decode(b64)).decode("utf-8"))
-                if veri.get("surum") == 1:
+                veri = _yedek_coz(b64)
+                if _yedek_gecerli(veri):
                     return veri
         except Exception:
-            continue
+            continue          # bozuk yedek: bir oncekini dene
     return None
 
 
@@ -160,9 +184,12 @@ def _geri_yukle(taban):
     if not y:
         return False
     os.makedirs(veri_dir, exist_ok=True)
-    for ad, anahtar in (("tracks.json", "tracks"), ("playlists.json", "playlists"), ("stats.json", "stats"), ("config.json", "cfg")):
-        with open(os.path.join(veri_dir, ad), "w", encoding="utf-8") as f:
+    dosyalar = (("tracks.json", "tracks"), ("playlists.json", "playlists"), ("stats.json", "stats"), ("config.json", "cfg"))
+    for ad, anahtar in dosyalar:                       # once gecici dosyalara yaz, sonra yerine koy (yarim kalan geri yukleme olmasin)
+        with open(os.path.join(veri_dir, ad + ".gecici"), "w", encoding="utf-8") as f:
             json.dump(y.get(anahtar) or {}, f, ensure_ascii=False)
+    for ad, _ in dosyalar:
+        os.replace(os.path.join(veri_dir, ad + ".gecici"), os.path.join(veri_dir, ad))
     return True
 
 
@@ -197,16 +224,46 @@ _degisti = [0.0]
 _yazilan = [0.0]
 
 
-def baslat(taban, web, yerel, arac_taban, onbellek, gecici, vm):
+_basladi = [False]
+
+
+def _sirli_yap(v, sir):
+    """Sunucuya oturum sirri ekler: ayni telefondaki baska uygulamalar API'ye ve dosyalara erisemesin.
+    Cerez `vmt` (WebView) ya da `?vmt=` sorgusu gerekir; /api/ping hari\u00e7 (kimlik kontrolu icin)."""
+    import hmac
+    import urllib.parse
+    asil = v.Istek._yerel_mi
+
+    def _yerel_mi(self):
+        if not asil(self):
+            return False
+        u = urllib.parse.urlparse(self.path)
+        if u.path == "/api/ping":
+            return True
+        for parca in (self.headers.get("Cookie") or "").split(";"):
+            ad, _, deger = parca.strip().partition("=")
+            if ad == "vmt" and hmac.compare_digest(deger.encode(), sir.encode()):
+                return True
+        q = urllib.parse.parse_qs(u.query).get("vmt")
+        return bool(q) and hmac.compare_digest(q[0].encode(), sir.encode())
+    v.Istek._yerel_mi = _yerel_mi
+
+
+def baslat(taban, web, yerel, arac_taban, onbellek, gecici, vm, sir=""):
     os.environ["VAALZ_BASE"] = taban
     os.environ["VAALZ_WEB"] = web
     os.environ["VAALZ_TEST"] = "1"           # pencere acma + bekci kapali
     os.environ["VAALZ_GECICI"] = gecici      # yt-dlp once buraya yazar
     os.environ["VAALZ_VM"] = vm              # kapak/soz onbellegi (paylasilan klasore yazilamaz)
+    if _basladi[0]:                          # ayni surecte ikinci cagri (Activity yeniden olusturuldu): sunucu zaten calisiyor
+        return False
+    _basladi[0] = True
     os.makedirs(gecici, exist_ok=True)
-    for ad in os.listdir(gecici):            # onceki oturumdan kalan yarim dosyalar
+    for ad in os.listdir(gecici):            # eski artiklar: 3 gunden eski dosyalar silinir (yeni olan, yayinlanamamis dosya kurtarilabilsin)
         try:
-            os.remove(os.path.join(gecici, ad))
+            yol = os.path.join(gecici, ad)
+            if time.time() - os.path.getmtime(yol) > 3 * 86400:
+                os.remove(yol)
         except OSError:
             pass
     geri = _geri_yukle(taban)
@@ -217,6 +274,8 @@ def baslat(taban, web, yerel, arac_taban, onbellek, gecici, vm):
     ctx = Python.getPlatform().getApplication()
     depo = jclass("com.vaalz.music.Depo")
 
+    if sir:
+        _sirli_yap(vaalzmusic, sir)
     vaalzmusic.subprocess = _Subprocess(ort)
     vaalzmusic.shutil = _Shutil(ort)
     vaalzmusic.ytdlp_komutu = ort.komut
@@ -228,7 +287,9 @@ def baslat(taban, web, yerel, arac_taban, onbellek, gecici, vm):
 
     def yayinla(yol):
         ad = depo.yayinla(ctx, yol, os.path.basename(yol))
-        return str(ad) if ad else None
+        if not ad:                           # MediaStore'a tasinamadi: basari gibi gosterme (dosya gecici klasorde kalir)
+            raise OSError("Muzik klasorune kaydedilemedi (depolama dolu ya da yazma hatasi)")
+        return str(ad)
     vaalzmusic.YAYIN[0] = yayinla
 
     kaydet0 = vaalzmusic.kaydet

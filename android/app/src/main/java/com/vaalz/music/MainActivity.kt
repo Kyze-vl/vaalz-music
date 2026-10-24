@@ -32,18 +32,28 @@ class MainActivity : Activity() {
         web = WebView(this)
         web.webViewClient = object : WebViewClient() {
             // Istemci yoksa Android adresleri (sayfa yenilemesi dahil) varsayilan tarayiciya atar; her sey uygulamanin icinde kalsin
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
+            // Yalnizca kendi yerel sunucumuz WebView'da acilir (kopru `VaalzAndroid` baska sayfalara tasinmaz); disari giden baglantilar tarayicida acilir
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val u = request.url
+                if (u.scheme == "http" && u.host == "127.0.0.1" && u.port == MedyaServisi.port) return false
+                if (u.scheme == "http" || u.scheme == "https") {
+                    try { startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, u)) } catch (_: Exception) { }
+                }
+                return true
+            }
             override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail): Boolean {
                 android.util.Log.w("Vaalz", "WebView render sureci coktu (cokme=${detail.didCrash()}); yeniden aciliyor")
                 runOnUiThread {
                     try { kok.removeView(view); view.destroy() } catch (_: Exception) { }
                     webKur()
-                    if (MedyaServisi.port > 0) web.loadUrl("http://127.0.0.1:${MedyaServisi.port}/")
+                    if (MedyaServisi.port > 0) sayfayiAc(MedyaServisi.port)
                 }
                 return true
             }
         }
         web.settings.javaScriptEnabled = true
+        web.settings.allowFileAccess = false
+        web.settings.allowContentAccess = false
         web.settings.domStorageEnabled = true
         web.settings.mediaPlaybackRequiresUserGesture = false
         web.setBackgroundColor(Color.parseColor("#0A0A0B"))
@@ -100,7 +110,7 @@ class MainActivity : Activity() {
         if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
 
     private fun izinAkisi() {
-        if (checkSelfPermission(okumaIzni()) == PackageManager.PERMISSION_GRANTED) { sunucuyuBaslat(); return }
+        if (checkSelfPermission(okumaIzni()) == PackageManager.PERMISSION_GRANTED) { bildirimIzniIste(); sunucuyuBaslat(); return }
         AlertDialog.Builder(this)
             .setTitle("Müziklerin ve listelerin kalsın")
             .setMessage("Vaalz Music indirdiğin müzikleri telefonun Music/Vaalz Music klasörüne kaydeder. Uygulamayı silip yeniden yüklesen bile müziklerini ve listelerini bulabilmesi için “Müzik ve ses dosyaları” iznini iste. Başka hiçbir dosyana erişmez.")
@@ -111,6 +121,16 @@ class MainActivity : Activity() {
             }
             .setNegativeButton("Şimdilik değil") { _, _ -> sunucuyuBaslat() }
             .show()
+    }
+
+    /** Ses izni zaten varsa bile (ornegin bildirim izni reddedilmisse) bildirim iznini bir kez daha, bagimsiz olarak iste. */
+    private fun bildirimIzniIste() {
+        if (Build.VERSION.SDK_INT < 33) return
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return
+        val p = getSharedPreferences("vaalz", MODE_PRIVATE)
+        if (p.getBoolean("bildirim_soruldu", false)) return
+        p.edit().putBoolean("bildirim_soruldu", true).apply()
+        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 4)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -142,15 +162,19 @@ class MainActivity : Activity() {
                 }
             }.start()
             if (!Python.isStarted()) Python.start(AndroidPlatform(this))
+            if (MedyaServisi.sir.isEmpty()) {          // oturum sirri: her surec icin bir kez
+                val rb = ByteArray(24); java.security.SecureRandom().nextBytes(rb)
+                MedyaServisi.sir = rb.joinToString("") { "%02x".format(it) }
+            }
             Python.getInstance().getModule("android_main").callAttr(
                 "baslat", filesDir.absolutePath, webDir.absolutePath, applicationInfo.nativeLibraryDir,
                 File(noBackupFilesDir, "youtubedl-android").absolutePath, cacheDir.absolutePath,
-                File(filesDir, "gecici").absolutePath, File(filesDir, "vm").absolutePath
+                File(filesDir, "gecici").absolutePath, File(filesDir, "vm").absolutePath, MedyaServisi.sir
             )
             val port = bekle()
             MedyaServisi.port = port
             runOnUiThread {
-                if (port > 0) web.loadUrl("http://127.0.0.1:$port/")
+                if (port > 0) sayfayiAc(port)
                 else web.loadData("Sunucu acilamadi", "text/plain", "utf-8")
             }
         }.start()
@@ -165,6 +189,14 @@ class MainActivity : Activity() {
             hedef.mkdirs()
             for (ad in liste) kopyala("$asset/$ad", File(hedef, ad))
         }
+    }
+
+    /** Sunucuya erisim cerezini (oturum sirri) WebView'a koyup sayfayi acar. */
+    private fun sayfayiAc(port: Int) {
+        val cm = android.webkit.CookieManager.getInstance()
+        cm.setCookie("http://127.0.0.1:$port", "vmt=${MedyaServisi.sir}; Path=/; HttpOnly; SameSite=Strict")
+        cm.flush()
+        web.loadUrl("http://127.0.0.1:$port/")
     }
 
     private fun bekle(): Int {
