@@ -6,6 +6,19 @@
   if (gercek) document.documentElement.classList.add("android");
   if (!gercek && !document.documentElement.classList.contains("android")) return;
 
+  // ---- Tema secimi yok: sistem koyuysa Onyx + "Kum" vurgusu, aciksa Retro yagmur bulutu + "Gul" vurgusu ----
+  try {
+    const temaUygulaAsil = temaUygula;
+    temaUygula = function () {
+      const koyu = !matchMedia("(prefers-color-scheme: light)").matches;
+      TEMA.mod = koyu ? "onyx" : "retro";
+      TEMA.vurgu = koyu ? "35,38" : "335,60";
+      return temaUygulaAsil.apply(this, arguments);
+    };
+    temaUygula();
+    matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => temaUygula());
+  } catch (e) { }
+
   // ---- Ayarlar sayfasi: ayni ogeleri (kimlikler, olay baglari) koruyup kartlara boler; PC'ye ozel satirlari gizler ----
   function ayarDuzen(sy) {
     sy.dataset.ay = "1";
@@ -27,6 +40,7 @@
     if (liste) { const et = liste.previousElementSibling; gizle(et && et.previousElementSibling, et && et.previousElementSibling && et.previousElementSibling.previousElementSibling); }
     gruplar.forEach((g, i) => {
       if (!g.dugumler.length) return;
+      if (g.dugumler.some(n => n.matches && (n.matches(".temalar") || n.querySelector(".temalar")))) { g.dugumler.forEach(n => n.remove()); return; }   // tema secimi Android'de yok
       const k = document.createElement("details");
       k.className = "ay-k"; if (i < 2) k.open = true;
       const s = document.createElement("summary");

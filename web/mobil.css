@@ -149,10 +149,10 @@ html.android #main{padding-bottom:104px}
 html.android #toast{bottom:94px}
 /* alt hapin sagindaki cal/duraklat dugmesi */
 html.android #rail .ray-cal{flex:none;width:50px;height:50px;align-self:center;margin:0 0 0 2px}
+html.android #rail .ray-cal{background:var(--hv2);color:var(--txt)}
 html.android #rail .ray-cal .ic{width:22px;height:22px}
 html.android #rail{width:min(380px,calc(100% - 32px))}
 /* kaydirma cubuklari gorunmesin (yatay cubuk ekranin en altinda gri serit olusturuyordu) */
 html.android #main{overflow-x:hidden}
 html.android *{scrollbar-width:none}
 html.android ::-webkit-scrollbar{display:none}
-
