@@ -143,6 +143,11 @@ html.android #rail .nv{height:100%;border-radius:25px;color:var(--mut);font-weig
 html.android #rail .nv .ic{width:23px;height:23px;stroke-width:1.7;transition:stroke-width .18s}
 html.android #rail .nv.on{background:var(--hv3);color:var(--txt);font-weight:700}
 html.android #rail .nv.on .ic{stroke-width:2.6}
-html.android #dock{bottom:80px}
-html.android #content{bottom:150px}
-html.android #toast{bottom:160px}
+html.android #dock{display:none}
+html.android #content{bottom:84px}
+html.android #toast{bottom:94px}
+/* alt hapin sagindaki cal/duraklat dugmesi */
+html.android #rail .ray-cal{flex:none;width:50px;height:50px;align-self:center;margin:0 0 0 2px}
+html.android #rail .ray-cal .ic{width:22px;height:22px}
+html.android #rail{width:min(380px,calc(100% - 32px))}
+

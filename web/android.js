@@ -42,6 +42,10 @@
     if (sy && sy.querySelector("#aDil")) ayarDuzen(sy);
   }).observe(document.getElementById("main"), { childList: true });
 
+  // ---- Mini calar cubugu kaldirildi: yalnizca cal/duraklat dugmesi alt hapin en sagina tasinir (kimlik ve olay baglari ayni kalir) ----
+  const cal = document.getElementById("btnCal"), ray = document.getElementById("rail");
+  if (cal && ray) { cal.classList.add("ray-cal"); ray.appendChild(cal); }
+
   if (!gercek) return;
 
   function gonder() {
