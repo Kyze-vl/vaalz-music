@@ -58,7 +58,7 @@
     };
     const satirlar = [
       { bolum: en ? "General" : "Genel", id: "dil", baslik: "Dil / Language", dugumler: dilNode ? [dilNode] : [], deger: () => yaziAl("#aDil", e => e.options[e.selectedIndex].text) },
-      { id: "ag", baslik: en ? "Internet usage" : "İnternet kullanımı", dugumler: agNode ? [agNode] : [], deger: () => yaziAl(".kutu b", e => (en ? "This month " : "Bu ay ") + e.textContent) },
+      { id: "ag", baslik: en ? "Internet usage" : "İnternet kullanımı", dugumler: agNode ? [agNode] : [], deger: () => { const e = agNode && agNode.querySelector("b"); return e ? (en ? "This month " : "Bu ay ") + e.textContent : ""; } },
       { bolum: en ? "App" : "Uygulama", id: "ses", baslik: en ? "Sound and playback" : "Ses ve oynatma", dugumler: sesG ? sesG.dugumler : [],
         deger: () => (yaziAl("#eqOn", e => e.checked) ? (en ? "Equalizer on" : "Ekolayzır açık") : (en ? "Equalizer off" : "Ekolayzır kapalı")) + " · " + (en ? "Crossfade " : "Geçiş ") + yaziAl("#cfSn", e => e.textContent) },
       { id: "dl", baslik: en ? "Downloads" : "İndirme", dugumler: dlG ? dlG.dugumler : [],

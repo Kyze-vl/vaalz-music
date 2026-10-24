@@ -245,4 +245,4 @@ html.android .ay-geri .ic{width:26px;height:26px}
 html.android .ay-ust2 h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
 html.android .sy.ay-ic-acik>.bas,html.android .sy.ay-ic-acik>.ay-liste{display:none}
 html.android .ay-sayfa .ay-ic{border-top:0;padding:0 0 14px}
-html.android .sy:not(.ay-ic-acik)>.ay-kaydet{display:none}
+html.android .sy>.ay-kaydet{display:none}
