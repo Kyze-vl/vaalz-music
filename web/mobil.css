@@ -213,3 +213,5 @@ html.android .ay-tutac i{width:44px;height:5px;border-radius:3px;background:var(
 html.android #oSag #kuyruk{flex:1;min-height:0;border:0;border-radius:0;background:transparent}
 html.android .ay-perde{position:fixed;inset:0;z-index:39;background:#000;opacity:0;pointer-events:none;transition:opacity .3s}
 html.android #odak.ay-sheet .ay-perde{opacity:.5;pointer-events:auto}
+
+html.android #odak{border-bottom:0;box-shadow:none}

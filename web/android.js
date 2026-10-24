@@ -133,6 +133,28 @@
     alt.addEventListener("touchstart", e => { ay0 = e.touches[0].clientY; }, { passive: true });
     alt.addEventListener("touchend", e => { if (ay0 !== null && ay0 - e.changedTouches[0].clientY > 30) { e.preventDefault(); ac("sira"); } ay0 = null; });
     sol.appendChild(alt);
+    // orta alandan tutup asagi kaydirinca calar parmagi izleyerek kapanir
+    let kx = null, ky = null, kd = 0, kt = 0, surukle = false;
+    sol.addEventListener("touchstart", e => {
+      if (odak.classList.contains("ay-sheet") || e.target.closest(".ay-cubuk, button, .kont, .ay-cipler")) { ky = null; return; }
+      kx = e.touches[0].clientX; ky = e.touches[0].clientY; kd = 0; kt = performance.now(); surukle = false;
+    }, { passive: true });
+    sol.addEventListener("touchmove", e => {
+      if (ky === null) return;
+      const dy = e.touches[0].clientY - ky, dx = e.touches[0].clientX - kx;
+      if (!surukle && dy > 12 && dy > Math.abs(dx) * 1.5) { surukle = true; odak.style.transition = "none"; }
+      if (!surukle) return;
+      kd = Math.max(0, dy); odak.style.transform = "translateY(" + kd + "px)";
+    }, { passive: true });
+    const kBitir = () => {
+      if (ky === null) return;
+      const hizli = kd > 40 && kd / Math.max(1, performance.now() - kt) > 0.6;
+      ky = null;
+      if (!surukle) return;
+      surukle = false; odak.style.transition = ""; odak.style.transform = "";
+      if (kd > 140 || hizli) H.odakKapat();
+    };
+    sol.addEventListener("touchend", kBitir); sol.addEventListener("touchcancel", kBitir);
     new MutationObserver(() => { if (!odak.classList.contains("acik")) kapatPencere(); else guncelle(); }).observe(odak, { attributes: true, attributeFilter: ["class", "hidden"] });
   }
 
