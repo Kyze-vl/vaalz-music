@@ -154,6 +154,7 @@ label.f{display:block;margin:22px 0 6px;font-weight:500}
 label.f small{color:var(--dim);font-weight:400}
 .inp{width:100%;height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--s2);color:var(--txt);outline:0}
 .inp:focus{border-color:var(--line2)}
+select.inp option{background-color:var(--pop);color:var(--txt)}   /* acik temalarda acilir liste: sistem varsayilani beyaz zemin + acik yazi olmasin */
 textarea.inp{height:130px;padding:10px 12px;resize:vertical;font:12px/1.7 Consolas,monospace}
 .ip{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
