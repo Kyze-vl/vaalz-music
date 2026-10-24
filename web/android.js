@@ -20,6 +20,7 @@
   } catch (e) { }
 
   // ---- Ayarlar sayfasi: ayni ogeleri (kimlikler, olay baglari) koruyup kartlara boler; PC'ye ozel satirlari gizler ----
+  let ayGeri = null;
   function ayarDuzen(sy) {
     sy.dataset.ay = "1";
     const bas = sy.querySelector(".bas"), simge = ["sliders", "moon", "queue", "dl"];
@@ -38,17 +39,62 @@
     if (klasor) { const ip = klasor.closest(".ip"); gizle(ip.previousElementSibling, ip, ip.nextElementSibling); }
     const liste = sy.querySelector("#aListe");
     if (liste) { const et = liste.previousElementSibling; gizle(et && et.previousElementSibling, et && et.previousElementSibling && et.previousElementSibling.previousElementSibling); }
-    gruplar.forEach((g, i) => {
-      if (!g.dugumler.length) return;
-      if (g.dugumler.some(n => n.matches && (n.matches(".temalar") || n.querySelector(".temalar")))) { g.dugumler.forEach(n => n.remove()); return; }   // tema secimi Android'de yok
-      const k = document.createElement("details");
-      k.className = "ay-k"; if (i < 2) k.open = true;
-      const s = document.createElement("summary");
-      s.innerHTML = (typeof I === "function" ? I(simge[i] || "sliders") : "") + `<b>${g.ad || (document.documentElement.lang === "en" ? "General" : "Genel")}</b>`;
-      const ic = document.createElement("div"); ic.className = "ay-ic";
-      g.dugumler.forEach(n => ic.appendChild(n));
-      k.append(s, ic); sy.appendChild(k);
+    // Satir listesi (Netflix / Disney / Anizium tarzi): bolum etiketi, ikon + baslik + soluk deger + ok; dokununca alt sayfa acilir
+    const en = document.documentElement.lang === "en";
+    const yaziAl = (sel, f) => { const e = sy.querySelector(sel); return e ? f(e) : ""; };
+    const tema = g => g.dugumler.some(n => n.matches && (n.matches(".temalar") || n.querySelector(".temalar")));
+    gruplar.forEach(g => { if (tema(g)) { g.dugumler.forEach(n => n.remove()); g.dugumler = []; } });          // tema secimi Android'de yok
+    const g0 = gruplar[0].dugumler;
+    const dilNode = g0.find(n => n.querySelector && n.querySelector("#aDil"));
+    const agNode = g0.find(n => n.classList && n.classList.contains("kutu") && n.id !== "sisKutu");
+    const sesG = gruplar.find(g => g.dugumler.some(n => n.querySelector && n.querySelector("#eqOn")));
+    const dlG = gruplar.find(g => g.dugumler.some(n => n.querySelector && n.querySelector("#aTasarruf")));
+    const svg = ic => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + ic + "</svg>";
+    const IKON = {
+      dil: svg('<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'),
+      ag: svg('<path d="M3 12h4l3-8 4 16 3-8h4"/>'),
+      ses: typeof I === "function" ? I("queue") : "",
+      dl: typeof I === "function" ? I("dl") : ""
+    };
+    const satirlar = [
+      { bolum: en ? "General" : "Genel", id: "dil", baslik: "Dil / Language", dugumler: dilNode ? [dilNode] : [], deger: () => yaziAl("#aDil", e => e.options[e.selectedIndex].text) },
+      { id: "ag", baslik: en ? "Internet usage" : "İnternet kullanımı", dugumler: agNode ? [agNode] : [], deger: () => yaziAl(".kutu b", e => (en ? "This month " : "Bu ay ") + e.textContent) },
+      { bolum: en ? "App" : "Uygulama", id: "ses", baslik: en ? "Sound and playback" : "Ses ve oynatma", dugumler: sesG ? sesG.dugumler : [],
+        deger: () => (yaziAl("#eqOn", e => e.checked) ? (en ? "Equalizer on" : "Ekolayzır açık") : (en ? "Equalizer off" : "Ekolayzır kapalı")) + " · " + (en ? "Crossfade " : "Geçiş ") + yaziAl("#cfSn", e => e.textContent) },
+      { id: "dl", baslik: en ? "Downloads" : "İndirme", dugumler: dlG ? dlG.dugumler : [],
+        deger: () => yaziAl("#esN", e => e.textContent) + (yaziAl("#aTasarruf", e => e.checked) ? (en ? " · data saver" : " · veri tasarrufu") : "") }
+    ].filter(s => s.dugumler.length);
+    const ayListe = document.createElement("div"); ayListe.className = "ay-liste";
+    const sayfalar = {};
+    const degerleriYenile = () => satirlar.forEach(s => { const e = ayListe.querySelector('[data-ay-id="' + s.id + '"] .ay-deger'); if (e) e.textContent = s.deger(); });
+    let aktif = null;
+    const kapat = () => {
+      if (!aktif) return;
+      const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (kb && aktif !== "dil" && aktif !== "ag") kb.click();   // ayarlar kapanirken kendiliginden kaydedilir
+      sayfalar[aktif].hidden = true; sy.classList.remove("ay-ic-acik"); aktif = null; degerleriYenile();
+      document.getElementById("main").scrollTop = 0;
+    };
+    const ac = id => {
+      aktif = id; sayfalar[id].hidden = false; sy.classList.add("ay-ic-acik");
+      if (kaydet && id !== "dil" && id !== "ag") sayfalar[id].appendChild(kaydet);
+      document.getElementById("main").scrollTop = 0;
+    };
+    ayGeri = () => { if (aktif) { kapat(); return true; } return false; };
+    satirlar.forEach(s => {
+      if (s.bolum) { const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = s.bolum; ayListe.appendChild(et); }
+      const b = document.createElement("button"); b.type = "button"; b.className = "ay-satir"; b.dataset.ayId = s.id;
+      b.innerHTML = IKON[s.id] + '<span class="ay-metin"><b>' + s.baslik + '</b><span class="ay-deger"></span></span>';
+      b.addEventListener("click", () => ac(s.id)); ayListe.appendChild(b);
+      const sp = document.createElement("div"); sp.className = "ay-sayfa"; sp.hidden = true;
+      const ust = document.createElement("div"); ust.className = "ay-ust2";
+      const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
+      const bs = document.createElement("h2"); bs.textContent = s.baslik; ust.append(geri, bs);
+      const ic = document.createElement("div"); ic.className = "ay-ic"; s.dugumler.forEach(n => ic.appendChild(n));
+      sp.append(ust, ic); sy.appendChild(sp); sayfalar[s.id] = sp;
     });
+    sy.insertBefore(ayListe, bas.nextSibling);
+    degerleriYenile();
+    gruplar.forEach(g => g.dugumler.forEach(n => { if (!n.isConnected) return; if (n.classList && n.classList.contains("ay-gizli")) return; if (!n.closest(".ay-ic")) n.classList.add("ay-gizli"); }));
     if (kaydet) { kaydet.classList.add("ay-kaydet"); sy.appendChild(kaydet); }
   }
   new MutationObserver(() => {
@@ -228,6 +274,13 @@
     kk.addEventListener("touchend", kBit); kk.addEventListener("touchcancel", kBit);
     kk.addEventListener("click", e => { if (hareketEtti) { e.stopPropagation(); e.preventDefault(); hareketEtti = false; } }, true);   // kaydirma sonrasi tam ekran acilmasin
   }
+
+  // Android geri tusu: once alttan acilan pencereyi, sonra tam ekran calari, sonra ayarlar alt sayfasini kapatir
+  window.__vaalzGeri = function () {
+    const o = document.getElementById("odak");
+    if (o && o.classList.contains("acik")) { if (o.classList.contains("ay-sheet")) o.classList.remove("ay-sheet"); else H.odakKapat(); return true; }
+    return ayGeri ? ayGeri() : false;
+  };
 
   if (!gercek) return;
 

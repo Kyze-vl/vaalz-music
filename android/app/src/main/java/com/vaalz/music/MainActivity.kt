@@ -184,7 +184,7 @@ class MainActivity : Activity() {
     // arka plana at (kapatirsak muzik de durur).
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        web.evaluateJavascript("(function(){try{var o=document.getElementById('odak');if(o&&o.classList.contains('acik')){H.odakKapat();return 1}}catch(e){}return 0})()") { r ->
+        web.evaluateJavascript("(function(){try{if(window.__vaalzGeri&&__vaalzGeri())return 1;var o=document.getElementById('odak');if(o&&o.classList.contains('acik')){H.odakKapat();return 1}}catch(e){}return 0})()") { r ->
             if (r == "1") return@evaluateJavascript
             if (web.canGoBack()) web.goBack() else moveTaskToBack(true)
         }

@@ -227,3 +227,22 @@ html.android .ay-kd{width:40px;height:40px;border-radius:50%;display:grid;place-
 html.android .ay-kd .ic{width:18px;height:18px}
 html.android #ayKart #btnBegen{width:40px;height:40px}
 html.android #ayKart .d-sol{gap:8px}
+
+/* ---- Ayarlar (Android) v2: duz liste + alt sayfalar ---- */
+html.android .ay-liste{margin-top:4px}
+html.android .ay-etiket{font-size:13px;color:var(--mut);font-weight:600;margin:24px 4px 4px}
+html.android .ay-satir{display:flex;align-items:center;gap:18px;width:100%;min-height:72px;padding:8px 6px;text-align:left;color:var(--txt);position:relative}
+html.android .ay-satir+.ay-satir::before{content:"";position:absolute;left:46px;right:0;top:0;height:1px;background:var(--line2)}
+html.android .ay-satir .ic{width:24px;height:24px;color:var(--mut);flex:none}
+html.android .ay-metin{flex:1;min-width:0}
+html.android .ay-metin b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}
+html.android .ay-deger{display:block;color:var(--mut);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.android .ay-satir::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--mut);border-top:2px solid var(--mut);transform:rotate(45deg);margin-right:6px}
+html.android .ay-sayfa[hidden]{display:none}
+html.android .ay-ust2{display:flex;align-items:center;gap:6px;padding:2px 0 8px;margin-left:-8px}
+html.android .ay-geri{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;color:var(--txt)}
+html.android .ay-geri .ic{width:26px;height:26px}
+html.android .ay-ust2 h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
+html.android .sy.ay-ic-acik>.bas,html.android .sy.ay-ic-acik>.ay-liste{display:none}
+html.android .ay-sayfa .ay-ic{border-top:0;padding:0 0 14px}
+html.android .sy:not(.ay-ic-acik)>.ay-kaydet{display:none}
