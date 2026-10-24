@@ -2,6 +2,7 @@
    Calan parcayi bildirim / kilit ekrani / kulaklik denetimlerine bildirir, onlardan gelen komutlari calara iletir. */
 (function () {
   if (!window.VaalzAndroid) return;
+  document.documentElement.classList.add("android");
 
   function gonder() {
     try {

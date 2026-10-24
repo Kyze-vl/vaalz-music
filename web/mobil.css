@@ -99,3 +99,6 @@
   .kt .pl{opacity:1;transform:none}
   .kq .kx{opacity:1}
 }
+
+/* Android: araclar uygulamayla geldigi icin Sistem durumu karti gereksiz */
+html.android #sisKutu{display:none!important}
