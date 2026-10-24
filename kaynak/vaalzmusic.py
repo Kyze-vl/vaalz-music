@@ -967,9 +967,19 @@ def listeyi_cek(url):
             tracks.setdefault(vid, {"id": vid, "eklendi": int(time.time()), "dosya": None, "title": baslik,
                                     "album": "", "duration": e.get("duration") or 0,
                                     "artist": temiz_sanatci(e.get("channel") or e.get("uploader"))})
-        playlists[pid] = {"id": pid, "title": veri.get("title") or pid, "url": url, "local": False, "tracks": sira}
+        ekler = [v for v in (playlists.get(pid) or {}).get("ekler", []) if v in tracks]   # elle eklenenler guncellemede kaybolmaz
+        playlists[pid] = {"id": pid, "title": veri.get("title") or pid, "url": url, "local": False,
+                          "tracks": sira + [v for v in ekler if v not in sira], "ekler": ekler}
         kaydet()
     gunluk(f"Liste: {playlists[pid]['title']} ({len(sira)} parca)")
+
+
+def listeye_ekle(pl, vid):
+    """Parcayi playliste ekler. YouTube'dan alinan listelerde parca ayrica "ekler"e yazilir (senkron listeyi yeniden kurar)."""
+    if vid not in pl["tracks"]:
+        pl["tracks"].append(vid)
+    if not pl["local"] and vid not in pl.setdefault("ekler", []):
+        pl["ekler"].append(vid)
 
 
 def eksikler(idler):
@@ -1111,6 +1121,34 @@ def benzer_getir(vid, yenile=False):
                 del benzer_onbellek[k]
         yaz("benzer.json", benzer_onbellek)
     return e
+
+
+LISTE_TOHUM = 4        # liste basina en fazla bu kadar parcanin benzerleri alinir (her biri parca basina bir kez internet)
+
+
+def liste_benzerleri(pl, yenile, mevcut):
+    """Playlistteki parcalarin benzerlerini birlestirir: birden cok parcayla eslesen ve kutuphanede olmayan onde."""
+    plays, liked = stats["plays"], set(stats["liked"])
+    adaylar = [v for v in pl["tracks"] if not v.startswith(("f_", "q_"))]
+    # sevilen/cok calinan parcalar once; esitlikte listedeki sira
+    sirali = sorted(range(len(adaylar)), key=lambda i: (-(plays.get(adaylar[i], 0) * 2 + (3 if adaylar[i] in liked else 0)), i))
+    tohum = [adaylar[i] for i in sirali[:LISTE_TOHUM]]
+    sayac, bilgi, hata = {}, {}, None
+    for t in tohum:
+        try:
+            e = benzer_getir(t, yenile)
+        except Exception as ex:
+            hata = str(ex)
+            continue
+        for x in e["liste"]:
+            sayac[x["id"]] = sayac.get(x["id"], 0) + 1
+            bilgi[x["id"]] = x
+    if tohum and not bilgi and hata:
+        raise RuntimeError(hata)
+    with KILIT:
+        liste = [x for k, x in bilgi.items() if k not in mevcut and not dosya_yolu(k)]
+    liste.sort(key=lambda x: (-sayac[x["id"]], random.random()))
+    return {"tohum": len(tohum), "liste": liste[:40]}
 
 
 # ---------------------------------------------------------------------------
@@ -1608,6 +1646,16 @@ class Istek(BaseHTTPRequestHandler):
                 with KILIT:
                     liste = [x for x in e["liste"] if not dosya_yolu(x["id"])]
                 return self._json({"zaman": e["zaman"], "liste": liste})
+            if p == "/api/benzer-liste":
+                with KILIT:
+                    pl = playlists.get((q.get("id") or [""])[0])
+                    if not pl:
+                        return self._json({"hata": "playlist bulunamadi"}, 404)
+                    mevcut = set(pl["tracks"])
+                try:
+                    return self._json(liste_benzerleri(pl, (q.get("yenile") or [""])[0] == "1", mevcut))
+                except Exception as ex:
+                    return self._json({"hata": str(ex)}, 502)
             if p == "/api/sistem":
                 d = dict(sistem_durumu(q.get("yenile") == ["1"]))
                 with KILIT:
@@ -1703,16 +1751,17 @@ class Istek(BaseHTTPRequestHandler):
                 return {"ok": True}
             if p == "/api/liste/ekle":
                 pl = playlists.get(g.get("id"))
-                if pl and pl["local"]:
+                if pl:
                     for v in ([g["parca"]] if g.get("parca") else g.get("parcalar", [])):
-                        if v in tracks and v not in pl["tracks"]:
-                            pl["tracks"].append(v)
+                        if v in tracks:
+                            listeye_ekle(pl, v)
                     kaydet()
                 return {"ok": True}
             if p == "/api/liste/cikar":
                 pl = playlists.get(g.get("id"))
-                if pl and pl["local"]:
+                if pl and (pl["local"] or g.get("parca") in pl.get("ekler", [])):     # YouTube listesinden yalnizca elle eklenenler cikarilir
                     pl["tracks"] = [x for x in pl["tracks"] if x != g.get("parca")]
+                    pl["ekler"] = [x for x in pl.get("ekler", []) if x != g.get("parca")]
                     kaydet()
                 return {"ok": True}
             if p == "/api/liste/sirala":
@@ -1844,8 +1893,8 @@ class Istek(BaseHTTPRequestHandler):
                 tracks.setdefault(vid, {"id": vid, "eklendi": int(time.time()), "dosya": None,
                                         "title": g.get("title") or vid, "artist": g.get("artist") or "",
                                         "album": "", "duration": g.get("duration") or 0})
-                if g.get("liste") in playlists and playlists[g["liste"]]["local"] and vid not in playlists[g["liste"]]["tracks"]:
-                    playlists[g["liste"]]["tracks"].append(vid)
+                if g.get("liste") in playlists:
+                    listeye_ekle(playlists[g["liste"]], vid)
                 kaydet()
             if not dosya_yolu(vid) and vid not in durum["ids"]:
                 indirmeye_ekle([vid])
