@@ -237,16 +237,14 @@
       if (!bas) return;
       if (!surukleHap && Math.abs(e.touches[0].clientX - bx) < 10) return;
       const el = nvAl(e); surukleHap = true; hap.classList.add("ay-surukle");
-      if (el && el !== uz) { uz = el; hap.querySelectorAll(".nv").forEach(n => n.classList.toggle("ay-uz", n === el)); try { navigator.vibrate && navigator.vibrate(6); } catch (x) { } }
+      if (el && el !== uz) { uz = el; hap.querySelectorAll(".nv").forEach(n => n.classList.toggle("ay-uz", n === el)); try { navigator.vibrate && navigator.vibrate(6); } catch (x) { } el.click(); }   // parmak hangi sekmedeyse o ekran hemen acilir
       else if (!uz) hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
       if (uz) uz.classList.add("ay-uz");
     }, { passive: true });
     const hapBitir = e => {
       if (!bas) return;
-      const git = surukleHap && uz && uz !== bas ? uz : null;
       hap.classList.remove("ay-surukle"); hap.querySelectorAll(".nv").forEach(n => n.classList.remove("ay-uz"));
       if (surukleHap && e.cancelable) e.preventDefault();          // surukleme sonrasi sahte tiklama olmasin
-      if (git) git.click();
       bas = uz = null; surukleHap = false;
     };
     hap.addEventListener("touchend", hapBitir); hap.addEventListener("touchcancel", hapBitir);
@@ -301,6 +299,24 @@
     if (o && o.classList.contains("acik")) { if (o.classList.contains("ay-sheet")) o.classList.remove("ay-sheet"); else H.odakKapat(); return true; }
     return ayGeri ? ayGeri() : false;
   };
+
+  // ---- Sekme gecisi anlik olsun: sik okunan GET verileri (ayarlar, internet sayaci) onbellekten hemen verilir, arkada tazelenir ----
+  // (api() degismez bir sabit; istekleri yapan fetch'i sararak ayni etkiyi elde ederiz.) Yazma (POST) olunca onbellek bosalir ve arkada yeniden doldurulur.
+  const SWR = ["/api/ayarlar", "/api/ag"], swrOnbellek = new Map();
+  const fetch0 = window.fetch.bind(window);
+  const tazele = yol => fetch0(yol).then(r => (r.ok ? r.text() : null)).then(t => { if (t !== null) swrOnbellek.set(yol, t); }).catch(() => { });
+  window.fetch = function (girdi, secenek) {
+    const yol = typeof girdi === "string" ? girdi : (girdi && girdi.url) || "";
+    const get = !secenek || !secenek.method || String(secenek.method).toUpperCase() === "GET";
+    if (get && SWR.includes(yol) && swrOnbellek.has(yol)) {
+      const ham = swrOnbellek.get(yol);
+      tazele(yol);                                           // arkada tazele; sonraki gorunum guncel olur
+      return Promise.resolve(new Response(ham, { status: 200, headers: { "Content-Type": "application/json; charset=utf-8" } }));
+    }
+    if (!get) { swrOnbellek.clear(); setTimeout(() => SWR.forEach(tazele), 600); }
+    return fetch0(girdi, secenek).then(r => { if (get && SWR.includes(yol) && r.ok) r.clone().text().then(t => swrOnbellek.set(yol, t)); return r; });
+  };
+  setTimeout(() => SWR.forEach(tazele), 2500);                // acilistan hemen sonra isit
 
   if (!gercek) return;
 
