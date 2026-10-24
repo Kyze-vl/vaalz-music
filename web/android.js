@@ -318,6 +318,21 @@
   };
   setTimeout(() => SWR.forEach(tazele), 2500);                // acilistan hemen sonra isit
 
+  // ---- Dokunmatik ekranda :hover ilk dokunulan ogede takili kaliyor (iz birakiyor); stil dosyalarindaki :hover kurallari Android'de kaldirilir ----
+  function hoverTemizle(liste) {
+    for (let i = liste.length - 1; i >= 0; i--) {
+      const r = liste[i];
+      try {
+        if (r.cssRules && !r.selectorText) { hoverTemizle(r.cssRules); continue; }       // @media / @supports
+        if (!r.selectorText || r.selectorText.indexOf(":hover") < 0) continue;
+        const kalan = r.selectorText.split(",").filter(x => x.indexOf(":hover") < 0);
+        if (kalan.length) r.selectorText = kalan.join(","); else liste.deleteRule ? liste.deleteRule(i) : r.parentStyleSheet.deleteRule(i);
+      } catch (x) { }
+    }
+  }
+  const hoverHepsi = () => { for (const sh of Array.from(document.styleSheets)) { try { hoverTemizle(sh.cssRules); } catch (x) { } } };
+  hoverHepsi(); addEventListener("load", hoverHepsi);
+
   if (!gercek) return;
 
   function gonder() {
