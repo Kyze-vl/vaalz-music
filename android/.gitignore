@@ -1,0 +1,5 @@
+# Imza anahtari ve parolalar asla depoya girmesin
+*.jks
+*.keystore
+keystore.properties
+dist/

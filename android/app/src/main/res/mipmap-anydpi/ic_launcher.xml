@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_arkaplan" />
+    <foreground android:drawable="@drawable/ic_launcher_on_plan" />
+    <monochrome android:drawable="@drawable/ic_launcher_tek_renk" />
+</adaptive-icon>

@@ -1,7 +1,13 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("com.chaquo.python")
 }
+
+// Release imzasi: anahtar ve parolalar depoda DEGIL, ~/.vaalz-keys/ altinda (ya da VAALZ_KEYSTORE_PROPS ile gosterilen dosyada)
+val imzaDosyasi = File(System.getenv("VAALZ_KEYSTORE_PROPS") ?: "${System.getProperty("user.home")}/.vaalz-keys/keystore.properties")
+val imza = Properties().apply { if (imzaDosyasi.isFile) imzaDosyasi.inputStream().use { load(it) } }
 
 // Masaustu surumle ayni kaynaklar: web/ arayuzu ve kaynak/vaalzmusic.py her derlemede kopyalanir.
 val syncWeb = tasks.register<Copy>("syncWeb") {
@@ -26,8 +32,23 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 1
-        versionName = "0.0.1"
+        versionName = "0.1.0"
         ndk { abiFilters += listOf("arm64-v8a") }
+    }
+    lint { checkReleaseBuilds = false; abortOnError = false }     // lint-gradle ek indirme ister; kotali internette cevrimdisi derleme icin kapali
+    signingConfigs {
+        if (imza.isNotEmpty()) create("release") {
+            storeFile = file(imza.getProperty("storeFile"))
+            storePassword = imza.getProperty("storePassword")
+            keyAlias = imza.getProperty("keyAlias")
+            keyPassword = imza.getProperty("keyPassword")
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false          // Chaquopy + youtubedl-android yansima/JNI kullaniyor; kucultme risk
+            signingConfigs.findByName("release")?.let { signingConfig = it }
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
