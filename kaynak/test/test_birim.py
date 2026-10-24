@@ -1,6 +1,6 @@
 # Birim/regresyon testleri (ek paket gerekmez):  python kaynak/test/test_birim.py
 # Gercek veri klasorune dokunmaz: gecici klasorde calisir, internete cikmaz (yt-dlp cagrilari taklit edilir).
-import os, sys, tempfile, unittest
+import os, socket, sys, tempfile, unittest
 from unittest import mock
 
 KOK = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -50,6 +50,23 @@ class Kilit(unittest.TestCase):
     def test_ikinci_ornek_kilit_alamaz(self):
         self.assertTrue(v.kilit_al())
         self.assertFalse(v.kilit_al())
+
+
+class Acilis(unittest.TestCase):
+    def test_kapali_portlar_hizli_elenir(self):
+        # bos portlari yoklamak (12 port) bazi bilgisayarlarda 2 sn x 12 surerdi; paralel + kisa deneme ile saniyeler icinde bitmeli
+        import time
+        bos = socket.socket(); bos.bind(("127.0.0.1", 0)); port = bos.getsockname()[1]; bos.close()
+        t = time.time()
+        self.assertIsNone(v.mevcut_ornek(port))
+        self.assertLess(time.time() - t, 5)
+
+    def test_yabanci_dinleyici_vaalz_sayilmaz(self):
+        s = socket.socket(); s.bind(("127.0.0.1", 0)); s.listen(1)
+        try:
+            self.assertFalse(v.zaten_calisiyor(s.getsockname()[1]))
+        finally:
+            s.close()
 
 
 class Dil(unittest.TestCase):

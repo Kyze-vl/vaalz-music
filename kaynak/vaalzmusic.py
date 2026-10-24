@@ -20,6 +20,7 @@ import random
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import threading
@@ -1997,6 +1998,12 @@ def pencere_ac(url):
 
 def zaten_calisiyor(port):
     try:
+        # Dinleyen bir sunucu baglantiyi aninda kabul eder; kapali port bazi bilgisayarlarda reddedilmek yerine zaman asimina
+        # kadar bekler (12 port x 2 sn = ~25 sn acilis gecikmesi). Once kisa bir baglanti denemesiyle ele.
+        socket.create_connection(("127.0.0.1", port), timeout=0.3).close()
+    except OSError:
+        return False
+    try:
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ping", timeout=2) as r:
             y = json.loads(r.read(200))
             # "app" alani olmayan yanit = kimlik eklenmeden onceki Vaalz surumu; baska bir "app" adi yabanci hizmettir
@@ -2049,10 +2056,16 @@ def kilit_al():
 
 
 def mevcut_ornek(port):
-    for p in range(port, port + 12):             # ilk port doluyken baslayan onceki ornek siradaki portlardan birinde olabilir
-        if zaten_calisiyor(p):
-            return p
-    return None
+    portlar = range(port, port + 12)             # ilk port doluyken baslayan onceki ornek siradaki portlardan birinde olabilir
+    sonuc = {}
+    def dene(p):
+        sonuc[p] = zaten_calisiyor(p)
+    isler_ = [threading.Thread(target=dene, args=(p,)) for p in portlar]
+    for t in isler_:
+        t.start()
+    for t in isler_:
+        t.join()
+    return next((p for p in portlar if sonuc.get(p)), None)
 
 
 def main():
