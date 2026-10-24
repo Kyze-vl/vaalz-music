@@ -53,11 +53,19 @@ class IndirmeServisi : Service() {
             .createNotificationChannel(NotificationChannel(KANAL, "İndirmeler", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
     }
 
+    /** Android 15: dataSync on plan servisinin sure kotasi dolunca sistem cagirir; hemen durdurmazsak uygulama hata alir. */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        android.util.Log.w("Vaalz", "Indirme servisi sure kotasi doldu; durduruluyor")
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
     override fun onStartCommand(i: Intent?, flags: Int, id: Int): Int {
         if (i?.action == "durdur") {
             Thread {
                 try {
                     (URL("http://127.0.0.1:${MedyaServisi.port}/api/indirme-durdur").openConnection() as HttpURLConnection).apply {
+                        setRequestProperty("Cookie", "vmt=${MedyaServisi.sir}")
                         requestMethod = "POST"
                         doOutput = true
                         setRequestProperty("Content-Type", "application/json")

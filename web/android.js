@@ -79,7 +79,17 @@
       if (kaydet && id !== "dil" && id !== "ag") sayfalar[id].appendChild(kaydet);
       document.getElementById("main").scrollTop = 0;
     };
-    ayGeri = () => { if (aktif) { kapat(); return true; } return false; };
+    ayGeri = () => {
+      if (!sy.isConnected) { ayGeri = null; return false; }      // sayfa degisti: eski alt sayfa geri tusunu tuketmesin
+      if (aktif) { kapat(); return true; }
+      return false;
+    };
+    // her degisiklik kendiliginden kaydedilir (alt sayfadan baska sekmeye gecilse de kayip olmasin)
+    let kaydetZ = 0;
+    sy.addEventListener("change", () => {
+      clearTimeout(kaydetZ);
+      kaydetZ = setTimeout(() => { const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (sy.isConnected && kb && aktif && aktif !== "dil" && aktif !== "ag") kb.click(); }, 500);
+    });
     satirlar.forEach(s => {
       if (s.bolum) { const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = s.bolum; ayListe.appendChild(et); }
       const b = document.createElement("button"); b.type = "button"; b.className = "ay-satir"; b.dataset.ayId = s.id;
@@ -87,7 +97,7 @@
       b.addEventListener("click", () => ac(s.id)); ayListe.appendChild(b);
       const sp = document.createElement("div"); sp.className = "ay-sayfa"; sp.hidden = true;
       const ust = document.createElement("div"); ust.className = "ay-ust2";
-      const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
+      const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.setAttribute("aria-label", en ? "Back" : "Geri"); geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
       const bs = document.createElement("h2"); bs.textContent = s.baslik; ust.append(geri, bs);
       const ic = document.createElement("div"); ic.className = "ay-ic"; s.dugumler.forEach(n => ic.appendChild(n));
       sp.append(ust, ic); sy.appendChild(sp); sayfalar[s.id] = sp;
@@ -145,7 +155,17 @@
     const cubuk = document.createElement("div"); cubuk.className = "ay-cubuk";
     cubuk.innerHTML = "<i></i><b></b>"; seek.insertBefore(cubuk, seek.querySelector("canvas"));
     const dolgu = cubuk.querySelector("i"), top = cubuk.querySelector("b");
-    const yaz = o => { dolgu.style.width = top.style.left = (o * 100) + "%"; };
+    // erisilebilirlik: kaydirici rolu, deger bildirimi ve klavye / ekran okuyucu ile ilerletme
+    cubuk.setAttribute("role", "slider"); cubuk.tabIndex = 0;
+    cubuk.setAttribute("aria-label", document.documentElement.lang === "en" ? "Progress" : "İlerleme");
+    cubuk.setAttribute("aria-valuemin", "0"); cubuk.setAttribute("aria-valuemax", "100"); cubuk.setAttribute("aria-valuenow", "0");
+    const yaz = o => { dolgu.style.width = top.style.left = (o * 100) + "%"; cubuk.setAttribute("aria-valuenow", String(Math.round(o * 100))); };
+    cubuk.addEventListener("keydown", e => {
+      const d = isFinite(audio.duration) ? audio.duration : 0;
+      if (!d) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") { audio.currentTime = Math.min(d, audio.currentTime + 5); e.preventDefault(); }
+      else if (e.key === "ArrowLeft" || e.key === "ArrowDown") { audio.currentTime = Math.max(0, audio.currentTime - 5); e.preventDefault(); }
+    });
     const sureVar = () => isFinite(audio.duration) && audio.duration > 0;
     const guncelle = () => yaz(sureVar() ? Math.min(1, audio.currentTime / audio.duration) : 0);
     for (const el of ELEM) el.addEventListener("timeupdate", e => { if (e.target === audio && !surukleniyor) guncelle(); });

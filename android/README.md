@@ -40,6 +40,12 @@ keyPassword=...
 ```
 Dosya yoksa `assembleRelease` imzasız APK üretir. Güncellemelerin eski sürümün üstüne kurulabilmesi için her sürümde **aynı anahtar** kullanılmalıdır.
 
+## Gizlilik ve güvenlik notları
+- **Yerel sunucu:** Uygulama, telefonun içinde yalnızca `127.0.0.1` üzerinde bir HTTP sunucusu çalıştırır. Her açılışta rastgele bir **oturum sırrı** üretilir; sunucu bu sırrı taşımayan isteklere (örneğin telefondaki başka bir uygulamadan gelenlere) yanıt vermez. WebView yalnızca bu sunucuyu açar; dışarı giden bağlantılar tarayıcıda açılır.
+- **Kütüphane yedeği:** Listeler, beğeniler ve dinleme sayıları `Audiobooks/Vaalz Music` klasöründeki küçük bir ses dosyasına (`vaalz-yedek-*.mp3`) şifresiz olarak yazılır; bu klasörü okuyabilen başka uygulamalar içeriği görebilir. Bu dosyayı istemiyorsan silebilirsin (yeniden kurulumda listeler geri gelmez). Uygulama verisi Android'in sistem yedeğine alınmaz (`allowBackup=false`).
+- **Otomatik güncelleme:** Uygulama her açılışta yt-dlp'nin yeni sürümü olup olmadığını GitHub'a sorar; varsa küçük bir indirme yapar (YouTube değiştikçe eski sürüm çalışmaz hâle gelir).
+- Üçüncü taraf bileşenler ve lisansları: [THIRD-PARTY.md](THIRD-PARTY.md).
+
 ## Bilinen sınırlar
 - Yalnızca `arm64-v8a` (çoğu güncel telefon). 16 KB sayfa boyutlu cihazlar denenmedi.
 - Başka bir kurulumdan kalan müzik dosyası uygulamadan silinemez (Android'in dosya sahipliği kuralı).

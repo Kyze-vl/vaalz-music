@@ -69,27 +69,30 @@ object Depo {
     @JvmStatic
     fun yedekYaz(ctx: Context, veri: ByteArray, yeniAd: String): Boolean {
         for (klasor in YEDEK_KLASORLERI) {
-            var uri: Uri? = null
+            // Once YENI dosya bekleyen (IS_PENDING) olarak yazilir; dogrulaninca gorunur olur ve ancak o zaman eski yedekler silinir:
+            // yazma sirasinda sure olurse ya da depolama dolarsa onceki saglam yedek korunur.
+            val eskiler = ArrayList<Uri>()
             ctx.contentResolver.query(
                 koleksiyon(), arrayOf(MediaStore.MediaColumns._ID),
                 "${MediaStore.MediaColumns.DISPLAY_NAME} LIKE ? AND ${MediaStore.MediaColumns.RELATIVE_PATH}=? AND ${MediaStore.MediaColumns.OWNER_PACKAGE_NAME}=?",
                 arrayOf("vaalz-yedek-%", klasor, ctx.packageName), null
-            )?.use { if (it.moveToFirst()) uri = ContentUris.withAppendedId(koleksiyon(), it.getLong(0)) }
+            )?.use { while (it.moveToNext()) eskiler.add(ContentUris.withAppendedId(koleksiyon(), it.getLong(0))) }
+            var yeni: Uri? = null
             try {
-                if (uri != null) {
-                    ctx.contentResolver.openOutputStream(uri!!, "wt")!!.use { it.write(veri) }
-                    return true
-                }
                 val v = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, yeniAd)
                     put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, klasor)
+                    put(MediaStore.MediaColumns.IS_PENDING, 1)
                 }
-                val yeni = ctx.contentResolver.insert(koleksiyon(), v) ?: continue
+                yeni = ctx.contentResolver.insert(koleksiyon(), v) ?: continue
                 ctx.contentResolver.openOutputStream(yeni)!!.use { it.write(veri) }
+                ctx.contentResolver.update(yeni, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
+                for (e in eskiler) { try { ctx.contentResolver.delete(e, null, null) } catch (_: Exception) { } }
                 return true
             } catch (e: Exception) {
                 android.util.Log.w("Vaalz", "Yedek yazilamadi ($klasor)", e)
+                yeni?.let { try { ctx.contentResolver.delete(it, null, null) } catch (_: Exception) { } }   // yarim yeni dosyayi temizle
             }
         }
         return false

@@ -33,6 +33,8 @@ class MedyaServisi : Service() {
         var ornek: MedyaServisi? = null
         var komutGonder: ((String, Long) -> Unit)? = null
         var port = 8765
+        /** Yerel sunucunun oturum sirri (Cookie: vmt=...). Baska uygulamalar sunucuya erisemesin. */
+        @Volatile var sir = ""
         private var son = Durum()
 
         fun guncelle(ctx: Context, d: Durum) {
@@ -96,7 +98,7 @@ class MedyaServisi : Service() {
         if (d.kapak != kapakUrl) {
             kapakUrl = d.kapak; kapakBmp = null
             if (d.kapak.isNotEmpty()) Thread {
-                val bmp = try { BitmapFactory.decodeStream(URL("http://127.0.0.1:$port${d.kapak}").openStream()) } catch (_: Exception) { null }
+                val bmp = try { BitmapFactory.decodeStream((URL("http://127.0.0.1:$port${d.kapak}").openConnection() as java.net.HttpURLConnection).apply { setRequestProperty("Cookie", "vmt=$sir"); connectTimeout = 3000; readTimeout = 8000 }.inputStream) } catch (_: Exception) { null }
                 if (bmp != null && kapakUrl == d.kapak) { kapakBmp = bmp; ornek?.let { it.isle(son) } }
             }.start()
         }
