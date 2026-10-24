@@ -25,6 +25,31 @@ import java.net.Socket
 class MainActivity : Activity() {
     private lateinit var web: WebView
     private var sunucuBasladi = false
+    private lateinit var kok: FrameLayout
+
+    /** WebView'u kurar; render sureci cokerse (Chromium hatasi) uygulama kapanmasin, sayfa yeniden acilsin */
+    private fun webKur() {
+        web = WebView(this)
+        web.webViewClient = object : WebViewClient() {
+            // Istemci yoksa Android adresleri (sayfa yenilemesi dahil) varsayilan tarayiciya atar; her sey uygulamanin icinde kalsin
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
+            override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail): Boolean {
+                android.util.Log.w("Vaalz", "WebView render sureci coktu (cokme=${detail.didCrash()}); yeniden aciliyor")
+                runOnUiThread {
+                    try { kok.removeView(view); view.destroy() } catch (_: Exception) { }
+                    webKur()
+                    if (MedyaServisi.port > 0) web.loadUrl("http://127.0.0.1:${MedyaServisi.port}/")
+                }
+                return true
+            }
+        }
+        web.settings.javaScriptEnabled = true
+        web.settings.domStorageEnabled = true
+        web.settings.mediaPlaybackRequiresUserGesture = false
+        web.setBackgroundColor(Color.parseColor("#0A0A0B"))
+        web.addJavascriptInterface(Kopru(), "VaalzAndroid")
+        kok.addView(web, FrameLayout.LayoutParams(-1, -1))
+    }
 
     /** Web arayuzunden gelen "su an su parca caliyor" bilgisi -> bildirim / kilit ekrani */
     inner class Kopru {
@@ -45,19 +70,9 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        web = WebView(this)
-        // Istemci yoksa Android adresleri (sayfa yenilemesi dahil) varsayilan tarayiciya atar; her sey uygulamanin icinde kalsin
-        web.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
-        }
-        web.settings.javaScriptEnabled = true
-        web.settings.domStorageEnabled = true
-        web.settings.mediaPlaybackRequiresUserGesture = false
-        web.setBackgroundColor(Color.parseColor("#0A0A0B"))
-        web.addJavascriptInterface(Kopru(), "VaalzAndroid")
-        val kok = FrameLayout(this)
+        kok = FrameLayout(this)
         kok.setBackgroundColor(Color.parseColor("#0A0A0B"))
-        kok.addView(web, FrameLayout.LayoutParams(-1, -1))
+        webKur()
         // Kenardan kenara cizimde durum/gezinme cubuklarinin altinda kalmasin
         kok.setOnApplyWindowInsetsListener { v, insets ->
             if (Build.VERSION.SDK_INT >= 30) {

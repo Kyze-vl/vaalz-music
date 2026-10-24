@@ -119,7 +119,7 @@
       const b = document.querySelector('#kuyruk [data-act=kTab][data-k="' + k2 + '"]'); if (b) b.click();
       odak.classList.add("ay-sheet");
     };
-    const kapatPencere = () => odak.classList.remove("ay-sheet");
+    const kapatPencere = () => { if (odak.classList.contains("ay-sheet")) odak.classList.remove("ay-sheet"); };   // gereksiz yazim izleyiciyi sonsuz dongude tetikler
     cip.addEventListener("click", e => { const b = e.target.closest(".ay-cip"); if (b) ac(b.dataset.k); });
     perde.addEventListener("click", kapatPencere);
     odak.addEventListener("click", e => { if (e.target.closest("#kuyruk .kc") || e.target.closest(".ay-tutac")) kapatPencere(); });
@@ -151,7 +151,8 @@
       const hizli = kd > 40 && kd / Math.max(1, performance.now() - kt) > 0.6;
       ky = null;
       if (!surukle) return;
-      surukle = false; odak.style.transition = ""; odak.style.transform = "";
+      surukle = false;
+      odak.style.transition = ""; odak.style.transform = "";      // parmagin biraktigi konumdan sinifa bagli gecis devralir
       if (kd > 140 || hizli) H.odakKapat();
     };
     sol.addEventListener("touchend", kBitir); sol.addEventListener("touchcancel", kBitir);
