@@ -22,3 +22,18 @@ __pycache__/
 
 # Kisisel devir notlari
 DEVIR_NOTU.md
+
+# Android derleme ciktilari
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks
+
+# Kisisel / oturum notlari
+GPT_ISTEM_2.md
+INCELEME.md
+ACIK_ISLER.md
+DEVIR_NOTU_ANDROID.md

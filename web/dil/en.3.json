@@ -1,0 +1,5 @@
+[
+  {"file": "web/app.js", "old": "<b>${esc(d.faz)}</b>", "new": "<b>${esc(FAZ_EN[d.faz] || d.faz)}</b>"},
+  {"file": "web/app.js", "old": "chip.textContent = `${d.faz}${d.toplam", "new": "chip.textContent = `${FAZ_EN[d.faz] || d.faz}${d.toplam"},
+  {"file": "web/app.js", "old": "// =============================================================== yonlendirme", "new": "const FAZ_EN = { \"Indiriliyor\": \"Downloading\", \"Benzerler araniyor\": \"Finding similar tracks\", \"Kapaklar getiriliyor\": \"Fetching covers\" };   // d.faz sunucudan Turkce gelir (=== ile karsilastirilir); yalniz gosterim cevrilir\n// =============================================================== yonlendirme"}
+]

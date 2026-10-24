@@ -1,0 +1,77 @@
+[
+  {
+    "file": "web/app.js",
+    "old": "<h2 class=\"b\">Kütüphanende <small>${parcalar.length} parça · internet kullanılmaz</small></h2>",
+    "new": "<h2 class=\"b\">In your library <small>${parcalar.length} track${parcalar.length === 1 ? \"\" : \"s\"} · no internet needed</small></h2>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<p class=\"not\">Kütüphanende eşleşme yok.</p>",
+    "new": "<p class=\"not\">No matches in your library.</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(`“${p.title}” indiriliyor ve “${ad}” playlistine eklenecek`)",
+    "new": "toast(`Downloading “${p.title}” and adding it to “${ad}”`)"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h3>İndir ve playlist'e ekle</h3>",
+    "new": "<h3>Download and add to playlist</h3>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span>${p.tracks.length} parça</span></div></a>`).join(\"\") || `<p class=\"not\">Henüz kendi playlistin yok; yeni bir tane oluştur.</p>`}",
+    "new": "<span>${p.tracks.length} track${p.tracks.length === 1 ? \"\" : \"s\"}</span></div></a>`).join(\"\") || `<p class=\"not\">You don't have any playlists yet; create a new one.</p>`}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Kapat</button><button class=\"btn on\" data-act=\"araYeniListe\">${I(\"plus\")}Yeni playlist</button></div>",
+    "new": "<div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Close</button><button class=\"btn on\" data-act=\"araYeniListe\">${I(\"plus\")}New playlist</button></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<p class=\"not\" style=\"margin-top:24px\">YouTube'da aranıyor…</p>",
+    "new": "<p class=\"not\" style=\"margin-top:24px\">Searching YouTube…</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h2 class=\"b\">YouTube sonuçları <small>indirmek için</small></h2>",
+    "new": "<h2 class=\"b\">YouTube results <small>to download</small></h2>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "\"<p class='not'>Sonuç yok.</p>\"",
+    "new": "\"<p class='not'>No results.</p>\""
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span class=\"eyebrow\">Tercihler</span><h1 class=\"b\">Ayarlar</h1>",
+    "new": "<span class=\"eyebrow\">Preferences</span><h1 class=\"b\">Settings</h1>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h3>İnternet kullanımı (yaklaşık)</h3><p>Bu ay <b style=\"color:var(--txt)\">${mbYaz(ag.ay)}</b> · bu oturum <b style=\"color:var(--txt)\">${mbYaz(ag.oturum)}</b>. Müzik çalma ve İndirilenler hiçbir zaman internet kullanmaz; sayaç yalnızca indirme, senkron, öneri, arama ve uzak kapakları sayar.</p>",
+    "new": "<h3>Internet usage (approximate)</h3><p>This month <b style=\"color:var(--txt)\">${mbYaz(ag.ay)}</b> · this session <b style=\"color:var(--txt)\">${mbYaz(ag.oturum)}</b>. Playback and Downloads never use the internet; the counter only includes downloads, sync, recommendations, search, and remote cover art.</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h2 class=\"b\" style=\"margin-top:30px\">Görünüm</h2>",
+    "new": "<h2 class=\"b\" style=\"margin-top:30px\">Appearance</h2>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<label class=\"f\">Vurgu rengi <small>çubuk, çalan parça ve kalp için</small></label>",
+    "new": "<label class=\"f\">Accent color <small>for the progress bar, current track, and heart</small></label>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "title=\"Çalan parçanın kapağından\">Kapaktan</button>",
+    "new": "title=\"From the current track's cover\">From cover</button>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "title=\"Özel renk\"></div>",
+    "new": "title=\"Custom color\"></div>"
+  }
+]

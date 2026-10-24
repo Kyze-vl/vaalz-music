@@ -1,0 +1,397 @@
+[
+  {
+    "file": "web/app.js",
+    "old": "return h ? `${h} sa ${d % 60} dk` : `${d} dk`;",
+    "new": "return h ? `${h} hr ${d % 60} min` : `${d} min`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "j.hata || \"Hata \" + r.status",
+    "new": "j.hata || \"Error \" + r.status"
+  },
+  {
+    "file": "web/app.js",
+    "old": "String(a).localeCompare(String(b), \"tr\")",
+    "new": "String(a).localeCompare(String(b), \"en\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"sistem\", \"Sistem\", null]",
+    "new": "[\"sistem\", \"System\", null]"
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"koyu\", \"Kömür\",",
+    "new": "[\"koyu\", \"Charcoal\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"ash\", \"Kül\",",
+    "new": "[\"ash\", \"Ash\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"acik\", \"Açık\",",
+    "new": "[\"acik\", \"Light\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"gece\", \"Gece mavimor\",",
+    "new": "[\"gece\", \"Midnight indigo\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"retro\", \"Retro yağmur bulutu\",",
+    "new": "[\"retro\", \"Retro raincloud\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"lofi\", \"Lofi ortamı\",",
+    "new": "[\"lofi\", \"Lofi vibes\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"elma\", \"Yeşil elma\",",
+    "new": "[\"elma\", \"Green apple\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"mavimor\", \"Mavimor alacakaranlık\",",
+    "new": "[\"mavimor\", \"Indigo twilight\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "[\"alaca\", \"Alacakaranlık\",",
+    "new": "[\"alaca\", \"Twilight\","
+  },
+  {
+    "file": "web/app.js",
+    "old": "const VURGULAR = [[\"Kum\", 35, 38], [\"Mercan\", 10, 70], [\"Adaçayı\", 105, 26], [\"Gök\", 210, 65], [\"Lavanta\", 260, 60], [\"Gül\", 335, 60]];",
+    "new": "const VURGULAR = [[\"Sand\", 35, 38], [\"Coral\", 10, 70], [\"Sage\", 105, 26], [\"Sky\", 210, 65], [\"Lavender\", 260, 60], [\"Rose\", 335, 60]];"
+  },
+  {
+    "file": "web/app.js",
+    "old": "a.title.localeCompare(b.title, \"tr\")",
+    "new": "a.title.localeCompare(b.title, \"en\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "satir(\"__begenilen\", \"Beğendiklerim\", `${L.liked.length} parça`, L.liked)",
+    "new": "satir(\"__begenilen\", \"Liked tracks\", `${L.liked.length} track${L.liked.length === 1 ? \"\" : \"s\"}`, L.liked)"
+  },
+  {
+    "file": "web/app.js",
+    "old": "`${p.tracks.length} parça${p.local ? \"\" : \" · YouTube\"}`",
+    "new": "`${p.tracks.length} track${p.tracks.length === 1 ? \"\" : \"s\"}${p.local ? \"\" : \" · YouTube\"}`"
+  },
+  {
+    "file": "web/app.js",
+    "old": "`İnternet<br>bu ay <b>${mbYaz(ag.ay)}</b> · bu oturum <b>${mbYaz(ag.oturum)}</b>`",
+    "new": "`Internet<br>this month <b>${mbYaz(ag.ay)}</b> · this session <b>${mbYaz(ag.oturum)}</b>`"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${t.var ? \"\" : \" · indirilmedi\"}",
+    "new": "${t.var ? \"\" : \" · not downloaded\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${t.var ? `<button class=\"ib ${b ? \"ac\" : \"\"}\" data-act=\"begen\" data-id=\"${esc(id)}\" title=\"Beğen\">${I(b ? \"heartf\" : \"heart\")}</button>` : `<button class=\"ib ac\" data-act=\"indir\" data-id=\"${esc(id)}\" title=\"İndir\">${I(\"dl\")}</button>`}",
+    "new": "${t.var ? `<button class=\"ib ${b ? \"ac\" : \"\"}\" data-act=\"begen\" data-id=\"${esc(id)}\" title=\"Like\">${I(b ? \"heartf\" : \"heart\")}</button>` : `<button class=\"ib ac\" data-act=\"indir\" data-id=\"${esc(id)}\" title=\"Download\">${I(\"dl\")}</button>`}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "data-liste=\"${esc(lid)}\" title=\"Daha fazla\"",
+    "new": "data-liste=\"${esc(lid)}\" title=\"More\""
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span>Parça</span><span class=\"alb\">Albüm</span><span style=\"text-align:right\">Süre</span>",
+    "new": "<span>Track</span><span class=\"alb\">Album</span><span style=\"text-align:right\">Duration</span>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<p>${ids.length} parça${p.local ? \"\" : \" · YouTube\"}</p>",
+    "new": "<p>${ids.length} track${ids.length === 1 ? \"\" : \"s\"}${p.local ? \"\" : \" · YouTube\"}</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "data-d=\"${o.duration || 0}\" title=\"Önizle (30 sn)\"",
+    "new": "data-d=\"${o.duration || 0}\" title=\"Preview (30 sec)\""
+  },
+  {
+    "file": "web/app.js",
+    "old": "${var_ ? \"İndirildi\" : I(\"dl\") + \"İndir\"}",
+    "new": "${var_ ? \"Downloaded\" : I(\"dl\") + \"Download\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "data-a=\"${esc(o.artist)}\" data-d=\"${o.duration || 0}\" title=\"İndir ve bir playlist'e ekle\"",
+    "new": "data-a=\"${esc(o.artist)}\" data-d=\"${o.duration || 0}\" title=\"Download and add to a playlist\""
+  },
+  {
+    "file": "web/app.js",
+    "old": "const GUN = [\"Pazar\", \"Pazartesi\", \"Salı\", \"Çarşamba\", \"Perşembe\", \"Cuma\", \"Cumartesi\"];",
+    "new": "const GUN = [\"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\"];"
+  },
+  {
+    "file": "web/app.js",
+    "old": "if (!SIS) return `<div class=\"kutu\" id=\"sisKutu\"><h3>Sistem durumu</h3><p class=\"not\">Kontrol ediliyor…</p></div>`;",
+    "new": "if (!SIS) return `<div class=\"kutu\" id=\"sisKutu\"><h3>System status</h3><p class=\"not\">Checking…</p></div>`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${a.var ? esc(a.surum || \"kurulu\") : \"kurulu değil\"}",
+    "new": "${a.var ? esc(a.surum || \"installed\") : \"not installed\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "  return `<div class=\"kutu\" id=\"sisKutu\"><h3>Sistem durumu</h3>",
+    "new": "  return `<div class=\"kutu\" id=\"sisKutu\"><h3>System status</h3>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "Çalmak için hiçbir şey gerekmez. YouTube'dan indirmek için aşağıdaki araçlar gerekir. Bunlar <b style=\"color:var(--txt)\">uygulamaya dahil değildir</b>; ${SIS.os === \"linux\" ? \"Linux'ta <code>kurulum.sh</code> ile bilgisayarına kurulur (yt-dlp ve deno kendi klasörüne, ffmpeg paket yöneticinle)\" : \"Windows'un resmi paket yöneticisi (winget) ile kurulur; winget yoksa resmi sürüm sayfalarından uygulamanın kendi <code>araclar</code> klasörüne indirilir\"}.",
+    "new": "Playback needs no extra tools. Downloading from YouTube requires the tools below. They are <b style=\"color:var(--txt)\">not included with the app</b>; ${SIS.os === \"linux\" ? \"on Linux they're installed using <code>kurulum.sh</code> (yt-dlp and deno in a local folder, ffmpeg via your package manager)\" : \"they are installed using Windows' official package manager (winget); without winget they are downloaded from official releases into the local <code>araclar</code> folder\"}."
+  },
+  {
+    "file": "web/app.js",
+    "old": "${eksik.length ? `<p class=\"not\">“Eksikleri kur” şunları yapar: ${eksik.map(a => `<code>${esc(a.komut)}</code>`).join(\" · \")}. Betik açık kaynaktır: <code>${SIS.os === \"linux\" ? \"kurulum.sh\" : \"kurulum.ps1\"}</code>. Başka hiçbir şey indirilmez.</p>` : \"\"}",
+    "new": "${eksik.length ? `<p class=\"not\">“Install missing tools” runs: ${eksik.map(a => `<code>${esc(a.komut)}</code>`).join(\" · \")}. The script is open source: <code>${SIS.os === \"linux\" ? \"kurulum.sh\" : \"kurulum.ps1\"}</code>. Nothing else is downloaded.</p>` : \"\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "Kuruluyor… ${esc((k.log || []).slice(-1)[0] || \"\")}",
+    "new": "Installing… ${esc((k.log || []).slice(-1)[0] || \"\")}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "Kurulum betiği çalıştırılamadı (bash ya da kurulum.sh yok). Araçları elle kur (README).",
+    "new": "Could not run the installer script (bash or kurulum.sh is missing). Install the tools manually (README)."
+  },
+  {
+    "file": "web/app.js",
+    "old": "winget bulunamadı. Microsoft Store'dan “Uygulama Yükleyici”yi kurup tekrar dene ya da araçları elle kur (README).",
+    "new": "winget not found. Install Microsoft Store's “App Installer” and try again or install the tools manually (README)."
+  },
+  {
+    "file": "web/app.js",
+    "old": "${SIS.os === \"linux\" ? \"Chrome/Chromium/Edge bulunamadı\" : \"Microsoft Edge bulunamadı\"}; arayüz varsayılan tarayıcında açılır.",
+    "new": "${SIS.os === \"linux\" ? \"Chrome/Chromium/Edge not found\" : \"Microsoft Edge not found\"}; the interface opens in your default browser."
+  },
+  {
+    "file": "web/app.js",
+    "old": "${I(\"dl\")}Eksikleri kur</button>",
+    "new": "${I(\"dl\")}Install missing tools</button>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "data-act=\"sisYenile\">${I(\"refresh\")}Yeniden kontrol et",
+    "new": "data-act=\"sisYenile\">${I(\"refresh\")}Check again"
+  },
+  {
+    "file": "web/app.js",
+    "old": ">yt-dlp'yi güncelle</button>",
+    "new": ">Update yt-dlp</button>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span class=\"eyebrow\">Hoş geldin</span>",
+    "new": "<span class=\"eyebrow\">Welcome</span>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "Hafif ve yerel bir müzik çalar. Çalma ve “İndirilenler” hiçbir zaman internet kullanmaz. İstersen YouTube Music playlistlerini içe aktarıp indirebilirsin.",
+    "new": "A lightweight local music player. Playback and “Downloads” never use the internet. You can also import and download YouTube Music playlists."
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"kutu\"><h3>Başlamak için</h3><p><b style=\"color:var(--txt)\">1.</b> Bir playlist linki ekle (YouTube Music, Spotify, Deezer), <b style=\"color:var(--txt)\">2.</b> ya da <b style=\"color:var(--txt)\">keşfetmeye başla</b>: bir şarkı ya da sanatçı ara, beğendiklerini indirip kendi playlistine ekle. Kendi müziklerin varsa <code>Indirilenler</code> klasörüne atman yeter.</p>",
+    "new": "<div class=\"kutu\"><h3>Getting started</h3><p><b style=\"color:var(--txt)\">1.</b> Add a playlist link (YouTube Music, Spotify, Deezer), <b style=\"color:var(--txt)\">2.</b> or <b style=\"color:var(--txt)\">start exploring</b>: search for a track or artist, then download your favorites and add them to your own playlist. To use your own music just drop it into the <code>Indirilenler</code> folder.</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"ip\" style=\"margin-top:12px\"><button class=\"btn on\" data-act=\"linkEkle\">${I(\"plus\")}Playlist linki ekle</button><button class=\"btn on\" data-act=\"kesfet\">${I(\"search\")}Keşfetmeye başla</button><button class=\"btn\" data-act=\"git\" data-to=\"#/kitaplik\">Kütüphane</button></div></div></div>`;",
+    "new": "<div class=\"ip\" style=\"margin-top:12px\"><button class=\"btn on\" data-act=\"linkEkle\">${I(\"plus\")}Add playlist link</button><button class=\"btn on\" data-act=\"kesfet\">${I(\"search\")}Start exploring</button><button class=\"btn\" data-act=\"git\" data-to=\"#/kitaplik\">Library</button></div></div></div>`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "selam = saat < 6 ? \"İyi geceler\" : saat < 12 ? \"Günaydın\" : saat < 18 ? \"İyi günler\" : \"İyi akşamlar\";",
+    "new": "selam = saat < 6 ? \"Good night\" : saat < 12 ? \"Good morning\" : saat < 18 ? \"Good afternoon\" : \"Good evening\";"
+  },
+  {
+    "file": "web/app.js",
+    "old": "d.toLocaleDateString(\"tr\", { day: \"numeric\", month: \"long\" })",
+    "new": "d.toLocaleDateString(\"en\", { day: \"numeric\", month: \"long\" })"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${son.length ? \"Kaldığın yer\" : \"Başlangıç\"}",
+    "new": "${son.length ? \"Continue listening\" : \"Get started\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "esc(dt.artist || \"Bilinmeyen sanatçı\")",
+    "new": "esc(dt.artist || \"Unknown artist\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"bt\"><button class=\"btn on\" data-act=\"satirCal\" data-id=\"${esc(dev)}\" data-liste=\"__indirilenler\">${I(\"play\")}Devam et</button><button class=\"btn\" data-act=\"hepsiKaristir\">${I(\"shuffle\")}Tümünü karıştır</button></div></div></div>",
+    "new": "<div class=\"bt\"><button class=\"btn on\" data-act=\"satirCal\" data-id=\"${esc(dev)}\" data-liste=\"__indirilenler\">${I(\"play\")}Resume</button><button class=\"btn\" data-act=\"hepsiKaristir\">${I(\"shuffle\")}Shuffle all</button></div></div></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h2 class=\"b\">Son dinlediklerim</h2>${son.length ? `<div class=\"satir\">${son.slice(0, 14).map(i => parcaKart(i, \"__hizli\")).join(\"\")}</div>` : `<p class=\"not\">Dinledikçe burada görünecek.</p>`}",
+    "new": "<h2 class=\"b\">Recently played</h2>${son.length ? `<div class=\"satir\">${son.slice(0, 14).map(i => parcaKart(i, \"__hizli\")).join(\"\")}</div>` : `<p class=\"not\">Tracks will appear here as you listen.</p>`}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h2 class=\"b\">Sık dinlediklerim <small>en çok çaldıkların</small></h2>${sik.length ? `<div class=\"sik\">${sik.map((i, n) => `<div class=\"sk1\" data-act=\"satirCal\" data-id=\"${esc(i)}\" data-liste=\"__sik\"><span class=\"nm\">${n + 1}</span>${cv(i)}<div class=\"mt\"><b>${esc(T(i).title)}</b><span>${esc(T(i).artist)}</span></div><span class=\"ad\">${L.plays[i]} dinleme</span></div>`).join(\"\")}</div>` : `<p class=\"not\">Bir parçayı yarıya kadar dinleyince sayılır; dinledikçe sıralama oluşur.</p>`}",
+    "new": "<h2 class=\"b\">On repeat <small>your most played tracks</small></h2>${sik.length ? `<div class=\"sik\">${sik.map((i, n) => `<div class=\"sk1\" data-act=\"satirCal\" data-id=\"${esc(i)}\" data-liste=\"__sik\"><span class=\"nm\">${n + 1}</span>${cv(i)}<div class=\"mt\"><b>${esc(T(i).title)}</b><span>${esc(T(i).artist)}</span></div><span class=\"ad\">${L.plays[i]} play${L.plays[i] === 1 ? \"\" : \"s\"}</span></div>`).join(\"\")}</div>` : `<p class=\"not\">A play counts once you listen halfway through a track; rankings build as you listen.</p>`}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "kutu.innerHTML = `<h2 class=\"b\">Dinlediklerine benzer <small>${o.zaman ? new Date(o.zaman * 1000).toLocaleString(\"tr\", { day: \"numeric\", month: \"short\", hour: \"2-digit\", minute: \"2-digit\" }) : \"\"}</small><span class=\"sag\"><button class=\"link\" data-act=\"oneriYenile\">Yenile</button></span></h2>",
+    "new": "kutu.innerHTML = `<h2 class=\"b\">More like your music <small>${o.zaman ? new Date(o.zaman * 1000).toLocaleString(\"en\", { day: \"numeric\", month: \"short\", hour: \"2-digit\", minute: \"2-digit\" }) : \"\"}</small><span class=\"sag\"><button class=\"link\" data-act=\"oneriYenile\">Refresh</button></span></h2>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${bekle ? `<p class=\"not\">YouTube'dan getiriliyor (birkaç MB)…</p>` : o.liste.length ? `<div class=\"satir\">${o.liste.slice(0, 20).map(oneriKart).join(\"\")}</div><p class=\"not\">Bu bölüm yalnızca Ana Sayfa açıkken ve 24 saatte bir internet kullanır; kapaklar bir kez indirilip saklanır.</p>` : `<p class=\"not\">${L.otomatik_oneri ? \"Henüz öneri yok.\" : \"Otomatik öneri kapalı; “Yenile” ile getirebilirsin.\"}</p>`}`;",
+    "new": "${bekle ? `<p class=\"not\">Loading YouTube's recommendations (a few MB)…</p>` : o.liste.length ? `<div class=\"satir\">${o.liste.slice(0, 20).map(oneriKart).join(\"\")}</div><p class=\"not\">This section only uses the internet while Home is open and once every 24 hours; cover art is downloaded once and saved.</p>` : `<p class=\"not\">${L.otomatik_oneri ? \"No recommendations yet.\" : \"Automatic recommendations are off; use “Refresh” to load them.\"}</p>`}`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "const sekme = a => `<div class=\"sekme\"><a href=\"#/kitaplik\" class=\"${a === \"p\" ? \"on\" : \"\"}\">Playlistler</a><a href=\"#/kitaplik/indirilenler\" class=\"${a === \"i\" ? \"on\" : \"\"}\">İndirilenler</a></div>`;",
+    "new": "const sekme = a => `<div class=\"sekme\"><a href=\"#/kitaplik\" class=\"${a === \"p\" ? \"on\" : \"\"}\">Playlists</a><a href=\"#/kitaplik/indirilenler\" class=\"${a === \"i\" ? \"on\" : \"\"}\">Downloads</a></div>`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span class=\"eyebrow\">Kütüphane</span></div>${sekme(\"i\")}",
+    "new": "<span class=\"eyebrow\">Library</span></div>${sekme(\"i\")}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"sat\" style=\"margin-top:26px\"><div><h1 class=\"b\">İndirilenler</h1><p class=\"not\">${ids.length} parça${sn ? \" · \" + uzunSure(sn) : \"\"} · internet kullanmaz, doğrudan diskten çalar</p></div>",
+    "new": "<div class=\"sat\" style=\"margin-top:26px\"><div><h1 class=\"b\">Downloads</h1><p class=\"not\">${ids.length} track${ids.length === 1 ? \"\" : \"s\"}${sn ? \" · \" + uzunSure(sn) : \"\"} · no internet needed, plays directly from disk</p></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"ip\"><button class=\"btn on\" data-act=\"listeCal\" data-liste=\"__indirilenler\">${I(\"play\")}Çal</button><button class=\"btn\" data-act=\"listeKaristir\" data-liste=\"__indirilenler\">${I(\"shuffle\")}Karıştır</button></div></div>",
+    "new": "<div class=\"ip\"><button class=\"btn on\" data-act=\"listeCal\" data-liste=\"__indirilenler\">${I(\"play\")}Play</button><button class=\"btn\" data-act=\"listeKaristir\" data-liste=\"__indirilenler\">${I(\"shuffle\")}Shuffle</button></div></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"sat\" style=\"margin-top:18px\"><div class=\"ip\">${L.kapaksiz ? `<button class=\"btn k\" data-act=\"kapaklar\" title=\"Kapağı olmayan parçaların kapakları bir kez indirilir\">Eksik kapaklar (${L.kapaksiz}) · ~${(L.kapaksiz * .08).toFixed(1)} MB</button>` : \"\"}<button class=\"btn k\" data-act=\"tara\">${I(\"refresh\")}Klasörü tara</button><button class=\"btn k\" data-act=\"klasorAc\">${I(\"folder\")}Klasörü aç</button></div>",
+    "new": "<div class=\"sat\" style=\"margin-top:18px\"><div class=\"ip\">${L.kapaksiz ? `<button class=\"btn k\" data-act=\"kapaklar\" title=\"Missing cover art is downloaded once\">Missing cover${L.kapaksiz === 1 ? \"\" : \"s\"} (${L.kapaksiz}) · ~${(L.kapaksiz * .08).toFixed(1)} MB</button>` : \"\"}<button class=\"btn k\" data-act=\"tara\">${I(\"refresh\")}Scan folder</button><button class=\"btn k\" data-act=\"klasorAc\">${I(\"folder\")}Open folder</button></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "[[\"yeni\", \"Son eklenen\"], [\"ad\", \"Ada göre\"], [\"sanatci\", \"Sanatçıya göre\"], [\"cok\", \"Çok dinlenen\"]]",
+    "new": "[[\"yeni\", \"Recently added\"], [\"ad\", \"By title\"], [\"sanatci\", \"By artist\"], [\"cok\", \"Most played\"]]"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"bos\"><h2>Henüz indirilen yok</h2><p>Playlist sayfasından indirebilir ya da dosyaları Indirilenler klasörüne atıp “Klasörü tara”ya basabilirsin.</p></div>",
+    "new": "<div class=\"bos\"><h2>No downloads yet</h2><p>Download from a playlist page or add files to the Indirilenler folder and click “Scan folder”.</p></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "const lists = [{ id: \"__begenilen\", title: \"Beğendiklerim\", tracks: L.liked, local: true }, ...L.playlists];",
+    "new": "const lists = [{ id: \"__begenilen\", title: \"Liked tracks\", tracks: L.liked, local: true }, ...L.playlists];"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span class=\"eyebrow\">Kütüphane</span></div>${sekme(\"p\")}",
+    "new": "<span class=\"eyebrow\">Library</span></div>${sekme(\"p\")}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"sat\" style=\"margin-top:22px\"><p class=\"not\" style=\"margin:0\">${L.playlists.length} playlist</p><div class=\"ip\"><button class=\"btn on k\" data-act=\"linkEkle\">${I(\"plus\")}Linkten ekle</button><button class=\"btn k\" data-act=\"kontrol\" title=\"Playlistleri YouTube'dan okur (~0,4 MB/liste)\">${I(\"refresh\")}Hepsini güncelle</button></div></div>",
+    "new": "<div class=\"sat\" style=\"margin-top:22px\"><p class=\"not\" style=\"margin:0\">${L.playlists.length} playlist${L.playlists.length === 1 ? \"\" : \"s\"}</p><div class=\"ip\"><button class=\"btn on k\" data-act=\"linkEkle\">${I(\"plus\")}Add from link</button><button class=\"btn k\" data-act=\"kontrol\" title=\"Reads YouTube's playlists (~0,4 MB/playlist)\">${I(\"refresh\")}Refresh all</button></div></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"pg\" style=\"margin-top:18px\"><div class=\"yeni-k\" data-act=\"linkEkle\"><div>${I(\"dl\")}Linkten ekle (YouTube, Spotify, Deezer)</div></div><div class=\"yeni-k\" data-act=\"yeniListe\"><div>${I(\"plus\")}Yeni playlist</div></div>${lists.map(listeKart).join(\"\")}</div></div>`;",
+    "new": "<div class=\"pg\" style=\"margin-top:18px\"><div class=\"yeni-k\" data-act=\"linkEkle\"><div>${I(\"dl\")}Add from link (YouTube, Spotify, Deezer)</div></div><div class=\"yeni-k\" data-act=\"yeniListe\"><div>${I(\"plus\")}New playlist</div></div>${lists.map(listeKart).join(\"\")}</div></div>`;"
+  },
+  {
+    "file": "web/app.js",
+    "old": "const p = sabit ? { id, title: \"Beğendiklerim\", tracks: L.liked, local: false, sabit: true } : listeBul(id);",
+    "new": "const p = sabit ? { id, title: \"Liked tracks\", tracks: L.liked, local: false, sabit: true } : listeBul(id);"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<h2>Playlist bulunamadı</h2>",
+    "new": "<h2>Playlist not found</h2>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${sabit ? \"Otomatik playlist\" : p.local ? \"Senin playlistin\" : \"YouTube Music playlisti\"}",
+    "new": "${sabit ? \"Automatic playlist\" : p.local ? \"Your playlist\" : \"YouTube Music playlist\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<p>${ids.length} parça${sn ? \" · \" + uzunSure(sn) : \"\"}${eksik.length ? ` · <span style=\"color:var(--ak)\">${eksik.length} tanesi indirilmedi</span>` : \"\"}</p>",
+    "new": "<p>${ids.length} track${ids.length === 1 ? \"\" : \"s\"}${sn ? \" · \" + uzunSure(sn) : \"\"}${eksik.length ? ` · <span style=\"color:var(--ak)\">${eksik.length} not downloaded</span>` : \"\"}</p>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"bt\"><button class=\"btn on\" data-act=\"listeCal\" data-liste=\"${esc(p.id)}\">${I(\"play\")}Çal</button><button class=\"btn\" data-act=\"listeKaristir\" data-liste=\"${esc(p.id)}\">${I(\"shuffle\")}Karıştır</button>",
+    "new": "<div class=\"bt\"><button class=\"btn on\" data-act=\"listeCal\" data-liste=\"${esc(p.id)}\">${I(\"play\")}Play</button><button class=\"btn\" data-act=\"listeKaristir\" data-liste=\"${esc(p.id)}\">${I(\"shuffle\")}Shuffle</button>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${I(\"dl\")}Eksikleri indir · ~${mb.toFixed(0)} MB",
+    "new": "${I(\"dl\")}Download missing tracks · ~${mb.toFixed(0)} MB"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${!p.local && !sabit ? `<button class=\"btn\" data-act=\"kontrol\" data-url=\"${esc(p.url)}\">${I(\"refresh\")}Güncelle</button><button class=\"btn\" data-act=\"listeKaldir\" data-liste=\"${esc(p.id)}\">${I(\"trash\")}Takibi bırak</button>` : \"\"}",
+    "new": "${!p.local && !sabit ? `<button class=\"btn\" data-act=\"kontrol\" data-url=\"${esc(p.url)}\">${I(\"refresh\")}Refresh</button><button class=\"btn\" data-act=\"listeKaldir\" data-liste=\"${esc(p.id)}\">${I(\"trash\")}Unfollow</button>` : \"\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${p.local && !sabit ? `<button class=\"btn\" data-act=\"listeAd\" data-liste=\"${esc(p.id)}\">${I(\"pencil\")}Adı değiştir</button><button class=\"btn\" data-act=\"listeSil\" data-liste=\"${esc(p.id)}\">${I(\"trash\")}Sil</button>` : \"\"}</div></div></div>",
+    "new": "${p.local && !sabit ? `<button class=\"btn\" data-act=\"listeAd\" data-liste=\"${esc(p.id)}\">${I(\"pencil\")}Rename</button><button class=\"btn\" data-act=\"listeSil\" data-liste=\"${esc(p.id)}\">${I(\"trash\")}Delete</button>` : \"\"}</div></div></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"bos\"><h2>Bu playlist boş</h2><p>Parçaların ⋯ menüsünden “Playlist'e ekle” ile doldurabilirsin.</p></div>",
+    "new": "<div class=\"bos\"><h2>This playlist is empty</h2><p>Use a track's ⋯ menu and choose “Add to playlist”.</p></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "q.toLocaleLowerCase(\"tr\")",
+    "new": "q.toLocaleLowerCase(\"en\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "(t.title + \" \" + t.artist + \" \" + t.album).toLocaleLowerCase(\"tr\")",
+    "new": "(t.title + \" \" + t.artist + \" \" + t.album).toLocaleLowerCase(\"en\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "const listeler = L.playlists.filter(p => p.title.toLocaleLowerCase(\"tr\").includes(k));",
+    "new": "const listeler = L.playlists.filter(p => p.title.toLocaleLowerCase(\"en\").includes(k));"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<span class=\"eyebrow\">Arama</span><h1 class=\"b\">${esc(q)}</h1>",
+    "new": "<span class=\"eyebrow\">Search</span><h1 class=\"b\">${esc(q)}</h1>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"ip\" style=\"margin-top:10px\"><button class=\"btn on\" data-act=\"apiAra\" data-q=\"${esc(q)}\">${I(\"search\")}YouTube'da ara</button><span class=\"not\" style=\"margin:0\">hesap ya da anahtar gerekmez · her arama ~0,5 MB internet</span></div>",
+    "new": "<div class=\"ip\" style=\"margin-top:10px\"><button class=\"btn on\" data-act=\"apiAra\" data-q=\"${esc(q)}\">${I(\"search\")}Search YouTube</button><span class=\"not\" style=\"margin:0\">no account or key needed · each search uses ~0,5 MB of data</span></div>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${listeler.length ? `<h2 class=\"b\">Playlistler</h2><div class=\"satir\">${listeler.map(listeKart).join(\"\")}</div>` : \"\"}",
+    "new": "${listeler.length ? `<h2 class=\"b\">Playlists</h2><div class=\"satir\">${listeler.map(listeKart).join(\"\")}</div>` : \"\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "İndirme için gereken araçlar uygulamanın içinde gelir; ayrıca bir şey kurman gerekmez. yt-dlp, uygulama her açıldığında internet varsa kendiliğinden güncellenir.",
+    "new": "The tools needed for downloading are built into the app, so there is nothing else to install. yt-dlp updates itself whenever the app starts and the internet is available."
+  }
+]

@@ -189,7 +189,7 @@ function sisKutu() {
   SIS.araclar.forEach(a => { if (!a.komut) a.komut = "winget install --id " + a.winget; });
   const satir = a => `<div class="sis-s"><span class="d ${a.var ? "ok" : "yok"}"></span><b>${esc(a.ad)}</b><span>${a.var ? esc(a.surum || "kurulu") : "kurulu değil"} · ${esc(a.ne)}</span></div>`;
   return `<div class="kutu" id="sisKutu"><h3>Sistem durumu</h3>
-   <p>Çalmak için hiçbir şey gerekmez. YouTube'dan indirmek için aşağıdaki araçlar gerekir. Bunlar <b style="color:var(--txt)">uygulamaya dahil değildir</b>; ${SIS.os === "linux" ? "Linux'ta <code>kurulum.sh</code> ile bilgisayarına kurulur (yt-dlp ve deno kendi klasörüne, ffmpeg paket yöneticinle)" : "Windows'un resmi paket yöneticisi (winget) ile kurulur; winget yoksa resmi sürüm sayfalarından uygulamanın kendi <code>araclar</code> klasörüne indirilir"}.</p>
+   <p>${SIS.os === "android" ? "İndirme için gereken araçlar uygulamanın içinde gelir; ayrıca bir şey kurman gerekmez. yt-dlp, uygulama her açıldığında internet varsa kendiliğinden güncellenir." : `Çalmak için hiçbir şey gerekmez. YouTube'dan indirmek için aşağıdaki araçlar gerekir. Bunlar <b style="color:var(--txt)">uygulamaya dahil değildir</b>; ${SIS.os === "linux" ? "Linux'ta <code>kurulum.sh</code> ile bilgisayarına kurulur (yt-dlp ve deno kendi klasörüne, ffmpeg paket yöneticinle)" : "Windows'un resmi paket yöneticisi (winget) ile kurulur; winget yoksa resmi sürüm sayfalarından uygulamanın kendi <code>araclar</code> klasörüne indirilir"}.`}</p>
    <div style="margin:12px 0 4px">${SIS.araclar.map(satir).join("")}</div>
    ${eksik.length ? `<p class="not">“Eksikleri kur” şunları yapar: ${eksik.map(a => `<code>${esc(a.komut)}</code>`).join(" · ")}. Betik açık kaynaktır: <code>${SIS.os === "linux" ? "kurulum.sh" : "kurulum.ps1"}</code>. Başka hiçbir şey indirilmez.</p>` : ""}
    ${k.calisiyor ? `<p class="not" style="color:var(--ak)">Kuruluyor… ${esc((k.log || []).slice(-1)[0] || "")}</p>` : ""}
@@ -198,7 +198,7 @@ function sisKutu() {
    ${!SIS.pencere ? `<p class="not" style="color:var(--uyari)">${SIS.os === "linux" ? "Chrome/Chromium/Edge bulunamadı" : "Microsoft Edge bulunamadı"}; arayüz varsayılan tarayıcında açılır.</p>` : ""}
    <div class="ip" style="margin-top:12px">${eksik.length ? `<button class="btn on" data-act="sisKur" ${k.calisiyor || !SIS.kurulabilir ? "disabled" : ""}>${I("dl")}Eksikleri kur</button>` : ""}
     <button class="btn" data-act="sisYenile">${I("refresh")}Yeniden kontrol et</button>
-    ${SIS.araclar[0].var ? `<button class="btn" data-act="sisGuncelle" ${k.calisiyor ? "disabled" : ""}>yt-dlp'yi güncelle</button>` : ""}</div></div>`;
+    ${SIS.araclar[0].var && SIS.os !== "android" ? `<button class="btn" data-act="sisGuncelle" ${k.calisiyor ? "disabled" : ""}>yt-dlp'yi güncelle</button>` : ""}</div></div>`;
 }
 function sisCiz() { const e = $("#sisKutu"); if (e) e.outerHTML = sisKutu(); }
 async function sisIzle() {
@@ -331,6 +331,7 @@ async function sayfaAyarlar() {
   const a = await api("/api/ayarlar"), ag = await api("/api/ag");
   if (decodeURIComponent(location.hash) !== "#/ayarlar") return;
   main.innerHTML = `<div class="sy" style="max-width:720px"><div class="bas"><span class="eyebrow">Tercihler</span><h1 class="b">Ayarlar</h1></div>
+   <div class="ip" style="margin:0 0 18px"><label class="f" style="margin:0">Dil / Language</label><select class="inp" id="aDil" style="width:160px"><option value="tr" ${a.dil !== "en" ? "selected" : ""}>Türkçe</option><option value="en" ${a.dil === "en" ? "selected" : ""}>English</option></select></div>
    <div class="kutu"><h3>İnternet kullanımı (yaklaşık)</h3><p>Bu ay <b style="color:var(--txt)">${mbYaz(ag.ay)}</b> · bu oturum <b style="color:var(--txt)">${mbYaz(ag.oturum)}</b>. Müzik çalma ve İndirilenler hiçbir zaman internet kullanmaz; sayaç yalnızca indirme, senkron, öneri, arama ve uzak kapakları sayar.</p></div>
    ${sisKutu()}
    <h2 class="b" style="margin-top:30px">Görünüm</h2>
@@ -359,6 +360,7 @@ async function sayfaAyarlar() {
    <label class="f">İndirilenler klasörü</label><div class="ip"><input class="inp" disabled value="${esc(a.indirilenler)}" style="flex:1"><button class="btn" data-act="klasorAc">${I("folder")}Klasörü aç</button></div><p class="not">Müzikler bu klasörde (alt klasörler dahil) durur. Buradan elle sildiğin dosya, uygulama yenilendiğinde kütüphaneden düşer; playlistler kalır.</p>
    <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="aOneri" ${a.otomatik_oneri ? "checked" : ""}> Ana Sayfa'da benzer parçaları otomatik getir (24 saatte bir)</label>
    <div class="ip" style="margin-top:26px"><button class="btn on" data-act="ayarKaydet">Kaydet</button><span id="aMsg" class="not" style="margin:0"></span></div></div>`;
+  $("#aDil").onchange = async e => { await api("/api/ayarlar", { dil: e.target.value }); location.reload(); };   // dili sunucu degistirir; sayfa yeni dille yeniden yuklenir
 }
 
 // =============================================================== yonlendirme

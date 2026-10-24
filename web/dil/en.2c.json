@@ -1,0 +1,172 @@
+[
+  {
+    "file": "web/app.js",
+    "old": "sozBul: async t => { t.disabled = true; t.textContent = \"Aranıyor…\"; try { const r = await api(\"/api/soz/bul\", { id: S.queue[S.qi] }); agGuncelle(); if (!r.var) toast(\"Bu parça için söz bulunamadı\"); SOZ.id = null; await sozYukle(S.queue[S.qi]); } catch (e) { toast(e.message); t.disabled = false; t.textContent = \"İnternetten bul\"; } },",
+    "new": "sozBul: async t => { t.disabled = true; t.textContent = \"Searching…\"; try { const r = await api(\"/api/soz/bul\", { id: S.queue[S.qi] }); agGuncelle(); if (!r.var) toast(\"No lyrics found for this track\"); SOZ.id = null; await sozYukle(S.queue[S.qi]); } catch (e) { toast(e.message); t.disabled = false; t.textContent = \"Find online\"; } },"
+  },
+  {
+    "file": "web/app.js",
+    "old": "modalAc(`<h3>Sözler (.lrc ya da düz metin)</h3><textarea class=\"inp\" id=\"sozMetin\" style=\"height:260px\" placeholder=\"[00:12.30] Satır...\">${esc(SOZ.var ? SOZ.sat.map(x => (x.t >= 0 ? `[${String(Math.floor(x.t / 60)).padStart(2, \"0\")}:${(x.t % 60).toFixed(2).padStart(5, \"0\")}] ` : \"\") + x.s).join(\"\\n\") : \"\")}</textarea><div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Vazgeç</button><button class=\"btn on\" data-act=\"sozKaydet\">Kaydet</button></div>`);",
+    "new": "modalAc(`<h3>Lyrics (.lrc or plain text)</h3><textarea class=\"inp\" id=\"sozMetin\" style=\"height:260px\" placeholder=\"[00:12.30] Line...\">${esc(SOZ.var ? SOZ.sat.map(x => (x.t >= 0 ? `[${String(Math.floor(x.t / 60)).padStart(2, \"0\")}:${(x.t % 60).toFixed(2).padStart(5, \"0\")}] ` : \"\") + x.s).join(\"\\n\") : \"\")}</textarea><div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Cancel</button><button class=\"btn on\" data-act=\"sozKaydet\">Save</button></div>`);"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"Sözler kaydedildi\");",
+    "new": "toast(\"Lyrics saved\");"
+  },
+  {
+    "file": "web/app.js",
+    "old": "[[\"15\", \"15 dakika\"], [\"30\", \"30 dakika\"], [\"45\", \"45 dakika\"], [\"60\", \"1 saat\"], [\"0\", \"Kapalı\"]]",
+    "new": "[[\"15\", \"15 minutes\"], [\"30\", \"30 minutes\"], [\"45\", \"45 minutes\"], [\"60\", \"1 hour\"], [\"0\", \"Off\"]]"
+  },
+  {
+    "file": "web/app.js",
+    "old": "girdiModal(\"Yeni playlist\", \"\", async ad => {",
+    "new": "girdiModal(\"New playlist\", \"\", async ad => {"
+  },
+  {
+    "file": "web/app.js",
+    "old": "girdiModal(\"Playlist adı\", listeBul(t.dataset.liste).title, async ad =>",
+    "new": "girdiModal(\"Playlist name\", listeBul(t.dataset.liste).title, async ad =>"
+  },
+  {
+    "file": "web/app.js",
+    "old": "confirm(\"Bu playlist silinsin mi? (Şarkı dosyaları silinmez)\")",
+    "new": "confirm(\"Delete this playlist? (Song files will not be deleted)\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"Playlist'e eklendi\");",
+    "new": "toast(\"Added to playlist\");"
+  },
+  {
+    "file": "web/app.js",
+    "old": "t.textContent = \"Kuyrukta\";",
+    "new": "t.textContent = \"Queued\";"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"İndirme arka planda başladı\"); izle(); } catch (e)",
+    "new": "toast(\"Download started in the background\"); izle(); } catch (e)"
+  },
+  {
+    "file": "web/app.js",
+    "old": "listeIndir: async t => { if (confirm(`${t.dataset.n} parça indirilecek (~${t.dataset.mb} MB internet). Devam edilsin mi?`)) { await api(\"/api/indir-liste\", { id: t.dataset.liste }); toast(\"İndirme arka planda başladı\"); izle(); } },",
+    "new": "listeIndir: async t => { if (confirm(`${t.dataset.n} track${Number(t.dataset.n) === 1 ? \"\" : \"s\"} will be downloaded (~${t.dataset.mb} MB of data). Continue?`)) { await api(\"/api/indir-liste\", { id: t.dataset.liste }); toast(\"Download started in the background\"); izle(); } },"
+  },
+  {
+    "file": "web/app.js",
+    "old": "durdur: async () => { if (!confirm(\"Devam eden indirmeler durdurulsun ve bekleyenler kuyruktan çıkarılsın mı? (Biten parçalar kalır)\")) return; try { const r = await api(\"/api/indirme-durdur\", {}); toast(`Durduruldu · ${r.calisan} çalışan, ${r.bekleyen} bekleyen iptal`); } catch (e) { toast(e.message); } izle(); },",
+    "new": "durdur: async () => { if (!confirm(\"Stop active downloads and remove pending ones from the queue? (Completed tracks will remain)\")) return; try { const r = await api(\"/api/indirme-durdur\", {}); toast(`Stopped · ${r.calisan} active download${r.calisan === 1 ? \"\" : \"s\"}, ${r.bekleyen} pending download${r.bekleyen === 1 ? \"\" : \"s\"} canceled`); } catch (e) { toast(e.message); } izle(); },"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"Bir şarkı ya da sanatçı yaz, sonra “YouTube'da ara”ya bas\");",
+    "new": "toast(\"Enter a song or artist, then click “Search YouTube”\");"
+  },
+  {
+    "file": "web/app.js",
+    "old": "girdiModal(\"Yeni playlist\", \"\", ad => araIndirEkle(null, ad))",
+    "new": "girdiModal(\"New playlist\", \"\", ad => araIndirEkle(null, ad))"
+  },
+  {
+    "file": "web/app.js",
+    "old": "<div class=\"link-modal\"><h3>Playlist linki ekle</h3><p>YouTube Music, <b style=\"color:var(--txt)\">Spotify</b> ya da <b style=\"color:var(--txt)\">Deezer</b> playlist/albüm linkini yapıştır.",
+    "new": "<div class=\"link-modal\"><h3>Add playlist link</h3><p>Paste a YouTube Music, <b style=\"color:var(--txt)\">Spotify</b> or <b style=\"color:var(--txt)\">Deezer</b> playlist/album link."
+  },
+  {
+    "file": "web/app.js",
+    "old": "Spotify ve Deezer listelerinde parça adları okunur, indirirken her parça YouTube'da aranır.</p><input class=\"inp\" id=\"lnkUrl\" placeholder=\"https://music.youtube.com/playlist?list=… · https://open.spotify.com/playlist/…\" spellcheck=\"false\"><label class=\"f\" style=\"display:flex;gap:10px;align-items:center;margin:14px 0 0\"><input type=\"checkbox\" id=\"lnkIndir\" checked> Ekledikten sonra eksik parçaları hemen indir</label><div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Vazgeç</button><button class=\"btn on\" data-act=\"linkGonder\">Ekle</button></div></div>`),",
+    "new": "Track titles are read from Spotify and Deezer lists; each track is searched on YouTube when downloading.</p><input class=\"inp\" id=\"lnkUrl\" placeholder=\"https://music.youtube.com/playlist?list=… · https://open.spotify.com/playlist/…\" spellcheck=\"false\"><label class=\"f\" style=\"display:flex;gap:10px;align-items:center;margin:14px 0 0\"><input type=\"checkbox\" id=\"lnkIndir\" checked> Download missing tracks immediately after adding</label><div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Cancel</button><button class=\"btn on\" data-act=\"linkGonder\">Add</button></div></div>`),"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"Geçerli bir YouTube Music, Spotify ya da Deezer playlist linki değil\")",
+    "new": "toast(\"Not a valid YouTube Music, Spotify, or Deezer playlist link\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "btn.textContent = \"Okunuyor…\";",
+    "new": "btn.textContent = \"Reading…\";"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(`${r.sayi} parça eklendi`);",
+    "new": "toast(`${r.sayi} track${r.sayi === 1 ? \"\" : \"s\"} added`);"
+  },
+  {
+    "file": "web/app.js",
+    "old": "confirm(`${r.sayi} parça indirilecek. Her parça önce YouTube'da aranır (parça başına ~0,5 MB ek internet). Başlansın mı?`)",
+    "new": "confirm(`${r.sayi} track${r.sayi === 1 ? \"\" : \"s\"} will be downloaded. Each track is first searched on YouTube (~0,5 MB additional data per track). Start?`)"
+  },
+  {
+    "file": "web/app.js",
+    "old": "catch (e) { btn.disabled = false; btn.textContent = \"Ekle\"; toast(e.message); }",
+    "new": "catch (e) { btn.disabled = false; btn.textContent = \"Add\"; toast(e.message); }"
+  },
+  {
+    "file": "web/app.js",
+    "old": "S.gitListe = r.id; toast(\"Playlist okunuyor…\"); izle();",
+    "new": "S.gitListe = r.id; toast(\"Reading playlist…\"); izle();"
+  },
+  {
+    "file": "web/app.js",
+    "old": "confirm(\"Bu YouTube playlist'i takipten çıkarılsın mı? (İndirilen şarkı dosyaları silinmez)\")",
+    "new": "confirm(\"Stop following this YouTube playlist? (Downloaded song files will not be deleted)\")"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(`${r.sayi} dosya bulundu`);",
+    "new": "toast(`${r.sayi} file${r.sayi === 1 ? \"\" : \"s\"} found`);"
+  },
+  {
+    "file": "web/app.js",
+    "old": "confirm(`${n} parçanın kapağı indirilecek (~${(n * .08).toFixed(1)} MB). Bir kez indirilip saklanır. Devam?`)",
+    "new": "confirm(`Cover art will be downloaded for ${n} track${n === 1 ? \"\" : \"s\"} (~${(n * .08).toFixed(1)} MB). Downloaded and cached once. Continue?`)"
+  },
+  {
+    "file": "web/app.js",
+    "old": "$(\"#aMsg\").textContent = \"Kaydedildi\";",
+    "new": "$(\"#aMsg\").textContent = \"Saved\";"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(/Failed to fetch|NetworkError|Load failed/i.test(m) ? \"Vaalz Music sunucusuna ulaşılamıyor — uygulamayı yeniden aç\" : m);",
+    "new": "toast(/Failed to fetch|NetworkError|Load failed/i.test(m) ? \"Cannot reach the Vaalz Music server — reopen the app\" : m);"
+  },
+  {
+    "file": "web/app.js",
+    "old": " · bu işte ~${d.mb.toFixed(1)} MB indirildi</span>${d.faz === \"Indiriliyor\" ? `<div style=\"margin-top:10px\"><button class=\"btn\" data-act=\"durdur\">${I(\"x\")}İndirmeyi durdur</button></div>` : \"\"}",
+    "new": " · ~${d.mb.toFixed(1)} MB downloaded in this job</span>${d.faz === \"Indiriliyor\" ? `<div style=\"margin-top:10px\"><button class=\"btn\" data-act=\"durdur\">${I(\"x\")}Stop download</button></div>` : \"\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "${b.sayi ? `<b>${b.sayi} indirilmemiş parça</b> bulundu · tahmini internet <b>~${b.mb} MB</b><br><br><button class=\"btn on\" data-act=\"basla\">İndirmeyi başlat</button>` : \"Her şey güncel, indirilecek parça yok.\"}",
+    "new": "${b.sayi ? `<b>${b.sayi} undownloaded track${b.sayi === 1 ? \"\" : \"s\"}</b> found · estimated data <b>~${b.mb} MB</b><br><br><button class=\"btn on\" data-act=\"basla\">Start download</button>` : \"Everything is up to date, no tracks to download.\"}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(\"Playlist okunamadı — linki kontrol et\");",
+    "new": "toast(\"Could not read playlist — check the link\");"
+  },
+  {
+    "file": "web/app.js",
+    "old": "title=\"Geri\" hidden>${I(\"chevl\")}",
+    "new": "title=\"Back\" hidden>${I(\"chevl\")}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "title=\"İleri\" hidden>${I(\"chevr\")}",
+    "new": "title=\"Forward\" hidden>${I(\"chevr\")}"
+  },
+  {
+    "file": "web/app.js",
+    "old": "throw new Error(\"Önizleme açılamadı\");",
+    "new": "throw new Error(\"Could not start preview\");"
+  },
+  {
+    "file": "web/app.js",
+    "old": "toast(e.message || \"Önizleme açılamadı\");",
+    "new": "toast(e.message || \"Could not start preview\");"
+  }
+]

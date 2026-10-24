@@ -39,6 +39,11 @@ else:
 BASE = os.environ.get("VAALZ_BASE", BASE)          # gelistirme/test icin
 WEB = os.environ.get("VAALZ_WEB", os.path.join(BASE, "web"))
 VERI = os.path.join(BASE, "veri")
+# Android (dar depolama izni): yt-dlp once GECICI klasore yazar, bitince YAYIN[0](yol) dosyayi paylasilan muzik klasorune tasir ve
+# son adini dondurur; kapak/soz onbellegi (.vaalzmusic) paylasilan klasore yazilamadigi icin VM_KOK'te tutulur. Masaustunde ikisi de bos.
+GECICI = os.environ.get("VAALZ_GECICI")
+VM_KOK = os.environ.get("VAALZ_VM")
+YAYIN = [None]
 LOGD = os.path.join(BASE, "logs")
 ONBELLEK = os.path.join(VERI, "onbellek")
 NOWIN = 0x08000000 if os.name == "nt" else 0
@@ -63,6 +68,7 @@ VARSAYILAN = {
     "veri_tasarrufu": False,    # True: kaynaktaki kucuk akis (~130 kbps AAC), donusturme yok -> ~%50-60 daha az internet
     "es_zamanli": 4,            # ayni anda kac parca indirilsin
     "playlists": [],            # takip edilen YouTube Music playlist linkleri (ilk acilista bos)
+    "dil": "tr",                # arayuz dili: "tr" ya da "en" (web/dil/<dil>.json degisim listesi sunulurken uygulanir)
 }
 KILIT = threading.RLock()
 PORT_AKTIF = [8765]
@@ -134,10 +140,10 @@ _gizli = set()
 
 
 def vm_klasoru(alt=""):
-    p = os.path.join(ind_klasoru(), ".vaalzmusic", alt)
+    kok = VM_KOK or os.path.join(ind_klasoru(), ".vaalzmusic")
+    p = os.path.join(kok, alt)
     if not os.path.isdir(p):
         os.makedirs(p, exist_ok=True)
-    kok = os.path.join(ind_klasoru(), ".vaalzmusic")
     if os.name == "nt" and kok not in _gizli:
         _gizli.add(kok)
         try:
@@ -646,6 +652,8 @@ def indirme_formati():
 
 def parca_indir(vid):
     kl = ind_klasoru()
+    cikis = GECICI or kl                                  # yt-dlp'nin yazdigi klasor (Android'de gecici, sonra YAYIN ile tasinir)
+    os.makedirs(cikis, exist_ok=True)
     ham = vm_klasoru("ham")
     fmt = indirme_formati()
     if cfg.get("veri_tasarrufu"):
@@ -659,7 +667,7 @@ def parca_indir(vid):
     args = bicim + ["--write-info-json", "--write-thumbnail", "--convert-thumbnails", "jpg",
                     "--no-playlist", "--no-warnings", "--newline", "--windows-filenames",
                     "--print-to-file", "after_move:filepath", yolf,
-                    "-o", os.path.join(kl, "%(title).120B [%(id)s].%(ext)s"),
+                    "-o", os.path.join(cikis, "%(title).120B [%(id)s].%(ext)s"),
                     "-o", "infojson:" + os.path.join(ham, "%(id)s"),
                     "-o", "thumbnail:" + os.path.join(ham, "%(id)s"),
                     "https://music.youtube.com/watch?v=" + vid]
@@ -707,7 +715,7 @@ def parca_indir(vid):
     try:
         with open(yolf, "r", encoding="utf-8") as f:
             bildirilen = [s.strip() for s in f if s.strip()][-1]
-        if os.path.isfile(bildirilen) and os.path.normcase(os.path.dirname(os.path.abspath(bildirilen))) == os.path.normcase(os.path.abspath(kl)):
+        if os.path.isfile(bildirilen) and os.path.normcase(os.path.dirname(os.path.abspath(bildirilen))) == os.path.normcase(os.path.abspath(cikis)):
             dosya = os.path.basename(bildirilen)
     except (OSError, IndexError):
         pass
@@ -716,10 +724,12 @@ def parca_indir(vid):
     except OSError:
         pass
     if not dosya:       # yol bildirilmediyse: ayni kimlikli dosyalardan en son yazilani al
-        adaylar = [f for f in os.listdir(kl) if f"[{vid}]." in f and f.lower().endswith(SES_UZ)]
-        dosya = max(adaylar, key=lambda f: os.path.getmtime(os.path.join(kl, f)), default=None)
+        adaylar = [f for f in os.listdir(cikis) if f"[{vid}]." in f and f.lower().endswith(SES_UZ)]
+        dosya = max(adaylar, key=lambda f: os.path.getmtime(os.path.join(cikis, f)), default=None)
     if not dosya:
         raise RuntimeError("Dosya olusmadi")
+    if YAYIN[0] and cikis != kl:                          # Android: gecici dosyayi paylasilan muzik klasorune tasi
+        dosya = YAYIN[0](os.path.join(cikis, dosya)) or dosya
     info = {}
     try:
         with open(os.path.join(ham, vid + ".info.json"), "r", encoding="utf-8") as f:
@@ -762,6 +772,13 @@ def kismi_temizle(vid):
             if f"[{vid}]" in ad and not ad.lower().endswith(SES_UZ):        # .part, .ytdl, kapak resmi, gecici bicimler
                 try:
                     os.remove(os.path.join(kok, ad))
+                except OSError:
+                    pass
+    if GECICI and os.path.isdir(GECICI):                  # Android gecici klasoru: biten dosya dahil [id]'li her sey
+        for ad in os.listdir(GECICI):
+            if f"[{vid}]" in ad:
+                try:
+                    os.remove(os.path.join(GECICI, ad))
                 except OSError:
                     pass
     ham = vm_klasoru("ham")
@@ -1319,7 +1336,90 @@ def ag_json():
 def ayarlar_json():
     return {"cookies_browser": cfg["cookies_browser"], "format": cfg["format"],
             "playlists": cfg["playlists"], "indirilenler": cfg["indirilenler"], "otomatik_oneri": cfg["otomatik_oneri"],
-            "veri_tasarrufu": cfg["veri_tasarrufu"], "es_zamanli": cfg["es_zamanli"]}
+            "veri_tasarrufu": cfg["veri_tasarrufu"], "es_zamanli": cfg["es_zamanli"], "dil": cfg.get("dil", "tr")}
+
+
+# ---------------------------------------------------------------------------
+# Arayuz dili: kaynak (web/index.html, web/app.js) Turkce yazilidir. "en" secilince web/dil/en.json icindeki
+# {file, old, new} degisimleri sunulurken uygulanir. Eslesmeyen satir atlanir (o metin Turkce kalir) ve gunluge yazilir.
+# ---------------------------------------------------------------------------
+
+_DIL_ONBELLEK = {}
+_DIL_UYARILAN = set()
+DILLER = ("tr", "en")
+
+
+def dil_degisimleri(dil):
+    """web/dil/<dil>.json ve parca parca eklenen <dil>.<ad>.json dosyalarini sirayla birlestirir."""
+    klasor = os.path.join(WEB, "dil")
+    try:
+        dosyalar = sorted(f for f in os.listdir(klasor) if f == dil + ".json" or (f.startswith(dil + ".") and f.endswith(".json")))
+    except OSError:
+        return []
+    imza = tuple((f, os.path.getmtime(os.path.join(klasor, f))) for f in dosyalar)
+    onb = _DIL_ONBELLEK.get(dil)
+    if onb and onb[0] == imza:
+        return onb[1]
+    liste = []
+    for f in dosyalar:
+        try:
+            with open(os.path.join(klasor, f), "r", encoding="utf-8") as fh:
+                liste += [e for e in json.load(fh) if isinstance(e, dict)]
+        except Exception as e:
+            gunluk(f"dil dosyasi okunamadi ({f}): {e}")
+    _DIL_ONBELLEK[dil] = (imza, liste)
+    return liste
+
+
+def dil_cevir(ad, metin, dil, eslesmeyen=None):
+    """ad: 'app.js' / 'index.html'. Eslesmeyen degisimleri eslesmeyen listesine ekler."""
+    for e in dil_degisimleri(dil):
+        dosya = str(e.get("file", "")).replace("\\", "/")
+        if dosya != ad and not dosya.endswith("/" + ad):
+            continue
+        eski, yeni = e.get("old"), e.get("new")
+        if not eski or not isinstance(yeni, str):
+            continue
+        if eski in metin:
+            metin = metin.replace(eski, yeni)
+        else:
+            if eslesmeyen is not None:
+                eslesmeyen.append(eski)
+            elif (dil, eski) not in _DIL_UYARILAN:
+                _DIL_UYARILAN.add((dil, eski))
+                gunluk(f"dil: eslesmedi ({ad}): {eski[:80]}")
+    return metin
+
+
+# Sunucunun arayuze gonderdigi metinler (hata ozetleri, arac aciklamalari, kurulum gunlugu): cevirileri web/dil/<dil>.msg.json icinde,
+# {"file": "kaynak/vaalzmusic.py", "old": <Turkce metin>, "new": <ceviri>}. Kisa girdiler yalnizca metnin TAMAMI esitse uygulanir
+# ("alt": true olanlar ve hata/mesaj/log anahtarlarinda her girdi alt dize olarak da uygulanir); parca adlarini bozmamak icin.
+_METIN_ANAHTAR = {"hata", "mesaj", "log", "ne", "komut"}
+_CEVRILEN_ANAHTAR = _METIN_ANAHTAR | {"parca", "baslik"}
+
+
+def mesaj_cevir(s, alt_izin, dil):
+    for e in dil_degisimleri(dil):
+        if not str(e.get("file", "")).replace("\\", "/").endswith("vaalzmusic.py"):
+            continue
+        eski, yeni = e.get("old"), e.get("new")
+        if not eski or not isinstance(yeni, str):
+            continue
+        if s == eski:
+            return yeni
+        if (alt_izin or e.get("alt")) and eski in s:
+            s = s.replace(eski, yeni)
+    return s
+
+
+def mesajlari_cevir(o, anahtar=None, dil="en"):
+    if isinstance(o, str):
+        return mesaj_cevir(o, anahtar in _METIN_ANAHTAR, dil) if anahtar in _CEVRILEN_ANAHTAR else o
+    if isinstance(o, list):
+        return [mesajlari_cevir(x, anahtar, dil) for x in o]
+    if isinstance(o, dict):
+        return {k: mesajlari_cevir(v, k, dil) for k, v in o.items()}
+    return o
 
 
 # ---------------------------------------------------------------------------
@@ -1339,6 +1439,9 @@ class Istek(BaseHTTPRequestHandler):
         return self.headers.get("Host", "").split(":")[0] in ("127.0.0.1", "localhost")
 
     def _json(self, veri, kod=200):
+        dil = cfg.get("dil", "tr")
+        if dil != "tr" and not self.path.startswith(("/api/kutuphane", "/api/oneriler", "/api/ara", "/api/benzer")):
+            veri = mesajlari_cevir(veri, None, dil)
         b = json.dumps(veri, ensure_ascii=False).encode("utf-8")
         self.send_response(kod)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -1348,6 +1451,17 @@ class Istek(BaseHTTPRequestHandler):
         self.wfile.write(b)
 
     def _dosya(self, yol, tip, onbellek=False):
+        ad, dil = os.path.basename(yol), cfg.get("dil", "tr")
+        if dil != "tr" and ad in ("index.html", "app.js"):
+            with open(yol, "r", encoding="utf-8") as f:
+                b = dil_cevir(ad, f.read(), dil).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", tip)
+            self.send_header("Content-Length", str(len(b)))
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(b)
+            return
         boyut = os.path.getsize(yol)
         bas, son, kod = 0, boyut - 1, 200
         m = re.match(r"bytes=(\d*)-(\d*)", self.headers.get("Range") or "")
@@ -1601,6 +1715,8 @@ class Istek(BaseHTTPRequestHandler):
                     cfg["veri_tasarrufu"] = bool(g["veri_tasarrufu"])
                 if "es_zamanli" in g:
                     cfg["es_zamanli"] = max(1, min(8, int(g["es_zamanli"] or 4)))
+                if g.get("dil") in DILLER:
+                    cfg["dil"] = g["dil"]
                 if "cookies_browser" in g:
                     CEREZ_YOK[0] = False
                 if "playlists" in g:
