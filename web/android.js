@@ -60,6 +60,26 @@
   const cal = document.getElementById("btnCal"), ray = document.getElementById("rail");
   if (cal && ray) { cal.classList.add("ray-cal"); ray.appendChild(cal); }
 
+  // ---- "Simdi caliyor" karti: mini calar bilgisi (kapak, ad, begen) hapin ustunde yuzer; dokununca / yukari kaydirinca tam ekran calar acilir ----
+  const sol = document.querySelector("#dock .d-sol");
+  if (sol) {
+    const kart = document.createElement("div");
+    kart.id = "ayKart"; kart.dataset.act = "odakAc";
+    kart.appendChild(sol); document.body.appendChild(kart);
+    const gorun = () => {
+      let var_ = false; try { var_ = S.qi >= 0 && !!S.queue[S.qi]; } catch (e) { }
+      kart.classList.toggle("var", var_); document.documentElement.classList.toggle("ay-kartli", var_);
+    };
+    new MutationObserver(gorun).observe(document.getElementById("dBaslik"), { childList: true, characterData: true, subtree: true });
+    gorun(); setInterval(gorun, 1500);
+    let y0 = null;
+    kart.addEventListener("touchstart", e => { y0 = e.touches[0].clientY; }, { passive: true });
+    kart.addEventListener("touchend", e => {
+      if (y0 !== null && y0 - e.changedTouches[0].clientY > 30 && !e.target.closest("#btnBegen")) { e.preventDefault(); H.odakGoster(); }
+      y0 = null;
+    });
+  }
+
   if (!gercek) return;
 
   function gonder() {

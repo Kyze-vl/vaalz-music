@@ -156,3 +156,15 @@ html.android #rail{width:min(380px,calc(100% - 32px))}
 html.android #main{overflow-x:hidden}
 html.android *{scrollbar-width:none}
 html.android ::-webkit-scrollbar{display:none}
+
+/* "simdi caliyor" karti: hapin ustunde yuzen cam seritle */
+html.android #ayKart{display:none;position:fixed;z-index:11;left:50%;transform:translateX(-50%);bottom:78px;width:min(380px,calc(100% - 32px));height:60px;padding:6px 8px 6px 6px;border:1px solid var(--line2);border-radius:22px;background:color-mix(in srgb,var(--pop) 62%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);box-shadow:0 6px 22px #0000005c,inset 0 0 0 1px #ffffff08;cursor:pointer}
+html.android #ayKart.var{display:block}
+html.android #ayKart .d-sol{height:100%;gap:10px}
+html.android #ayKart #dKapak{width:46px;height:46px;border-radius:14px;flex:none}
+html.android #ayKart .mt b{font-size:14px}
+html.android #ayKart .mt span{font-size:12px}
+html.android.ay-kartli #main{padding-bottom:170px}
+html.android.ay-kartli #toast{bottom:150px}
+html.android body.odakAcik #ayKart{display:none!important}
+
