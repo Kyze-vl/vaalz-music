@@ -22,7 +22,7 @@
   {"file":"web/app.js","old":"<div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Kapat</button><button class=\"btn on\" data-act=\"yeniListe\" data-parca=\"${esc(parca)}\">${I(\"plus\")}Yeni playlist</button></div>`);","new":"<div class=\"ip\"><button class=\"btn\" data-act=\"modalKapat\">Close</button><button class=\"btn on\" data-act=\"yeniListe\" data-parca=\"${esc(parca)}\">${I(\"plus\")}New playlist</button></div>`);"},
   {"file":"web/app.js","old":"if (t.var) it.push([\"cal\", \"Çal\"], [\"sira\", \"Sıradaki olarak çal\"], [\"ekle\", \"Kuyruğa ekle\"]); else it.push([\"indir\", \"İndir\"]);","new":"if (t.var) it.push([\"cal\", \"Play\"], [\"sira\", \"Play next\"], [\"ekle\", \"Add to queue\"]); else it.push([\"indir\", \"Download\"]);"},
   {"file":"web/app.js","old":"it.push([\"liste\", \"Playlist'e ekle…\"]);","new":"it.push([\"liste\", \"Add to playlist…\"]);"},
-  {"file":"web/app.js","old":"if (pl && pl.local) it.push([\"cikar\", \"Bu playlist'ten çıkar\"]);","new":"if (pl && pl.local) it.push([\"cikar\", \"Remove from this playlist\"]);"},
+  {"file":"web/app.js","old":"if (pl && (pl.local || (pl.ekler || []).includes(id))) it.push([\"cikar\", \"Bu playlist'ten çıkar\"]);","new":"if (pl && (pl.local || (pl.ekler || []).includes(id))) it.push([\"cikar\", \"Remove from this playlist\"]);"},
   {"file":"web/app.js","old":"if (t.var) it.push([\"goster\", \"Klasörde göster\"]);","new":"if (t.var) it.push([\"goster\", \"Show in folder\"]);"},
   {"file":"web/app.js","old":"if (t.var) it.push([\"sil\", \"Dosyayı diskten sil\", \"tehlike\"]);","new":"if (t.var) it.push([\"sil\", \"Delete file from disk\", \"tehlike\"]);"},
   {"file":"web/app.js","old":"toast(\"Kuyruğa eklendi\")","new":"toast(\"Added to queue\")"},
