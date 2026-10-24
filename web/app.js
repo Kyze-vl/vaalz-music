@@ -137,12 +137,14 @@ function vurgu(id) {
 }
 
 // =============================================================== yan liste
+let railSon = "";
 function railCiz() {
   const aktif = (location.hash.match(/^#\/liste\/(.+)$/) || [])[1];
   const sirali = [...L.playlists].sort((a, b) => (L.lists[b.id] || 0) - (L.lists[a.id] || 0) || a.title.localeCompare(b.title, "tr"));
   const satir = (id, ad, alt, ids) => `<a class="rl ${aktif === id ? "on" : ""}" href="#/liste/${esc(id)}">${cv(ids.find(i => T(i) && T(i).kapak) || id)}<div class="mt"><b>${esc(ad)}</b><span>${esc(alt)}</span></div></a>`;
-  $("#railListe").innerHTML = satir("__begenilen", "Beğendiklerim", `${L.liked.length} parça`, L.liked) +
+  const html = satir("__begenilen", "Beğendiklerim", `${L.liked.length} parça`, L.liked) +
     sirali.map(p => satir(p.id, p.title, `${p.tracks.length} parça${p.local ? "" : " · YouTube"}`, p.tracks)).join("");
+  if (html !== railSon) { railSon = html; $("#railListe").innerHTML = html; }
 }
 function navIsaretle(ad) { document.querySelectorAll("[data-nav]").forEach(a => a.classList.toggle("on", a.dataset.nav === ad)); }
 async function agGuncelle(ag) {
@@ -328,7 +330,8 @@ async function apiAra(q) {
 
 async function sayfaAyarlar() {
   navIsaretle("ayarlar");
-  const a = await api("/api/ayarlar"), ag = await api("/api/ag");
+  const [a, ag] = await Promise.all([api("/api/ayarlar"), api("/api/ag")]);
+  agGuncelle(ag);
   if (decodeURIComponent(location.hash) !== "#/ayarlar") return;
   main.innerHTML = `<div class="sy" style="max-width:720px"><div class="bas"><span class="eyebrow">Tercihler</span><h1 class="b">Ayarlar</h1></div>
    <div class="ip" style="margin:0 0 18px"><label class="f" style="margin:0">Dil / Language</label><select class="inp" id="aDil" style="width:160px"><option value="tr" ${a.dil !== "en" ? "selected" : ""}>Türkçe</option><option value="en" ${a.dil === "en" ? "selected" : ""}>English</option></select></div>
