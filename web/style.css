@@ -292,15 +292,15 @@ body{background:radial-gradient(1100px 620px at 80% -12%,color-mix(in srgb,var(-
 .link-modal p{color:var(--mut);margin:-6px 0 12px}
 @media(max-width:1000px){.o-ana{grid-template-columns:minmax(0,1fr)}#oSag{display:none}}
 
-/* ---------- gradyan temalar (Discord'daki gradyan temalarindan ilham) ---------- */
+/* ---------- gradyan temalar (renkler bu projeye ozgu) ---------- */
 [data-grad]{--s1:rgba(0,0,0,.26);--s2:rgba(255,255,255,.07);--s3:rgba(255,255,255,.12);--dock:rgba(0,0,0,.38);
   --line:#ffffff14;--line2:#ffffff26;--txt:#f1f0f5;--mut:#aeb0c0;--dim:#7d8097;--cvl:20%}
-[data-tema="gece"]{--g:linear-gradient(48.17deg,#5348ca 11.21%,#140730 61.92%);--ov:0.1;--bg:#140730;--pop:#1e1146;--pop2:#291a58}
-[data-tema="retro"]{--g:linear-gradient(148.71deg,#3a7ca1 5.64%,#58579a 26.38%,#58579a 49.92%,#3a7ca1 73.12%);--ov:0.52;--bg:#1b2740;--pop:#242f4c;--pop2:#2f3a5a}
-[data-tema="lofi"]{--g:linear-gradient(179.52deg,#a4c0f7 7.08%,#a9e4e8 34.94%,#b0e2b8 65.12%,#cfdfa2 96.23%);--ov:0.76;--bg:#1c2a2c;--pop:#243436;--pop2:#2e4043}
-[data-tema="elma"]{--g:linear-gradient(180deg,#56b69f 6.15%,#63bc61 48.7%,#9eca67 93.07%);--ov:0.74;--bg:#1b2a1f;--pop:#233428;--pop2:#2d4033}
-[data-tema="mavimor"]{--g:linear-gradient(47.61deg,#2c3fe7 11.18%,#261d83 64.54%);--ov:0.22;--bg:#15124a;--pop:#1e1a5c;--pop2:#292470}
-[data-tema="alaca"]{--g:linear-gradient(160deg,#69426a 0%,#111731 100%);--ov:0.1;--bg:#111731;--pop:#1b2140;--pop2:#262c50}
+[data-tema="gece"]{--g:linear-gradient(52deg,#4a2fa8 8%,#12062b 70%);--ov:0.1;--bg:#12062b;--pop:#1e1146;--pop2:#291a58}
+[data-tema="retro"]{--g:linear-gradient(140deg,#2f6f8f 0%,#4b4f8c 45%,#2f6f8f 100%);--ov:0.52;--bg:#1b2740;--pop:#242f4c;--pop2:#2f3a5a}
+[data-tema="lofi"]{--g:linear-gradient(175deg,#9db4ee 0%,#a2d8e6 38%,#b9e0c4 68%,#dfe3ac 100%);--ov:0.76;--bg:#1c2a2c;--pop:#243436;--pop2:#2e4043}
+[data-tema="elma"]{--g:linear-gradient(185deg,#4aa88f 0%,#5fb554 50%,#a6c95a 100%);--ov:0.74;--bg:#1b2a1f;--pop:#233428;--pop2:#2d4033}
+[data-tema="mavimor"]{--g:linear-gradient(40deg,#1f3fd0 5%,#1a1470 70%);--ov:0.22;--bg:#15124a;--pop:#1e1a5c;--pop2:#292470}
+[data-tema="alaca"]{--g:linear-gradient(155deg,#7a3a58 0%,#0d1430 100%);--ov:0.1;--bg:#0d1430;--pop:#1b2140;--pop2:#262c50}
 [data-grad] body{background:radial-gradient(1100px 620px at 80% -12%,color-mix(in srgb,var(--tint) 14%,transparent),transparent),linear-gradient(rgba(0,0,0,var(--ov)),rgba(0,0,0,var(--ov))),var(--g) fixed}
 [data-grad] #kuyruk{-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
 [data-grad] #rail,[data-grad] #dock{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}

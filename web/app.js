@@ -85,14 +85,14 @@ function kapakAyar(el, id) {
 }
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.z); toast.z = setTimeout(() => t.hidden = true, 2200); }
 
-// ---- tema + vurgu rengi (Discord'daki gibi: taban tema + ozel renk; ek olarak kapaktan otomatik renk)
+// ---- tema + vurgu rengi (taban tema + ozel renk; ek olarak kapaktan otomatik renk)
 const TEMALAR = [
   ["sistem", "Sistem", null], ["koyu", "Kömür", ["#0a0a0b", "#17171a", "#ececea"]], ["onyx", "Onyx", ["#000", "#111113", "#ececea"]],
   ["ash", "Kül", ["#1a1b1f", "#282a30", "#eceef3"]], ["acik", "Açık", ["#f5f4f1", "#efeee9", "#19191c"]],
   // gradyan temalar: [önizleme arka planı, panel, yazı]; GRAD listesindekiler data-grad alır
-  ["gece", "Mor gece", ["linear-gradient(48.17deg,#5348ca 11.21%,#140730 61.92%)", "#0000004d", "#f1f0f5"]], ["retro", "Fırtına bulutu", ["linear-gradient(148.71deg,#3a7ca1 5.64%,#58579a 26.38%,#58579a 49.92%,#3a7ca1 73.12%)", "#0000004d", "#f1f0f5"]],
-  ["lofi", "Sakin gökyüzü", ["linear-gradient(179.52deg,#a4c0f7 7.08%,#a9e4e8 34.94%,#b0e2b8 65.12%,#cfdfa2 96.23%)", "#0000004d", "#f1f0f5"]], ["elma", "Çayır", ["linear-gradient(180deg,#56b69f 6.15%,#63bc61 48.7%,#9eca67 93.07%)", "#0000004d", "#f1f0f5"]],
-  ["mavimor", "Derin mavi", ["linear-gradient(47.61deg,#2c3fe7 11.18%,#261d83 64.54%)", "#0000004d", "#f1f0f5"]], ["alaca", "Gün batımı", ["linear-gradient(160deg,#69426a 0%,#111731 100%)", "#0000004d", "#f1f0f5"]],
+  ["gece", "Mor gece", ["linear-gradient(52deg,#4a2fa8 8%,#12062b 70%)", "#0000004d", "#f1f0f5"]], ["retro", "Fırtına bulutu", ["linear-gradient(140deg,#2f6f8f 0%,#4b4f8c 45%,#2f6f8f 100%)", "#0000004d", "#f1f0f5"]],
+  ["lofi", "Sakin gökyüzü", ["linear-gradient(175deg,#9db4ee 0%,#a2d8e6 38%,#b9e0c4 68%,#dfe3ac 100%)", "#0000004d", "#f1f0f5"]], ["elma", "Çayır", ["linear-gradient(185deg,#4aa88f 0%,#5fb554 50%,#a6c95a 100%)", "#0000004d", "#f1f0f5"]],
+  ["mavimor", "Derin mavi", ["linear-gradient(40deg,#1f3fd0 5%,#1a1470 70%)", "#0000004d", "#f1f0f5"]], ["alaca", "Gün batımı", ["linear-gradient(155deg,#7a3a58 0%,#0d1430 100%)", "#0000004d", "#f1f0f5"]],
 ];
 const GRAD = new Set(["gece", "retro", "lofi", "elma", "mavimor", "alaca"]);
 const VURGULAR = [["Kum", 35, 38], ["Mercan", 10, 70], ["Adaçayı", 105, 26], ["Gök", 210, 65], ["Lavanta", 260, 60], ["Gül", 335, 60]];
