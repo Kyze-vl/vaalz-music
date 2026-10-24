@@ -31,8 +31,8 @@ android {
         applicationId = "com.vaalz.music"
         minSdk = 29
         targetSdk = 35
-        versionCode = 4
-        versionName = "0.1.3"
+        versionCode = 5
+        versionName = "0.1.4"
         ndk { abiFilters += listOf("arm64-v8a") }
     }
     lint { checkReleaseBuilds = false; abortOnError = false }     // lint-gradle ek indirme ister; kotali internette cevrimdisi derleme icin kapali

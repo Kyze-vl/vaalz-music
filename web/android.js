@@ -305,6 +305,8 @@
 
   // Android geri tusu: once alttan acilan pencereyi, sonra tam ekran calari, sonra ayarlar alt sayfasini kapatir
   window.__vaalzGeri = function () {
+    const md = document.getElementById("modal");
+    if (md && !md.hidden && typeof H.modalKapat === "function") { H.modalKapat(); return true; }      // acik pencere (Ekle vb.) once kapanir
     const o = document.getElementById("odak");
     if (o && o.classList.contains("acik")) { if (o.classList.contains("ay-sheet")) o.classList.remove("ay-sheet"); else H.odakKapat(); return true; }
     return ayGeri ? ayGeri() : false;
