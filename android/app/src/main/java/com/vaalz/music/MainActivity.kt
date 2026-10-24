@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
 import android.webkit.JavascriptInterface
+import android.webkit.WebResourceRequest
+import android.webkit.WebViewClient
 import android.webkit.WebView
 import android.widget.FrameLayout
 import com.chaquo.python.Python
@@ -44,6 +46,10 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         web = WebView(this)
+        // Istemci yoksa Android adresleri (sayfa yenilemesi dahil) varsayilan tarayiciya atar; her sey uygulamanin icinde kalsin
+        web.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
+        }
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
         web.settings.mediaPlaybackRequiresUserGesture = false
