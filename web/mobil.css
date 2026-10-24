@@ -138,13 +138,14 @@ html.android .ay-kaydet #aMsg{text-align:center;min-height:0}
 html.android .ay-ic label.f:has(>input[type=checkbox]):has(small){flex-wrap:wrap}
 
 /* ---- Alt gezinme (Android): yuzen kapsul, secili sekme vurgulu hap; kaydirmada gizlenmez ---- */
-html.android #rail{left:50%;right:auto;bottom:10px;width:min(340px,calc(100% - 64px));height:60px;transform:translateX(-50%);padding:5px;gap:4px;border:1px solid var(--line2);border-radius:30px;background:color-mix(in srgb,var(--pop) 94%,transparent);box-shadow:0 6px 22px #0000005c,inset 0 0 0 1px #ffffff08}
+html.android #rail{left:50%;right:auto;bottom:10px;width:min(340px,calc(100% - 64px));height:60px;transform:translateX(-50%);padding:5px;gap:4px;border:1px solid var(--line2);border-radius:30px;background:color-mix(in srgb,var(--pop) 88%,transparent);box-shadow:0 6px 22px #0000005c,inset 0 0 0 1px #ffffff08}
 html.android #rail .nv{height:100%;border-radius:25px;color:var(--mut);font-weight:500;gap:2px;transition:background .18s,color .18s}
 html.android #rail .nv .ic{width:23px;height:23px;stroke-width:1.7;transition:stroke-width .18s}
 html.android #rail .nv.on{background:var(--hv3);color:var(--txt);font-weight:700}
 html.android #rail .nv.on .ic{stroke-width:2.6}
 html.android #dock{display:none}
-html.android #content{bottom:84px}
+html.android #content{bottom:0}
+html.android #main{padding-bottom:104px}
 html.android #toast{bottom:94px}
 /* alt hapin sagindaki cal/duraklat dugmesi */
 html.android #rail .ray-cal{flex:none;width:50px;height:50px;align-self:center;margin:0 0 0 2px}
