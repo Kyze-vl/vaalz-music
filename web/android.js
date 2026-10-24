@@ -80,6 +80,62 @@
     });
   }
 
+  // ---- Tam ekran calar (Android): yalnizca calma ekrani; sira / sozler / benzer alttan acilan pencerede ----
+  const odak = document.getElementById("odak");
+  if (odak) {
+    const ust = odak.querySelector(".o-ust"), kapat = ust && ust.querySelector("[data-act=odakKapat]");
+    if (kapat) kapat.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';   // X yerine asagi ok
+    const sol = odak.querySelector(".o-sol"), meta = odak.querySelector(".o-meta"), seek = odak.querySelector(".seekrow");
+    const sag = document.getElementById("oSag");
+    const ad = document.documentElement.lang === "en" ? ["Up next", "Lyrics", "Related"] : ["Sıradakiler", "Sözler", "Benzer"];
+    // eylem dugmeleri (sira / sozler / benzer)
+    const cip = document.createElement("div"); cip.className = "ay-cipler";
+    [["sira", ad[0]], ["soz", ad[1]], ["benzer", ad[2]]].forEach(([k2, t]) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "ay-cip"; b.textContent = t; b.dataset.k = k2; cip.appendChild(b);
+    });
+    meta.after(cip);
+    // ince ilerleme cubugu (tuvalin yerine)
+    let surukleniyor = false;
+    const cubuk = document.createElement("div"); cubuk.className = "ay-cubuk";
+    cubuk.innerHTML = "<i></i><b></b>"; seek.insertBefore(cubuk, seek.querySelector("canvas"));
+    const dolgu = cubuk.querySelector("i"), top = cubuk.querySelector("b");
+    const yaz = o => { dolgu.style.width = top.style.left = (o * 100) + "%"; };
+    const sureVar = () => isFinite(audio.duration) && audio.duration > 0;
+    const guncelle = () => yaz(sureVar() ? Math.min(1, audio.currentTime / audio.duration) : 0);
+    for (const el of ELEM) el.addEventListener("timeupdate", e => { if (e.target === audio && !surukleniyor) guncelle(); });
+    const oranAl = e => { const r = cubuk.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); };
+    cubuk.addEventListener("pointerdown", e => { surukleniyor = true; cubuk.setPointerCapture(e.pointerId); cubuk.classList.add("tut"); yaz(oranAl(e)); });
+    cubuk.addEventListener("pointermove", e => { if (surukleniyor) yaz(oranAl(e)); });
+    const birak = e => {
+      if (!surukleniyor) return;
+      surukleniyor = false; cubuk.classList.remove("tut");
+      if (sureVar()) audio.currentTime = oranAl(e) * audio.duration;
+    };
+    cubuk.addEventListener("pointerup", birak); cubuk.addEventListener("pointercancel", birak);
+    // alttan acilan pencere
+    const perde = document.createElement("div"); perde.className = "ay-perde"; odak.querySelector(".o-ana").appendChild(perde);
+    const tutac = document.createElement("div"); tutac.className = "ay-tutac"; tutac.innerHTML = "<i></i>"; sag.prepend(tutac);
+    const ac = k2 => {
+      const b = document.querySelector('#kuyruk [data-act=kTab][data-k="' + k2 + '"]'); if (b) b.click();
+      odak.classList.add("ay-sheet");
+    };
+    const kapatPencere = () => odak.classList.remove("ay-sheet");
+    cip.addEventListener("click", e => { const b = e.target.closest(".ay-cip"); if (b) ac(b.dataset.k); });
+    perde.addEventListener("click", kapatPencere);
+    odak.addEventListener("click", e => { if (e.target.closest("#kuyruk .kc") || e.target.closest(".ay-tutac")) kapatPencere(); });
+    let sy = null;
+    sag.addEventListener("touchstart", e => { sy = e.touches[0].clientY; }, { passive: true });
+    sag.addEventListener("touchend", e => { if (sy !== null && e.changedTouches[0].clientY - sy > 70 && e.target.closest(".k-bas, .ay-tutac")) kapatPencere(); sy = null; });
+    // altta "Sıradakiler" tutacagi: dokun / yukari kaydir
+    const alt = document.createElement("button"); alt.type = "button"; alt.className = "ay-alt"; alt.innerHTML = "<i></i><span>" + ad[0] + "</span>";
+    alt.addEventListener("click", () => ac("sira"));
+    let ay0 = null;
+    alt.addEventListener("touchstart", e => { ay0 = e.touches[0].clientY; }, { passive: true });
+    alt.addEventListener("touchend", e => { if (ay0 !== null && ay0 - e.changedTouches[0].clientY > 30) { e.preventDefault(); ac("sira"); } ay0 = null; });
+    sol.appendChild(alt);
+    new MutationObserver(() => { if (!odak.classList.contains("acik")) kapatPencere(); else guncelle(); }).observe(odak, { attributes: true, attributeFilter: ["class", "hidden"] });
+  }
+
   if (!gercek) return;
 
   function gonder() {
