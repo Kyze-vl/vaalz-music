@@ -170,3 +170,6 @@ html.android.ay-kartli #main{padding-bottom:170px}
 html.android.ay-kartli #toast{bottom:150px}
 html.android body.odakAcik #ayKart{display:none!important}
 
+
+/* kisa sayfalar da biraz kaydirilabilsin: son ogeler alttaki kartin/hapin arkasinda kalmasin */
+html.android.ay-kartli #main>.sy{min-height:calc(100% + 140px)}
