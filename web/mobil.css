@@ -264,3 +264,8 @@ html.android #odak.ay-sheet #oSag{visibility:visible;transition:transform .34s c
 /* dalga modunda satir daha yuksek: kapak kuculur, oneri dugmeleri kirpilmaz */
 html.android .o-sol>*:not(.cv){flex:none}
 html.android #odak:not(.ay-duz) .o-sol .cv.buyuk{max-height:42vh}
+
+/* klavye acikken alt hap ve kart gizli; pencere ekrana siger */
+html.android.ay-klavye #rail,html.android.ay-klavye #ayKart{display:none!important}
+html.android .mk{max-height:94vh}
+

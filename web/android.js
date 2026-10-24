@@ -343,6 +343,11 @@
   const hoverHepsi = () => { for (const sh of Array.from(document.styleSheets)) { try { hoverTemizle(sh.cssRules); } catch (x) { } } };
   hoverHepsi(); addEventListener("load", hoverHepsi);
 
+  // ---- Klavye acilinca (pencere kisalir) alt hap ve kart gizlenir; kapaninca geri gelir ----
+  const yukseklik0 = innerHeight;
+  const klavyeKontrol = () => document.documentElement.classList.toggle("ay-klavye", innerHeight < yukseklik0 * 0.8);
+  addEventListener("resize", klavyeKontrol);
+
   if (!gercek) return;
 
   function gonder() {
