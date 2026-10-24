@@ -38,6 +38,7 @@ const P = {
   more: ["", '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>'],
   plus: ["", '<path d="M5 12h14"/><path d="M12 5v14"/>'],
   x: ["", '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'],
+  check: ["", '<path d="M20 6 9 17l-5-5"/>'],
   refresh: ["", '<path d="M3 12a9 9 0 0 1 9-9 9.750 9.750 0 0 1 6.740 2.740L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.750 9.750 0 0 1-6.740-2.740L3 16"/><path d="M8 16H3v5"/>'],
   trash: ["", '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>'],
   mic: ["", '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>'],
@@ -172,11 +173,11 @@ function listeKart(p) {
   const ids = p.id === "__begenilen" ? L.liked : p.tracks;
   return `<div class="kt" data-act="git" data-to="#/liste/${esc(p.id)}"><div class="cvw">${mozaik(ids.filter(T))}<div class="pl" data-act="listeCal" data-liste="${esc(p.id)}">${I("play")}</div></div><h3>${esc(p.title)}</h3><p>${ids.length} parça${p.local ? "" : " · YouTube"}</p></div>`;
 }
-function oneriKart(o, listeli) {
+function oneriKart(o, listeli, listeId) {
   const var_ = T(o.id) && T(o.id).var;
   return `<div class="kt" style="cursor:default"><div class="cvw"><div class="cv" style="--h:${hue(o.id)}"><img loading="lazy" decoding="async" src="/api/kapak/${encodeURIComponent(o.id)}?uzak=1" alt="" onerror="this.remove()"></div><div class="pl onz" data-act="onizle" data-onz="${esc(o.id)}" data-id="${esc(o.id)}" data-d="${o.duration || 0}" title="Önizle (30 sn)">${I("play")}${I("pause")}</div></div>
    <h3 title="${esc(o.title)}">${esc(o.title)}</h3><p>${esc(o.artist)}${o.duration ? " · " + sure(o.duration) : ""}</p>
-   <button class="btn k" data-act="indir" ${var_ ? "disabled" : ""} data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}">${var_ ? "İndirildi" : I("dl") + "İndir"}</button>${listeli ? `<button class="btn k" style="margin-left:6px" data-act="araListe" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bir playlist'e ekle">${I("plus")}Playlist</button>` : ""}</div>`;
+   <button class="btn k" data-act="indir" ${var_ ? "disabled" : ""} data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}">${var_ ? "İndirildi" : I("dl") + "İndir"}</button>${listeId ? `<button class="btn k" style="margin-left:6px" data-act="listeyeIndirEkle" data-liste="${esc(listeId)}" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bu listeye ekle">${I("plus")}Listeye ekle</button>` : listeli ? `<button class="btn k" style="margin-left:6px" data-act="araListe" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bir playlist'e ekle">${I("plus")}Playlist</button>` : ""}</div>`;
 }
 
 // =============================================================== sayfalar
@@ -283,12 +284,57 @@ function sayfaListe(id) {
   main.innerHTML = `<div class="sy"><div class="ph">${mozaik(ids)}<div><span class="eyebrow">${sabit ? "Otomatik playlist" : p.local ? "Senin playlistin" : "YouTube Music playlisti"}</span><h1 class="b">${esc(p.title)}</h1>
    <p>${ids.length} parça${sn ? " · " + uzunSure(sn) : ""}${eksik.length ? ` · <span style="color:var(--ak)">${eksik.length} tanesi indirilmedi</span>` : ""}</p>
    <div class="bt"><button class="btn on" data-act="listeCal" data-liste="${esc(p.id)}">${I("play")}Çal</button><button class="btn" data-act="listeKaristir" data-liste="${esc(p.id)}">${I("shuffle")}Karıştır</button>
+    ${!sabit ? `<button class="btn" data-act="listeAra" data-liste="${esc(p.id)}">${I("plus")}Ekle</button>` : ""}
     ${eksik.length ? `<button class="btn" data-act="listeIndir" data-liste="${esc(p.id)}" data-n="${eksik.length}" data-mb="${mb.toFixed(0)}">${I("dl")}Eksikleri indir · ~${mb.toFixed(0)} MB</button>` : ""}
     ${!p.local && !sabit ? `<button class="btn" data-act="kontrol" data-url="${esc(p.url)}">${I("refresh")}Güncelle</button><button class="btn" data-act="listeKaldir" data-liste="${esc(p.id)}">${I("trash")}Takibi bırak</button>` : ""}
     ${p.local && !sabit ? `<button class="btn" data-act="listeAd" data-liste="${esc(p.id)}">${I("pencil")}Adı değiştir</button><button class="btn" data-act="listeSil" data-liste="${esc(p.id)}">${I("trash")}Sil</button>` : ""}</div></div></div>
    <div id="isPanel"></div>
    ${ids.length ? satirBas() + ids.map((i, n) => satir(i, p.id, n + 1)).join("") : `<div class="bos"><h2>Bu playlist boş</h2><p>Parçaların ⋯ menüsünden “Playlist'e ekle” ile doldurabilirsin.</p></div>`}</div>`;
   panelCiz(durumSon);
+  if (!sabit) { main.querySelector(".sy").insertAdjacentHTML("beforeend", `<div id="listeBenzer"></div>`); listeBenzerCiz(p.id); }
+}
+
+// Playlistin altinda: listedeki parcalara benzerler (acik istekle; parca basina bir kez internet)
+function listeBenzerCiz(id) {
+  const k = $("#listeBenzer"), p = listeBul(id); if (!k || !p) return;
+  const b = S.listeBenzer && S.listeBenzer.id === id ? S.listeBenzer : null;
+  const bas = `<h2 class="b" style="margin-top:34px">Bu listeye benzerler</h2>`;
+  if (!b) { k.innerHTML = bas + `<p class="not">Listedeki parçalara benzer şarkıları YouTube'dan bulur (en çok dinlediklerin ve beğendiklerin baz alınır; parça başına bir kez, ~0,4 MB internet).</p><div class="ip"><button class="btn" data-act="listeBenzer" data-liste="${esc(id)}">${I("search")}Benzerleri bul</button></div>`; return; }
+  if (b.durum === "yukleniyor") { k.innerHTML = bas + `<p class="not">YouTube'dan getiriliyor…</p>`; return; }
+  if (b.durum === "hata") { k.innerHTML = bas + `<div class="kutu"><div class="hata">${esc(b.hata)}</div></div><div class="ip"><button class="btn" data-act="listeBenzer" data-liste="${esc(id)}">${I("refresh")}Tekrar dene</button></div>`; return; }
+  const l = b.liste.filter(o => !p.tracks.includes(o.id));
+  k.innerHTML = bas + (l.length ? `<div class="satir" style="flex-wrap:wrap;row-gap:22px">${l.map(o => oneriKart(o, true, id)).join("")}</div><p class="not"><button class="link" data-act="listeBenzer" data-liste="${esc(id)}" data-yenile="1">Yenile</button> · bir parça için bir kez indirilip saklanır.</p>`
+    : `<p class="not">Yeni öneri yok: bulunanların hepsi zaten listede ya da kütüphanende.</p>`);
+}
+async function listeBenzerGetir(id, yenile) {
+  S.listeBenzer = { id, durum: "yukleniyor" }; listeBenzerCiz(id);
+  try { const o = await api(`/api/benzer-liste?id=${encodeURIComponent(id)}${yenile ? "&yenile=1" : ""}`); S.listeBenzer = { id, durum: "tamam", liste: o.liste }; agGuncelle(); }
+  catch (e) { S.listeBenzer = { id, durum: "hata", hata: e.message || "alınamadı" }; }
+  if (decodeURIComponent(location.hash) === "#/liste/" + id) listeBenzerCiz(id);
+}
+
+// Playlistin icinden YouTube'da ara; sonucu dogrudan bu listeye indirip ekle
+function listeAraModal(id) {
+  const p = listeBul(id); if (!p) return;
+  S.araListeId = id;
+  modalAc(`<h3>“${esc(p.title)}” listesine ekle</h3>
+   <div class="ip" style="margin:0"><input class="inp" id="lAraIn" placeholder="Şarkı ya da sanatçı ara (YouTube)" autocomplete="off"><button class="btn on" id="lAraGo">${I("search")}Ara</button></div>
+   <p class="not" style="margin:8px 0 0">hesap ya da anahtar gerekmez · her arama ~0,5 MB internet</p><div id="lAraSonuc"></div>
+   <div class="ip"><button class="btn" data-act="modalKapat">Kapat</button></div>`);
+  const girdi = $("#lAraIn"); girdi.focus();
+  const ara = async () => {
+    const q = girdi.value.trim(); if (!q) return;
+    const kutu = $("#lAraSonuc"); kutu.innerHTML = `<p class="not" style="margin-top:14px">YouTube'da aranıyor…</p>`;
+    try {
+      const { sonuclar } = await api("/api/ara?q=" + encodeURIComponent(q)); agGuncelle();
+      const pl = listeBul(id) || p;
+      kutu.innerHTML = sonuclar.length ? `<div style="margin-top:12px">${sonuclar.map(o => {
+        const v = `data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" data-liste="${esc(id)}"`, var_ = pl.tracks.includes(o.id);
+        return `<div class="kq" style="cursor:default"><div class="cv" style="--h:${hue(o.id)}"><img loading="lazy" src="/api/kapak/${encodeURIComponent(o.id)}?uzak=1" alt="" onerror="this.remove()"></div><div class="mt"><b>${esc(o.title)}</b><span>${esc(o.artist)}${o.duration ? " · " + sure(o.duration) : ""}</span></div><button class="ib kc onz" data-act="onizle" data-onz="${esc(o.id)}" ${v} title="Önizle (30 sn)">${I("play")}${I("pause")}</button><button class="ib kc" data-act="listeyeIndirEkle" ${v} ${var_ ? "disabled" : ""} title="${var_ ? "Listede" : "İndir ve bu listeye ekle"}">${I(var_ ? "check" : "plus")}</button></div>`;
+      }).join("")}</div>` : `<p class="not" style="margin-top:14px">Sonuç yok.</p>`;
+    } catch (e) { kutu.innerHTML = `<div class="hata" style="margin-top:14px">${esc(e.message)}</div>`; }
+  };
+  $("#lAraGo").onclick = ara; girdi.onkeydown = e => { if (e.key === "Enter") ara(); };
 }
 
 function sayfaAra(q) {
@@ -315,7 +361,7 @@ async function araIndirEkle(listeId, yeniAd) {
   } catch (e) { toast(e.message); }
 }
 function araListeModal() {
-  const yerel = L.playlists.filter(p => p.local);
+  const yerel = L.playlists;
   modalAc(`<h3>İndir ve playlist'e ekle</h3><p class="not" style="margin:0 0 10px">${esc(S.araParca.title)}</p>${yerel.map(p => `<a class="rl" data-act="araListeSec" data-liste="${esc(p.id)}">${cv(p.tracks.find(i => T(i) && T(i).kapak) || p.id)}<div class="mt"><b>${esc(p.title)}</b><span>${p.tracks.length} parça</span></div></a>`).join("") || `<p class="not">Henüz kendi playlistin yok; yeni bir tane oluştur.</p>`}
    <div class="ip"><button class="btn" data-act="modalKapat">Kapat</button><button class="btn on" data-act="araYeniListe">${I("plus")}Yeni playlist</button></div>`);
 }
@@ -796,7 +842,7 @@ function girdiModal(baslik, deger, tamam) {
   $("#mOk").onclick = git; i.onkeydown = e => { if (e.key === "Enter") git(); };
 }
 function listeSec(parca) {
-  const yerel = L.playlists.filter(p => p.local);
+  const yerel = L.playlists;
   modalAc(`<h3>Playlist'e ekle</h3>${yerel.map(p => `<a class="rl" data-act="listeyeEkle" data-liste="${esc(p.id)}" data-id="${esc(parca)}">${cv(p.tracks.find(i => T(i) && T(i).kapak) || p.id)}<div class="mt"><b>${esc(p.title)}</b><span>${p.tracks.length} parça</span></div></a>`).join("") || `<p class="not">Henüz kendi playlistin yok.</p>`}
    <div class="ip"><button class="btn" data-act="modalKapat">Kapat</button><button class="btn on" data-act="yeniListe" data-parca="${esc(parca)}">${I("plus")}Yeni playlist</button></div>`);
 }
@@ -809,7 +855,7 @@ function parcaMenusu(x, y, id, lid) {
   const t = T(id), pl = listeBul(lid), it = [];
   if (t.var) it.push(["cal", "Çal"], ["sira", "Sıradaki olarak çal"], ["ekle", "Kuyruğa ekle"]); else it.push(["indir", "İndir"]);
   it.push(["liste", "Playlist'e ekle…"]);
-  if (pl && pl.local) it.push(["cikar", "Bu playlist'ten çıkar"]);
+  if (pl && (pl.local || (pl.ekler || []).includes(id))) it.push(["cikar", "Bu playlist'ten çıkar"]);
   if (t.var) it.push(["goster", "Klasörde göster"]);
   if (t.var) it.push(["sil", "Dosyayı diskten sil", "tehlike"]);
   menuAc(x, y, it, async k => {
@@ -900,6 +946,17 @@ const H = {
   }),
   listeAd: t => girdiModal("Playlist adı", listeBul(t.dataset.liste).title, async ad => { await api("/api/liste/ad", { id: t.dataset.liste, title: ad }); await yukle(); yonlendir(); }),
   listeSil: t => { if (confirm("Bu playlist silinsin mi? (Şarkı dosyaları silinmez)")) api("/api/liste/sil", { id: t.dataset.liste }).then(yukle).then(() => { location.hash = "#/kitaplik"; }); },
+  listeAra: t => listeAraModal(t.dataset.liste),
+  listeBenzer: t => listeBenzerGetir(t.dataset.liste, t.dataset.yenile === "1"),
+  listeyeIndirEkle: async t => {
+    if (t.disabled) return;
+    try {
+      await api("/api/indir", { id: t.dataset.id, title: t.dataset.t, artist: t.dataset.a, duration: +t.dataset.d || 0, liste: t.dataset.liste });
+      if (t.classList.contains("ib")) { t.disabled = true; t.innerHTML = I("check"); }
+      await yukle(); toast("İndiriliyor ve listeye eklendi"); izle();
+      if (decodeURIComponent(location.hash) === "#/liste/" + t.dataset.liste) { const sk = main.scrollTop; await yonlendir(); main.scrollTop = sk; }
+    } catch (e) { toast(e.message); }
+  },
   listeyeEkle: async t => { await api("/api/liste/ekle", { id: t.dataset.liste, parca: t.dataset.id }); modalKapat(); await yukle(); toast("Playlist'e eklendi"); },
   indir: async t => {
     const eskiMetin = t.innerHTML, btn = t.classList && t.classList.contains("btn");

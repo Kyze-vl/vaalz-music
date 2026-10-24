@@ -52,6 +52,56 @@ class Kilit(unittest.TestCase):
         self.assertFalse(v.kilit_al())
 
 
+class ListeEkleme(unittest.TestCase):
+    def setUp(self):
+        for vid in ("aaaaaaaaaaa", "bbbbbbbbbbb", "ccccccccccc", "ddddddddddd"):
+            v.tracks[vid] = {"id": vid, "title": vid, "artist": "x", "duration": 200, "dosya": None}
+        v.playlists["yt1"] = {"id": "yt1", "title": "YT", "url": "https://x", "local": False, "tracks": ["aaaaaaaaaaa"]}
+        v.playlists["yer1"] = {"id": "yer1", "title": "Yerel", "url": None, "local": True, "tracks": ["aaaaaaaaaaa"]}
+
+    def test_youtube_listesine_ekleme_guncellemede_korunur(self):
+        v.listeye_ekle(v.playlists["yt1"], "bbbbbbbbbbb")
+        v.listeye_ekle(v.playlists["yt1"], "bbbbbbbbbbb")                       # ikinci kez eklenmez
+        self.assertEqual(v.playlists["yt1"]["tracks"], ["aaaaaaaaaaa", "bbbbbbbbbbb"])
+        self.assertEqual(v.playlists["yt1"]["ekler"], ["bbbbbbbbbbb"])
+        # YouTube'daki liste degisti: yalnizca ccc var. Elle eklenen bbb yine listede olmali.
+        veri = {"title": "YT", "entries": [{"id": "ccccccccccc", "title": "c", "duration": 100}]}
+        with mock.patch.object(v, "ytdlp_json", return_value=veri), mock.patch.object(v, "kaydet"):
+            v.listeyi_cek("https://x")
+        pid = v.liste_id("https://x")
+        self.assertEqual(v.playlists[pid]["tracks"], ["ccccccccccc"])             # kimlik url'den turetildigi icin yeni kayit
+        v.playlists[pid]["ekler"] = ["bbbbbbbbbbb"]
+        with mock.patch.object(v, "ytdlp_json", return_value=veri), mock.patch.object(v, "kaydet"):
+            v.listeyi_cek("https://x")
+        self.assertEqual(v.playlists[pid]["tracks"], ["ccccccccccc", "bbbbbbbbbbb"])
+
+    def test_yerel_listede_ekler_alani_yok(self):
+        v.listeye_ekle(v.playlists["yer1"], "bbbbbbbbbbb")
+        self.assertEqual(v.playlists["yer1"]["tracks"], ["aaaaaaaaaaa", "bbbbbbbbbbb"])
+        self.assertNotIn("ekler", v.playlists["yer1"])
+
+
+class ListeBenzerleri(unittest.TestCase):
+    def test_ortak_cikanlar_once_ve_mevcutlar_elenir(self):
+        v.tracks.update({t: {"id": t, "title": t, "dosya": None} for t in ("s1_aaaaaaaaa", "s2_aaaaaaaaa")})
+        pl = {"id": "p", "tracks": ["s1_aaaaaaaaa", "s2_aaaaaaaaa", "f_yerel"], "local": True}
+        oneri = lambda *ids: {"zaman": 1, "liste": [{"id": i, "title": i, "artist": "", "duration": 1} for i in ids]}
+        sonuc = {"s1_aaaaaaaaa": oneri("x1", "ortak", "zatenvar"), "s2_aaaaaaaaa": oneri("ortak", "x2")}
+        with mock.patch.object(v, "benzer_getir", side_effect=lambda t, y=False: sonuc[t]):
+            r = v.liste_benzerleri(pl, False, {"s1_aaaaaaaaa", "s2_aaaaaaaaa", "zatenvar"})
+        ids = [x["id"] for x in r["liste"]]
+        self.assertEqual(ids[0], "ortak")                                         # iki parcayla eslesen basta
+        self.assertNotIn("zatenvar", ids)
+        self.assertEqual(r["tohum"], 2)                                           # f_ ile baslayan yerel parca tohum olmaz
+
+    def test_hepsi_hata_verirse_hata_firlatilir(self):
+        v.tracks["s9_aaaaaaaaa"] = {"id": "s9_aaaaaaaaa", "title": "t", "dosya": None}
+        pl = {"id": "p", "tracks": ["s9_aaaaaaaaa"], "local": True}
+        with mock.patch.object(v, "benzer_getir", side_effect=RuntimeError("ag yok")):
+            with self.assertRaises(RuntimeError):
+                v.liste_benzerleri(pl, False, set())
+
+
 class Acilis(unittest.TestCase):
     def test_kapali_portlar_hizli_elenir(self):
         # bos portlari yoklamak (12 port) bazi bilgisayarlarda 2 sn x 12 surerdi; paralel + kisa deneme ile saniyeler icinde bitmeli

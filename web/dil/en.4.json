@@ -1,0 +1,87 @@
+[
+ {
+  "file": "web/app.js",
+  "old": "title=\"İndir ve bu listeye ekle\">${I(\"plus\")}Listeye ekle</button>",
+  "new": "title=\"Download and add to this list\">${I(\"plus\")}Add to list</button>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "<h2 class=\"b\" style=\"margin-top:34px\">Bu listeye benzerler</h2>",
+  "new": "<h2 class=\"b\" style=\"margin-top:34px\">More like this list</h2>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "Listedeki parçalara benzer şarkıları YouTube'dan bulur (en çok dinlediklerin ve beğendiklerin baz alınır; parça başına bir kez, ~0,4 MB internet).",
+  "new": "Finds songs similar to the tracks in this list on YouTube (based on the ones you play and like most; once per track, ~0.4 MB of data)."
+ },
+ {
+  "file": "web/app.js",
+  "old": "${I(\"search\")}Benzerleri bul</button>",
+  "new": "${I(\"search\")}Find similar</button>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "<p class=\"not\">YouTube'dan getiriliyor…</p>",
+  "new": "<p class=\"not\">Fetching from YouTube…</p>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "${I(\"refresh\")}Tekrar dene</button></div>",
+  "new": "${I(\"refresh\")}Try again</button></div>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "data-yenile=\"1\">Yenile</button> · bir parça için bir kez indirilip saklanır.</p>",
+  "new": "data-yenile=\"1\">Refresh</button> · fetched once per track and then stored.</p>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "Yeni öneri yok: bulunanların hepsi zaten listede ya da kütüphanende.",
+  "new": "No new suggestions: everything found is already in this list or your library."
+ },
+ {
+  "file": "web/app.js",
+  "old": "durum: \"hata\", hata: e.message || \"alınamadı\"",
+  "new": "durum: \"hata\", hata: e.message || \"could not be fetched\""
+ },
+ {
+  "file": "web/app.js",
+  "old": "placeholder=\"Şarkı ya da sanatçı ara (YouTube)\"",
+  "new": "placeholder=\"Search a song or artist (YouTube)\""
+ },
+ {
+  "file": "web/app.js",
+  "old": "<h3>“${esc(p.title)}” listesine ekle</h3>",
+  "new": "<h3>Add to “${esc(p.title)}”</h3>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "${I(\"search\")}Ara</button></div>\n   <p class=\"not\" style=\"margin:8px 0 0\">hesap ya da anahtar gerekmez · her arama ~0,5 MB internet</p>",
+  "new": "${I(\"search\")}Search</button></div>\n   <p class=\"not\" style=\"margin:8px 0 0\">no account or key needed · ~0.5 MB of data per search</p>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "title=\"Önizle (30 sn)\">${I(\"play\")}${I(\"pause\")}</button><button class=\"ib kc\" data-act=\"listeyeIndirEkle\"",
+  "new": "title=\"Preview (30 s)\">${I(\"play\")}${I(\"pause\")}</button><button class=\"ib kc\" data-act=\"listeyeIndirEkle\""
+ },
+ {
+  "file": "web/app.js",
+  "old": "title=\"${var_ ? \"Listede\" : \"İndir ve bu listeye ekle\"}\"",
+  "new": "title=\"${var_ ? \"In list\" : \"Download and add to this list\"}\""
+ },
+ {
+  "file": "web/app.js",
+  "old": "style=\"margin-top:14px\">Sonuç yok.</p>",
+  "new": "style=\"margin-top:14px\">No results.</p>"
+ },
+ {
+  "file": "web/app.js",
+  "old": "toast(\"İndiriliyor ve listeye eklendi\")",
+  "new": "toast(\"Downloading and added to the list\")"
+ },
+ {
+  "file": "web/app.js",
+  "old": "data-act=\"listeAra\" data-liste=\"${esc(p.id)}\">${I(\"plus\")}Ekle</button>",
+  "new": "data-act=\"listeAra\" data-liste=\"${esc(p.id)}\">${I(\"plus\")}Add</button>"
+ }
+]
