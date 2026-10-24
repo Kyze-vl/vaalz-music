@@ -6,17 +6,23 @@
   if (gercek) document.documentElement.classList.add("android");
   if (!gercek && !document.documentElement.classList.contains("android")) return;
 
+  // WebView'in prefers-color-scheme degeri uygulama temasina (hep koyu) bagli kalir; sistem modunu Android'den okuruz
+  const sistemKoyu = () => {
+    try { if (window.VaalzAndroid && typeof VaalzAndroid.koyuMu === "function") return !!VaalzAndroid.koyuMu(); } catch (e) { }
+    return !matchMedia("(prefers-color-scheme: light)").matches;
+  };
   // ---- Tema secimi yok: sistem koyuysa Onyx + "Kum" vurgusu, aciksa Retro yagmur bulutu + "Gul" vurgusu ----
   try {
     const temaUygulaAsil = temaUygula;
     temaUygula = function () {
-      const koyu = !matchMedia("(prefers-color-scheme: light)").matches;
+      const koyu = sistemKoyu();
       TEMA.mod = koyu ? "onyx" : "retro";
       TEMA.vurgu = koyu ? "35,38" : "335,60";
       return temaUygulaAsil.apply(this, arguments);
     };
     temaUygula();
     matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => temaUygula());
+    window.__vaalzTema = () => temaUygula();      // Kotlin, sistem modu degisince cagirir
   } catch (e) { }
 
   // ---- Ayarlar sayfasi: ayni ogeleri (kimlikler, olay baglari) koruyup kartlara boler; PC'ye ozel satirlari gizler ----

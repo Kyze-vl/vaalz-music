@@ -63,6 +63,11 @@ class MainActivity : Activity() {
 
     /** Web arayuzunden gelen "su an su parca caliyor" bilgisi -> bildirim / kilit ekrani */
     inner class Kopru {
+        /** Sistem koyu modda mi? (WebView'in prefers-color-scheme degeri uygulama temasina bagli oldugundan sistem modunu buradan okuyoruz) */
+        @JavascriptInterface
+        fun koyuMu(): Boolean =
+            (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
         @JavascriptInterface
         fun durum(json: String) {
             try {
@@ -76,6 +81,12 @@ class MainActivity : Activity() {
                 )
             } catch (_: Exception) { }
         }
+    }
+
+    /** Sistem acik/koyu modu degisince (Activity yeniden olusturulmaz) sayfadaki temayi yenile */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (::web.isInitialized) web.evaluateJavascript("window.__vaalzTema&&__vaalzTema()", null)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
