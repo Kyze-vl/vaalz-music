@@ -86,7 +86,7 @@ class MainActivity : Activity() {
         // Kenardan kenara cizimde durum/gezinme cubuklarinin altinda kalmasin
         kok.setOnApplyWindowInsetsListener { v, insets ->
             if (Build.VERSION.SDK_INT >= 30) {
-                val b = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                val b = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout() or WindowInsets.Type.ime())   // klavye acilinca sayfa yukari kisalir
                 v.setPadding(b.left, b.top, b.right, b.bottom)
             } else {
                 @Suppress("DEPRECATION")

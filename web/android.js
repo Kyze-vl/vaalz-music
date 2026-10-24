@@ -102,6 +102,11 @@
       const ic = document.createElement("div"); ic.className = "ay-ic"; s.dugumler.forEach(n => ic.appendChild(n));
       sp.append(ust, ic); sy.appendChild(sp); sayfalar[s.id] = sp;
     });
+    const stilSel = sy.querySelector("#cubukStil");                    // "Düz çizgi" secenegi: oynatici ilerleme cubugu
+    if (stilSel && !stilSel.querySelector('option[value="duz"]')) {
+      const o = document.createElement("option"); o.value = "duz"; o.textContent = en ? "Plain line" : "Düz çizgi";
+      stilSel.insertBefore(o, stilSel.firstChild); try { stilSel.value = AY.stil; } catch (x) { }
+    }
     sy.insertBefore(ayListe, bas.nextSibling);
     degerleriYenile();
     gruplar.forEach(g => g.dugumler.forEach(n => { if (!n.isConnected) return; if (n.classList && n.classList.contains("ay-gizli")) return; if (!n.closest(".ay-ic")) n.classList.add("ay-gizli"); }));
@@ -178,6 +183,11 @@
       if (sureVar()) audio.currentTime = oranAl(e) * audio.duration;
     };
     cubuk.addEventListener("pointerup", birak); cubuk.addEventListener("pointercancel", birak);
+    // ilerleme cubugu stili: "duz" (varsayilan, ince cizgi) / "dalga" / "form" (Ayarlar > Ses ve oynatma'daki secim oynaticiya da uygulanir)
+    const stilUygula = () => { odak.classList.toggle("ay-duz", AY.stil === "duz"); try { oDalga.boyutla(); dalgaBaslat(); } catch (x) { } };
+    try { if (!localStorage.getItem("ay_cubuk_ilk")) { localStorage.setItem("ay_cubuk_ilk", "1"); if (AY.stil !== "form") { AY.stil = "duz"; ayKaydet(); } } } catch (x) { }
+    stilUygula();
+    document.addEventListener("change", e => { if (e.target && e.target.id === "cubukStil") stilUygula(); });
     // alttan acilan pencere
     const perde = document.createElement("div"); perde.className = "ay-perde"; odak.querySelector(".o-ana").appendChild(perde);
     const tutac = document.createElement("div"); tutac.className = "ay-tutac"; tutac.innerHTML = "<i></i>"; sag.prepend(tutac);
@@ -295,6 +305,8 @@
 
   // Android geri tusu: once alttan acilan pencereyi, sonra tam ekran calari, sonra ayarlar alt sayfasini kapatir
   window.__vaalzGeri = function () {
+    const md = document.getElementById("modal");
+    if (md && !md.hidden && typeof H.modalKapat === "function") { H.modalKapat(); return true; }      // acik pencere (Ekle vb.) once kapanir
     const o = document.getElementById("odak");
     if (o && o.classList.contains("acik")) { if (o.classList.contains("ay-sheet")) o.classList.remove("ay-sheet"); else H.odakKapat(); return true; }
     return ayGeri ? ayGeri() : false;
@@ -332,6 +344,11 @@
   }
   const hoverHepsi = () => { for (const sh of Array.from(document.styleSheets)) { try { hoverTemizle(sh.cssRules); } catch (x) { } } };
   hoverHepsi(); addEventListener("load", hoverHepsi);
+
+  // ---- Klavye acilinca (pencere kisalir) alt hap ve kart gizlenir; kapaninca geri gelir ----
+  const yukseklik0 = innerHeight;
+  const klavyeKontrol = () => document.documentElement.classList.toggle("ay-klavye", innerHeight < yukseklik0 * 0.8);
+  addEventListener("resize", klavyeKontrol);
 
   if (!gercek) return;
 

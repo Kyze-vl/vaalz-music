@@ -189,7 +189,10 @@ html.android .o-meta span{font-size:16px;display:block;margin-top:2px;white-spac
 html.android .ay-cipler{display:flex;gap:10px;margin:18px 0 6px;overflow-x:auto}
 html.android .ay-cip{flex:none;height:42px;padding:0 18px;border-radius:21px;background:var(--hv2);color:var(--txt);font-weight:600;font-size:14px}
 html.android .seekrow.o{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:16px}
-html.android .seekrow.o canvas{display:none}
+html.android .seekrow.o canvas{display:block;width:100%;grid-column:1/-1;grid-row:1}
+html.android .seekrow.o .ay-cubuk{display:none}
+html.android #odak.ay-duz .seekrow.o canvas{display:none}
+html.android #odak.ay-duz .seekrow.o .ay-cubuk{display:block}
 html.android .seekrow.o .ay-cubuk{grid-column:1/-1;grid-row:1}
 html.android .seekrow.o #oGec{grid-row:2;grid-column:1;width:auto;text-align:left;font-size:12.5px;margin-top:8px}
 html.android .seekrow.o #oTop{grid-row:2;grid-column:2;width:auto;text-align:right;font-size:12.5px;margin-top:8px}
@@ -250,3 +253,19 @@ html.android .sy>.ay-kaydet{display:none}
 /* dokunmatikte :hover ilk dokunulan sekmede takili kaliyordu (surukleme sonrasi iz) */
 html.android #rail .nv:not(.on):not(.ay-uz):hover{background:none;color:var(--mut)}
 html.android #rail .nv:not(.on):not(.ay-uz):hover .ic{stroke-width:1.7}
+
+/* Soz akisi gorunur satiri kaydirirken ust ekrani da kaydiriyordu (oynatici yukari kayiyor, kapali pencere gorunuyordu): ust kaplar programatik kaydirmaya kapali */
+html.android #odak,html.android .o-ana{overflow:clip}
+/* kapali pencere hic gorunmesin, kapanis animasyonu bitince gizlensin */
+html.android #oSag{visibility:hidden;transition:transform .34s cubic-bezier(.22,1,.36,1),visibility 0s linear .34s}
+html.android #odak.ay-sheet #oSag{visibility:visible;transition:transform .34s cubic-bezier(.22,1,.36,1),visibility 0s}
+
+
+/* dalga modunda satir daha yuksek: kapak kuculur, oneri dugmeleri kirpilmaz */
+html.android .o-sol>*:not(.cv){flex:none}
+html.android #odak:not(.ay-duz) .o-sol .cv.buyuk{max-height:42vh}
+
+/* klavye acikken alt hap ve kart gizli; pencere ekrana siger */
+html.android.ay-klavye #rail,html.android.ay-klavye #ayKart{display:none!important}
+html.android .mk{max-height:94vh}
+
