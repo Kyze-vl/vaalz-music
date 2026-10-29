@@ -2079,6 +2079,17 @@ def bekci():
             os._exit(0)
 
 
+class Sunucu(ThreadingHTTPServer):
+    # Windows'ta SO_REUSEADDR, baska bir programin (ornegin `python -m http.server 8765`) dinledigi porta da baglanmaya izin
+    # verir ve baglantilari eski sahibi yakalar: pencere yabanci sunucuyu gosterir. Windows'ta portu ozel tut.
+    allow_reuse_address = os.name != "nt"
+
+    def server_bind(self):
+        if os.name == "nt":
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
 KILIT_DOSYA = []
 
 
@@ -2136,7 +2147,7 @@ def main():
     srv = None
     for deneme in range(port, port + 12):        # baska bir program portu tutuyorsa siradakini dene
         try:
-            srv = ThreadingHTTPServer(("127.0.0.1", deneme), Istek)
+            srv = Sunucu(("127.0.0.1", deneme), Istek)
             port = deneme
             break
         except OSError:
