@@ -17,7 +17,7 @@
     temaUygula = function () {
       const koyu = sistemKoyu();
       TEMA.mod = koyu ? "onyx" : "retro";
-      TEMA.vurgu = koyu ? "35,38" : "335,60";
+      if (TEMA.vurgu !== "oto") TEMA.vurgu = koyu ? "35,38" : "335,60";
       return temaUygulaAsil.apply(this, arguments);
     };
     temaUygula();
@@ -56,33 +56,65 @@
     const sesG = gruplar.find(g => g.dugumler.some(n => n.querySelector && n.querySelector("#eqOn")));
     const dlG = gruplar.find(g => g.dugumler.some(n => n.querySelector && n.querySelector("#aTasarruf")));
     const svg = ic => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + ic + "</svg>";
+    const gorunumDeger = () => (typeof TEMA !== "undefined" && TEMA.vurgu === "oto")
+      ? (en ? "Auto from cover" : "Kapağa göre otomatik")
+      : (en ? "Default (Yellow)" : "Varsayılan (Sarı)");
+    const gorunumPanel = document.createElement("div");
+    gorunumPanel.className = "ay-gorunum-panel";
+    const gorunumSecenekler = [
+      { k: "35,38", ad: en ? "Default (Yellow)" : "Varsayılan (Sarı)", alt: en ? "Fixed warm yellow background and accent" : "Sabit sıcak sarı arka plan ve vurgu rengi" },
+      { k: "oto", ad: en ? "Auto from cover" : "Kapağa göre otomatik", alt: en ? "Adapts to the currently playing track cover" : "Çalan şarkının kapağına göre otomatik ayarlanır" }
+    ];
+    const gorunumKart = document.createElement("div"); gorunumKart.className = "ay-kart-grup";
+    gorunumSecenekler.forEach(opt => {
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "ay-radio-satir"; btn.dataset.vurgu = opt.k;
+      btn.innerHTML = '<span class="ay-metin"><b>' + opt.ad + '</b><span class="ay-deger">' + opt.alt + '</span></span><span class="ay-radio"><i></i></span>';
+      btn.addEventListener("click", () => {
+        if (typeof TEMA !== "undefined") { TEMA.vurgu = opt.k; if (typeof temaUygula === "function") temaUygula(); }
+        gorunumYenile();
+        degerleriYenile();
+      });
+      gorunumKart.appendChild(btn);
+    });
+    const gorunumNot = document.createElement("p"); gorunumNot.className = "ay-kart-not";
+    gorunumNot.textContent = en ? "Choose between the default yellow tone or automatic colors from the current song cover." : "Tam ekran oynatıcı ve uygulama vurgu rengi seçiminize göre anında güncellenir.";
+    gorunumPanel.append(gorunumKart, gorunumNot);
+    const gorunumYenile = () => {
+      const aktifV = (typeof TEMA !== "undefined" && TEMA.vurgu === "oto") ? "oto" : "35,38";
+      gorunumKart.querySelectorAll(".ay-radio-satir").forEach(b => b.classList.toggle("on", b.dataset.vurgu === aktifV));
+    };
+    gorunumYenile();
+
     const IKON = {
+      gorunum: svg('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18c1.5 0 2.5-1 2.5-2.2 0-.6-.2-1.1-.6-1.5-.4-.4-.6-.9-.6-1.5 0-1.1.9-2 2-2H17a4 4 0 0 0 4-4c0-4.4-4-7.8-9-7.8z"/>'),
       dil: svg('<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'),
       ag: svg('<path d="M3 12h4l3-8 4 16 3-8h4"/>'),
       ses: typeof I === "function" ? I("queue") : "",
       dl: typeof I === "function" ? I("dl") : ""
     };
     const satirlar = [
-      { bolum: en ? "General" : "Genel", id: "dil", baslik: "Dil / Language", dugumler: dilNode ? [dilNode] : [], deger: () => yaziAl("#aDil", e => e.options[e.selectedIndex].text) },
-      { id: "ag", baslik: en ? "Internet usage" : "İnternet kullanımı", dugumler: agNode ? [agNode] : [], deger: () => { const e = agNode && agNode.querySelector("b"); return e ? (en ? "This month " : "Bu ay ") + e.textContent : ""; } },
-      { bolum: en ? "App" : "Uygulama", id: "ses", baslik: en ? "Sound and playback" : "Ses ve oynatma", dugumler: sesG ? sesG.dugumler : [],
+      { bolum: en ? "DISPLAY OPTIONS" : "GÖRÜNTÜLEME SEÇENEKLERİ", id: "gorunum", baslik: en ? "Background color" : "Arkaplan rengi", dugumler: [gorunumPanel], deger: gorunumDeger },
+      { bolum: en ? "AUDIO & DOWNLOADS" : "SES VE İNDİRME", id: "ses", baslik: en ? "Sound and playback" : "Ses ve oynatma", dugumler: sesG ? sesG.dugumler : [],
         deger: () => (yaziAl("#eqOn", e => e.checked) ? (en ? "Equalizer on" : "Ekolayzır açık") : (en ? "Equalizer off" : "Ekolayzır kapalı")) + " · " + (en ? "Crossfade " : "Geçiş ") + yaziAl("#cfSn", e => e.textContent) },
       { id: "dl", baslik: en ? "Downloads" : "İndirme", dugumler: dlG ? dlG.dugumler : [],
-        deger: () => yaziAl("#esN", e => e.textContent) + (yaziAl("#aTasarruf", e => e.checked) ? (en ? " · data saver" : " · veri tasarrufu") : "") }
+        deger: () => yaziAl("#esN", e => e.textContent) + (yaziAl("#aTasarruf", e => e.checked) ? (en ? " · data saver" : " · veri tasarrufu") : "") },
+      { bolum: en ? "GENERAL" : "GENEL", id: "dil", baslik: "Dil / Language", dugumler: dilNode ? [dilNode] : [], deger: () => yaziAl("#aDil", e => e.options[e.selectedIndex].text) },
+      { id: "ag", baslik: en ? "Internet usage" : "İnternet kullanımı", dugumler: agNode ? [agNode] : [], deger: () => { const e = agNode && agNode.querySelector("b"); return e ? (en ? "This month " : "Bu ay ") + e.textContent : ""; } }
     ].filter(s => s.dugumler.length);
     const ayListe = document.createElement("div"); ayListe.className = "ay-liste";
     const sayfalar = {};
     const degerleriYenile = () => satirlar.forEach(s => { const e = ayListe.querySelector('[data-ay-id="' + s.id + '"] .ay-deger'); if (e) e.textContent = s.deger(); });
     let aktif = null;
+    const sunucusuz = id => id === "dil" || id === "ag" || id === "gorunum";
     const kapat = () => {
       if (!aktif) return;
-      const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (kb && aktif !== "dil" && aktif !== "ag") kb.click();   // ayarlar kapanirken kendiliginden kaydedilir
+      const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (kb && !sunucusuz(aktif)) kb.click();   // ayarlar kapanirken kendiliginden kaydedilir
       sayfalar[aktif].hidden = true; sy.classList.remove("ay-ic-acik"); aktif = null; degerleriYenile();
       document.getElementById("main").scrollTop = 0;
     };
     const ac = id => {
       aktif = id; sayfalar[id].hidden = false; sy.classList.add("ay-ic-acik");
-      if (kaydet && id !== "dil" && id !== "ag") sayfalar[id].appendChild(kaydet);
+      if (kaydet && !sunucusuz(id)) sayfalar[id].appendChild(kaydet);
       document.getElementById("main").scrollTop = 0;
     };
     ayGeri = () => {
@@ -94,13 +126,17 @@
     let kaydetZ = 0;
     sy.addEventListener("change", () => {
       clearTimeout(kaydetZ);
-      kaydetZ = setTimeout(() => { const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (sy.isConnected && kb && aktif && aktif !== "dil" && aktif !== "ag") kb.click(); }, 500);
+      kaydetZ = setTimeout(() => { const kb = kaydet && kaydet.querySelector("[data-act=ayarKaydet]"); if (sy.isConnected && kb && aktif && !sunucusuz(aktif)) kb.click(); }, 500);
     });
+    let aktifGrup = null;
     satirlar.forEach(s => {
-      if (s.bolum) { const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = s.bolum; ayListe.appendChild(et); }
+      if (s.bolum) {
+        const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = s.bolum; ayListe.appendChild(et);
+        aktifGrup = document.createElement("div"); aktifGrup.className = "ay-kart-grup"; ayListe.appendChild(aktifGrup);
+      }
       const b = document.createElement("button"); b.type = "button"; b.className = "ay-satir"; b.dataset.ayId = s.id;
       b.innerHTML = IKON[s.id] + '<span class="ay-metin"><b>' + s.baslik + '</b><span class="ay-deger"></span></span>';
-      b.addEventListener("click", () => ac(s.id)); ayListe.appendChild(b);
+      b.addEventListener("click", () => ac(s.id)); (aktifGrup || ayListe).appendChild(b);
       const sp = document.createElement("div"); sp.className = "ay-sayfa"; sp.hidden = true;
       const ust = document.createElement("div"); ust.className = "ay-ust2";
       const geri = document.createElement("button"); geri.type = "button"; geri.className = "ay-geri"; geri.setAttribute("aria-label", en ? "Back" : "Geri"); geri.innerHTML = svg('<path d="m15 18-6-6 6-6"/>'); geri.addEventListener("click", kapat);
@@ -113,7 +149,88 @@
       const o = document.createElement("option"); o.value = "duz"; o.textContent = en ? "Plain line" : "Düz çizgi";
       stilSel.insertBefore(o, stilSel.firstChild); try { stilSel.value = AY.stil; } catch (x) { }
     }
+    const kartEkle = (kap, baslik, satirlarDizisi) => {
+      if (baslik) { const et = document.createElement("div"); et.className = "ay-etiket"; et.textContent = baslik; kap.appendChild(et); }
+      const g = document.createElement("div"); g.className = "ay-kart-grup ay-ic-kart";
+      satirlarDizisi.forEach(oge => {
+        if (!oge) return;
+        const r = document.createElement("div"); r.className = "ay-ic-satir";
+        (Array.isArray(oge) ? oge : [oge]).forEach(n => n && r.appendChild(n));
+        if (r.childNodes.length) g.appendChild(r);
+      });
+      if (g.childNodes.length) kap.appendChild(g);
+    };
+    const sesIc = sayfalar.ses && sayfalar.ses.querySelector(".ay-ic");
+    if (sesIc) {
+      const eqLbl = sesIc.querySelector("#eqOn") && sesIc.querySelector("#eqOn").closest("label");
+      const eqPreIp = sesIc.querySelector("#eqPre") && sesIc.querySelector("#eqPre").closest(".ip");
+      const ekoz = sesIc.querySelector(".ekoz");
+      const esitleLbl = sesIc.querySelector("#esitleOn") && sesIc.querySelector("#esitleOn").closest("label");
+      const esitleIp = sesIc.querySelector("#esitleHedef") && sesIc.querySelector("#esitleHedef").closest(".ip");
+      const cfR = sesIc.querySelector("#cfR");
+      const cfLbl = cfR && cfR.previousElementSibling;
+      const stilLbl = stilSel && stilSel.previousElementSibling;
+      const kalan = Array.from(sesIc.children).filter(n => ![eqLbl, eqPreIp, ekoz, esitleLbl, esitleIp, cfLbl, cfR, stilLbl, stilSel].includes(n));
+      sesIc.innerHTML = "";
+      kartEkle(sesIc, en ? "EQUALIZER" : "EKOLAYZIR", [eqLbl, eqPreIp, ekoz]);
+      kartEkle(sesIc, en ? "SOUND CHECK & CROSSFADE" : "SES DENETİMİ VE GEÇİŞ", [esitleLbl, esitleIp, [cfLbl, cfR]]);
+      kartEkle(sesIc, en ? "PLAYER" : "OYNATICI", [[stilLbl, stilSel]]);
+      kalan.forEach(n => sesIc.appendChild(n));
+    }
+    const dlIc = sayfalar.dl && sayfalar.dl.querySelector(".ay-ic");
+    if (dlIc) {
+      const tasarrufLbl = dlIc.querySelector("#aTasarruf") && dlIc.querySelector("#aTasarruf").closest("label");
+      const esInput = dlIc.querySelector("#aEs");
+      const esLbl = esInput && esInput.previousElementSibling;
+      const oneriLbl = dlIc.querySelector("#aOneri") && dlIc.querySelector("#aOneri").closest("label");
+      const notlar = Array.from(dlIc.querySelectorAll("p.not:not(.ay-gizli)")).map(p => p.textContent.trim()).filter(Boolean);
+      const gizliler = Array.from(dlIc.querySelectorAll(".ay-gizli"));
+      dlIc.innerHTML = "";
+      kartEkle(dlIc, en ? "DOWNLOAD OPTIONS" : "İNDİRME SEÇENEKLERİ", [tasarrufLbl, [esLbl, esInput]]);
+      kartEkle(dlIc, en ? "HOME SUGGESTIONS" : "ANA SAYFA ÖNERİLERİ", [oneriLbl]);
+      if (notlar.length) {
+        const notP = document.createElement("p"); notP.className = "ay-kart-not";
+        notP.textContent = notlar[0];
+        dlIc.appendChild(notP);
+      }
+      gizliler.forEach(n => dlIc.appendChild(n));
+    }
+    const dilIc = sayfalar.dil && sayfalar.dil.querySelector(".ay-ic");
+    if (dilIc && dilIc.firstElementChild) {
+      const n = dilIc.firstElementChild;
+      dilIc.innerHTML = "";
+      kartEkle(dilIc, en ? "LANGUAGE" : "DİL SEÇİMİ", [n]);
+    }
     sy.insertBefore(ayListe, bas.nextSibling);
+    // "Kapaklari tara": guncelleme/yeniden kurulum sonrasi eksik kalan kapaklari tek dokunusla getirir (GENEL kartinda)
+    const kapakBtn = document.createElement("button");
+    kapakBtn.type = "button";
+    kapakBtn.className = "ay-satir ay-aksiyon";
+    const kapakDeger = () => {
+      const n = (typeof L !== "undefined" && L.kapaksiz) ? L.kapaksiz : 0;
+      return n > 0 ? (en ? n + " missing covers" : n + " eksik kapak") : (en ? "All covers present" : "Tüm kapaklar mevcut");
+    };
+    kapakBtn.innerHTML = svg('<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>') +
+      '<span class="ay-metin"><b>' + (en ? "Scan covers" : "Kapakları tara") + '</b><span class="ay-deger">' + kapakDeger() + '</span></span>';
+    kapakBtn.addEventListener("click", async () => {
+      const alt = kapakBtn.querySelector(".ay-deger");
+      if (alt) alt.textContent = en ? "Scanning…" : "Taranıyor…";
+      try {
+        await api("/api/tara", {});
+        const r = await api("/api/kapaklari-getir", {});
+        if (r && r.sayi > 0) {
+          if (typeof izle === "function") izle();
+          if (typeof toast === "function") toast(en ? `Fetching ${r.sayi} missing covers…` : `${r.sayi} eksik kapak ekleniyor…`);
+        } else {
+          if (typeof toast === "function") toast(en ? "All covers are up to date" : "Tüm kapaklar zaten mevcut");
+        }
+        if (typeof yukle === "function") await yukle();
+      } catch (x) {
+        if (typeof toast === "function") toast(en ? "Could not scan covers" : "Kapaklar taranamadı");
+      }
+      if (alt) alt.textContent = kapakDeger();
+    });
+    (aktifGrup || ayListe).appendChild(kapakBtn);
     degerleriYenile();
     gruplar.forEach(g => g.dugumler.forEach(n => { if (!n.isConnected) return; if (n.classList && n.classList.contains("ay-gizli")) return; if (!n.closest(".ay-ic")) n.classList.add("ay-gizli"); }));
     if (kaydet) { kaydet.classList.add("ay-kaydet"); sy.appendChild(kaydet); }
@@ -123,9 +240,13 @@
     if (sy && sy.querySelector("#aDil")) ayarDuzen(sy);
   }).observe(document.getElementById("main"), { childList: true });
 
-  // ---- Mini calar cubugu kaldirildi: yalnizca cal/duraklat dugmesi alt hapin en sagina tasinir (kimlik ve olay baglari ayni kalir) ----
+  // ---- Alt hap: Kutuphane ile Ayarlar yer degistirir (Ana Sayfa - Ayarlar - Kutuphane) ----
   const cal = document.getElementById("btnCal"), ray = document.getElementById("rail");
-  if (cal && ray) { cal.classList.add("ray-cal"); ray.appendChild(cal); }
+  if (ray) {
+    const nav = ray.querySelector("nav"), rfoot = ray.querySelector(".rfoot");
+    const nvKit = ray.querySelector('[data-nav="kitaplik"]'), nvAyar = ray.querySelector('[data-nav="ayarlar"]');
+    if (nav && rfoot && nvKit && nvAyar) { nav.appendChild(nvAyar); rfoot.appendChild(nvKit); }
+  }
 
   // ---- "Simdi caliyor" karti: mini calar bilgisi (kapak, ad, begen) hapin ustunde yuzer; dokununca / yukari kaydirinca tam ekran calar acilir ----
   const sol = document.querySelector("#dock .d-sol");
@@ -147,26 +268,73 @@
     });
   }
 
-  // ---- Tam ekran calar (Android): yalnizca calma ekrani; sira / sozler / benzer alttan acilan pencerede ----
+  // ---- Tam ekran calar (Android): Apple Music 3 modlu yerlesim (cal / soz / sira) ----
   const odak = document.getElementById("odak");
   if (odak) {
+    odak.dataset.ayMod = "cal";
     const ust = odak.querySelector(".o-ust"), kapat = ust && ust.querySelector("[data-act=odakKapat]");
     if (kapat) kapat.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';   // X yerine asagi ok
     const sol = odak.querySelector(".o-sol"), meta = odak.querySelector(".o-meta"), seek = odak.querySelector(".seekrow");
     const sag = document.getElementById("oSag");
     const ad = document.documentElement.lang === "en" ? ["Up next", "Lyrics", "Related"] : ["Sıradakiler", "Sözler", "Benzer"];
-    // eylem dugmeleri (sira / sozler / benzer)
-    const cip = document.createElement("div"); cip.className = "ay-cipler";
-    [["sira", ad[0]], ["soz", ad[1]], ["benzer", ad[2]]].forEach(([k2, t]) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "ay-cip"; b.textContent = t; b.dataset.k = k2; cip.appendChild(b);
-    });
-    meta.after(cip);
+
+    // Meta satiri: solda baslik/sanatci, sagda daire Begen + Uyku/Daha fazla dugmeleri
+    const metaRow = document.createElement("div"); metaRow.className = "o-meta-row";
+    meta.parentNode.insertBefore(metaRow, meta);
+    metaRow.appendChild(meta);
+    const metaAks = document.createElement("div"); metaAks.className = "o-meta-aks";
+    const odakBegen = document.createElement("button"); odakBegen.type = "button"; odakBegen.className = "ib ay-daire"; odakBegen.id = "ayOdakBegen"; odakBegen.dataset.act = "begenCal"; odakBegen.title = "Beğen";
+    const odakUyku = document.createElement("button"); odakUyku.type = "button"; odakUyku.className = "ib ay-daire ay-uyku-btn"; odakUyku.dataset.act = "uyku"; odakUyku.title = "Uyku zamanlayıcısı";
+    odakUyku.innerHTML = (typeof I === "function" ? I("moon") : "") + '<span class="ay-uyku-rozet" id="ayUykuRozet" hidden></span>';
+    const uykuRozet = odakUyku.querySelector("#ayUykuRozet");
+    const uykuGuncelle = () => {
+      const k = typeof window.__vaalzUykuKalan === "function" ? window.__vaalzUykuKalan() : "";
+      odakUyku.classList.toggle("ac", !!k);
+      if (uykuRozet) { uykuRozet.hidden = !k; uykuRozet.textContent = k === "Parça bitince" ? "Son" : (k ? k.split(":").slice(0, -1).join(":") + "d" : ""); }
+    };
+    window.addEventListener("vaalz-uyku", uykuGuncelle);
+    setInterval(() => { if (!odak.hidden) uykuGuncelle(); }, 15000);
+    uykuGuncelle();
+    metaAks.append(odakBegen, odakUyku);
+    metaRow.appendChild(metaAks);
+
+    // #btnBegen durumunu odak ekranindaki begen dugmesine esitle
+    const btnBegen0 = document.getElementById("btnBegen");
+    const esitleBegen = () => {
+      if (!btnBegen0) return;
+      odakBegen.innerHTML = btnBegen0.innerHTML;
+      odakBegen.classList.toggle("ac", btnBegen0.classList.contains("ac"));
+    };
+    if (btnBegen0) {
+      new MutationObserver(esitleBegen).observe(btnBegen0, { childList: true, attributes: true, attributeFilter: ["class"] });
+      esitleBegen();
+    }
+
+    // Kucuk kapak + baslik ust cubugu (soz / sira modunda ustte gorunur)
+    const miniKapak = document.createElement("div"); miniKapak.className = "cv ay-mini-cv";
+    metaRow.prepend(miniKapak);
+    const oKapak = document.getElementById("oKapak");
+    const esitleKapak = () => { if (oKapak) miniKapak.innerHTML = oKapak.innerHTML; };
+    if (oKapak) {
+      new MutationObserver(esitleKapak).observe(oKapak, { childList: true, attributes: true });
+      esitleKapak();
+    }
+
+    // Sira modunda ustte 3 esit hap dugme (Karistir / Tekrar / Benzer)
+    const siraKont = document.createElement("div"); siraKont.className = "ay-sira-kont";
+    const oKaris = document.getElementById("oKaris"), oTekrar = document.getElementById("oTekrar");
+    const btnBenzerMod = document.createElement("button"); btnBenzerMod.type = "button"; btnBenzerMod.className = "ib ay-benzer-hap"; btnBenzerMod.title = ad[2];
+    btnBenzerMod.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>';
+    if (oKaris) siraKont.appendChild(oKaris);
+    if (oTekrar) siraKont.appendChild(oTekrar);
+    siraKont.appendChild(btnBenzerMod);
+    sag.prepend(siraKont);
+
     // ince ilerleme cubugu (tuvalin yerine)
     let surukleniyor = false;
     const cubuk = document.createElement("div"); cubuk.className = "ay-cubuk";
     cubuk.innerHTML = "<i></i><b></b>"; seek.insertBefore(cubuk, seek.querySelector("canvas"));
     const dolgu = cubuk.querySelector("i"), top = cubuk.querySelector("b");
-    // erisilebilirlik: kaydirici rolu, deger bildirimi ve klavye / ekran okuyucu ile ilerletme
     cubuk.setAttribute("role", "slider"); cubuk.tabIndex = 0;
     cubuk.setAttribute("aria-label", document.documentElement.lang === "en" ? "Progress" : "İlerleme");
     cubuk.setAttribute("aria-valuemin", "0"); cubuk.setAttribute("aria-valuemax", "100"); cubuk.setAttribute("aria-valuenow", "0");
@@ -189,39 +357,48 @@
       if (sureVar()) audio.currentTime = oranAl(e) * audio.duration;
     };
     cubuk.addEventListener("pointerup", birak); cubuk.addEventListener("pointercancel", birak);
-    // ilerleme cubugu stili: "duz" (varsayilan, ince cizgi) / "dalga" / "form" (Ayarlar > Ses ve oynatma'daki secim oynaticiya da uygulanir)
     const stilUygula = () => { odak.classList.toggle("ay-duz", AY.stil === "duz"); try { oDalga.boyutla(); dalgaBaslat(); } catch (x) { } };
     try { if (!localStorage.getItem("ay_cubuk_ilk")) { localStorage.setItem("ay_cubuk_ilk", "1"); if (AY.stil !== "form") { AY.stil = "duz"; ayKaydet(); } } } catch (x) { }
     stilUygula();
     document.addEventListener("change", e => { if (e.target && e.target.id === "cubukStil") stilUygula(); });
-    // alttan acilan pencere
-    const perde = document.createElement("div"); perde.className = "ay-perde"; odak.querySelector(".o-ana").appendChild(perde);
-    const tutac = document.createElement("div"); tutac.className = "ay-tutac"; tutac.innerHTML = "<i></i>"; sag.prepend(tutac);
-    const ac = k2 => {
-      const b = document.querySelector('#kuyruk [data-act=kTab][data-k="' + k2 + '"]'); if (b) b.click();
-      odak.classList.add("ay-sheet");
+
+    // Alttaki 3 ikonlu Apple Music cubugu: Sozler | Benzer | Siradakiler
+    const altBar = document.createElement("div"); altBar.className = "ay-alt-bar";
+    const mkBtn = (k2, baslik, svgI) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "ib ay-alt-b"; b.dataset.k = k2; b.title = baslik;
+      b.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + svgI + '</svg>';
+      return b;
     };
-    const kapatPencere = () => { if (odak.classList.contains("ay-sheet")) odak.classList.remove("ay-sheet"); };   // gereksiz yazim izleyiciyi sonsuz dongude tetikler
-    cip.addEventListener("click", e => { const b = e.target.closest(".ay-cip"); if (b) ac(b.dataset.k); });
-    perde.addEventListener("click", kapatPencere);
-    odak.addEventListener("click", e => { if (e.target.closest("#kuyruk .kc") || e.target.closest(".ay-tutac")) kapatPencere(); });
-    let sy = null;
-    sag.addEventListener("touchstart", e => { sy = e.touches[0].clientY; }, { passive: true });
-    sag.addEventListener("touchend", e => { if (sy !== null && e.changedTouches[0].clientY - sy > 70 && e.target.closest(".k-bas, .ay-tutac")) kapatPencere(); sy = null; });
-    // altta "Sıradakiler" tutacagi: dokun / yukari kaydir
-    const alt = document.createElement("button"); alt.type = "button"; alt.className = "ay-alt"; alt.innerHTML = "<i></i><span>" + ad[0] + "</span>";
-    alt.addEventListener("click", () => ac("sira"));
-    let ay0 = null;
-    alt.addEventListener("touchstart", e => { ay0 = e.touches[0].clientY; }, { passive: true });
-    alt.addEventListener("touchend", e => { if (ay0 !== null && ay0 - e.changedTouches[0].clientY > 30) { e.preventDefault(); ac("sira"); } ay0 = null; });
-    sol.appendChild(alt);
-    // orta alandan tutup asagi kaydirinca calar parmagi izleyerek kapanir
+    const bSoz = mkBtn("soz", ad[1], '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M9 9h.01M15 9h.01" stroke-width="2.4"/>');
+    const bBenzer = mkBtn("benzer", ad[2], '<path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/>');
+    const bSira = mkBtn("sira", ad[0], '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/>');
+    altBar.append(bSoz, bBenzer, bSira);
+    sol.appendChild(altBar);
+
+    const modKur = (mod, sekme) => {
+      odak.dataset.ayMod = mod;
+      const k2 = sekme || (mod === "soz" ? "soz" : "sira");
+      const tab = document.querySelector('#kuyruk [data-act=kTab][data-k="' + k2 + '"]');
+      if (mod !== "cal" && tab) tab.click();
+      bSoz.classList.toggle("on", mod === "soz");
+      bSira.classList.toggle("on", mod === "sira" && k2 !== "benzer");
+      bBenzer.classList.toggle("on", mod === "sira" && k2 === "benzer");
+      btnBenzerMod.classList.toggle("ac", mod === "sira" && k2 === "benzer");
+    };
+
+    bSoz.addEventListener("click", () => modKur(odak.dataset.ayMod === "soz" ? "cal" : "soz", "soz"));
+    bSira.addEventListener("click", () => modKur(odak.dataset.ayMod === "sira" && !bBenzer.classList.contains("on") ? "cal" : "sira", "sira"));
+    bBenzer.addEventListener("click", () => modKur(odak.dataset.ayMod === "sira" && bBenzer.classList.contains("on") ? "cal" : "sira", "benzer"));
+    btnBenzerMod.addEventListener("click", () => modKur("sira", bBenzer.classList.contains("on") ? "sira" : "benzer"));
+    miniKapak.addEventListener("click", () => modKur("cal"));
+
+    // Orta/ust alandan tutup asagi kaydirinca calar parmagi izleyerek kapanir
     let kx = null, ky = null, kd = 0, kt = 0, surukle = false;
-    sol.addEventListener("touchstart", e => {
-      if (odak.classList.contains("ay-sheet") || e.target.closest(".ay-cubuk, button, .kont, .ay-cipler")) { ky = null; return; }
+    odak.addEventListener("touchstart", e => {
+      if (e.target.closest(".ay-cubuk, button, .kont, .ay-alt-bar, .ay-sira-kont, #kuyrukListe, #sozKutu, #benzerKutu")) { ky = null; return; }
       kx = e.touches[0].clientX; ky = e.touches[0].clientY; kd = 0; kt = performance.now(); surukle = false;
     }, { passive: true });
-    sol.addEventListener("touchmove", e => {
+    odak.addEventListener("touchmove", e => {
       if (ky === null) return;
       const dy = e.touches[0].clientY - ky, dx = e.touches[0].clientX - kx;
       if (!surukle && dy > 12 && dy > Math.abs(dx) * 1.5) { surukle = true; odak.style.transition = "none"; }
@@ -234,11 +411,11 @@
       ky = null;
       if (!surukle) return;
       surukle = false;
-      odak.style.transition = ""; odak.style.transform = "";      // parmagin biraktigi konumdan sinifa bagli gecis devralir
+      odak.style.transition = ""; odak.style.transform = "";
       if (kd > 140 || hizli) H.odakKapat();
     };
-    sol.addEventListener("touchend", kBitir); sol.addEventListener("touchcancel", kBitir);
-    new MutationObserver(() => { if (!odak.classList.contains("acik")) kapatPencere(); else guncelle(); }).observe(odak, { attributes: true, attributeFilter: ["class", "hidden"] });
+    odak.addEventListener("touchend", kBitir); odak.addEventListener("touchcancel", kBitir);
+    new MutationObserver(() => { if (!odak.classList.contains("acik")) modKur("cal"); else guncelle(); }).observe(odak, { attributes: true, attributeFilter: ["class", "hidden"] });
   }
 
   // ---- Alt hap: basili tutup sekmeler uzerinde surukleyince secim parmagi izler, birakinca gecilir ----
@@ -274,7 +451,8 @@
       b.innerHTML = typeof I === "function" ? I(ic) : ""; return b;
     };
     const sagKapsul = document.createElement("div"); sagKapsul.className = "ay-kdler";
-    sagKapsul.append(dugme("onceki", "prev", "Önceki"), dugme("sonraki", "next", "Sonraki"));
+    if (cal) { cal.classList.add("ay-kd", "ay-cal"); sagKapsul.append(cal, dugme("sonraki", "next", "Sonraki")); }
+    else sagKapsul.append(dugme("sonraki", "next", "Sonraki"));
     kk.querySelector(".d-sol").appendChild(sagKapsul);
     let x0 = null, y0k = null, dxk = 0, yatay = false, hareketEtti = false;
     kk.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0k = e.touches[0].clientY; dxk = 0; yatay = false; hareketEtti = false; }, { passive: true });

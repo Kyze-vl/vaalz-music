@@ -208,14 +208,12 @@ html.android .kont.o .ib.cal{width:88px;height:88px}
 html.android .kont.o .ib.cal .ic{width:36px;height:36px}
 html.android .ay-alt{margin:auto auto 0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 24px 2px;color:var(--mut);font-weight:600;font-size:14px}
 html.android .ay-alt i{width:44px;height:5px;border-radius:3px;background:var(--hv4)}
-/* pencere: sira / sozler / benzer */
-html.android #oSag{position:fixed;left:0;right:0;bottom:0;height:76vh;min-height:0;z-index:40;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .34s cubic-bezier(.22,1,.36,1);border-radius:26px 26px 0 0;background:color-mix(in srgb,var(--pop) 90%,transparent);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:0 -14px 40px #0008;border-top:1px solid var(--line2)}
-html.android #odak.ay-sheet #oSag{transform:none}
-html.android .ay-tutac{display:flex;justify-content:center;padding:10px 0 2px;flex:none}
-html.android .ay-tutac i{width:44px;height:5px;border-radius:3px;background:var(--hv4)}
+/* pencere: Android'de artik alttan acilan karartmali sheet degil, #odak icinde seffaf yerlesik panel */
+html.android #oSag{position:static;left:auto;right:auto;bottom:auto;height:auto;min-height:0;z-index:auto;display:none;flex:1;flex-direction:column;transform:none;border-radius:0;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border-top:0;visibility:visible;transition:none}
 html.android #oSag #kuyruk{flex:1;min-height:0;border:0;border-radius:0;background:transparent}
-html.android .ay-perde{position:fixed;inset:0;z-index:39;background:#000;opacity:0;pointer-events:none;transition:opacity .3s}
-html.android #odak.ay-sheet .ay-perde{opacity:.5;pointer-events:auto}
+html.android #oSag .k-bas{display:none}
+html.android #odak[data-ay-mod="soz"] #oSag,
+html.android #odak[data-ay-mod="sira"] #oSag{display:flex}
 
 html.android #odak{border-bottom:0;box-shadow:none}
 
@@ -228,37 +226,58 @@ html.android #rail .nv.ay-uz .ic{stroke-width:2.6}
 html.android .ay-kdler{display:flex;gap:6px;flex:none}
 html.android .ay-kd{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--hv2);color:var(--txt)}
 html.android .ay-kd .ic{width:18px;height:18px}
+html.android #ayKart #btnCal.ay-cal{width:40px;height:40px;background:var(--hv2);color:var(--txt)}
+html.android #ayKart #btnCal.ay-cal:hover{background:var(--hv3);transform:none}
+html.android #ayKart #btnCal.ay-cal .ic{width:18px;height:18px}
 html.android #ayKart #btnBegen{width:40px;height:40px}
 html.android #ayKart .d-sol{gap:8px}
 
-/* ---- Ayarlar (Android) v2: duz liste + alt sayfalar ---- */
-html.android .ay-liste{margin-top:4px}
-html.android .ay-etiket{font-size:13px;color:var(--mut);font-weight:600;margin:24px 4px 4px}
-html.android .ay-satir{display:flex;align-items:center;gap:18px;width:100%;min-height:72px;padding:8px 6px;text-align:left;color:var(--txt);position:relative}
-html.android .ay-satir+.ay-satir::before{content:"";position:absolute;left:46px;right:0;top:0;height:1px;background:var(--line2)}
-html.android .ay-satir .ic{width:24px;height:24px;color:var(--mut);flex:none}
+/* ---- Ayarlar (Android) v3: Apple Music tarzi gruplanmis kartlar + alt sayfalar ---- */
+html.android .sy[data-ay]>.bas{padding:12px 2px 10px}
+html.android .ay-liste{margin-top:6px}
+html.android .ay-etiket{font-size:12px;color:var(--mut);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin:22px 2px 8px}
+html.android .ay-etiket:first-child{margin-top:12px}
+html.android .ay-kart-grup{background:var(--s1);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+html.android .ay-satir{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:12px 16px;text-align:left;color:var(--txt);position:relative;transition:background .12s}
+html.android .ay-satir:active{background:var(--hv1)}
+html.android .ay-satir+.ay-satir::before{content:"";position:absolute;left:52px;right:0;top:0;height:1px;background:var(--line)}
+html.android .ay-satir .ic{width:22px;height:22px;color:var(--ak);flex:none}
 html.android .ay-metin{flex:1;min-width:0}
-html.android .ay-metin b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}
-html.android .ay-deger{display:block;color:var(--mut);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html.android .ay-satir::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--mut);border-top:2px solid var(--mut);transform:rotate(45deg);margin-right:6px}
+html.android .ay-metin b{display:block;font-size:15.5px;font-weight:500;letter-spacing:-.01em}
+html.android .ay-deger{display:block;color:var(--mut);font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.android .ay-satir:not(.ay-aksiyon)::after{content:"";flex:none;width:8px;height:8px;border-right:1.8px solid var(--mut);border-top:1.8px solid var(--mut);transform:rotate(45deg);margin-right:2px;opacity:.7}
+html.android .ay-gorunum-panel{padding-top:8px}
+html.android .ay-radio-satir{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:14px 16px;text-align:left;color:var(--txt);position:relative;transition:background .12s}
+html.android .ay-radio-satir:active{background:var(--hv1)}
+html.android .ay-radio-satir+.ay-radio-satir::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+html.android .ay-radio{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--hv4);display:grid;place-items:center;transition:border-color .15s}
+html.android .ay-radio i{width:11px;height:11px;border-radius:50%;background:transparent;transform:scale(.4);transition:transform .15s,background .15s}
+html.android .ay-radio-satir.on .ay-radio{border-color:var(--ak)}
+html.android .ay-radio-satir.on .ay-radio i{background:var(--ak);transform:scale(1)}
+html.android .ay-kart-not{margin:12px 14px 0;font-size:13px;line-height:1.45;color:var(--mut)}
 html.android .ay-sayfa[hidden]{display:none}
-html.android .ay-ust2{display:flex;align-items:center;gap:6px;padding:2px 0 8px;margin-left:-8px}
-html.android .ay-geri{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;color:var(--txt)}
-html.android .ay-geri .ic{width:26px;height:26px}
-html.android .ay-ust2 h2{font-size:24px;font-weight:700;letter-spacing:-.02em}
+html.android .ay-ust2{display:flex;align-items:center;gap:12px;padding:4px 0 14px}
+html.android .ay-geri{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:var(--hv1);color:var(--txt);flex:none}
+html.android .ay-geri .ic{width:22px;height:22px}
+html.android .ay-ust2 h2{font-size:22px;font-weight:700;letter-spacing:-.02em}
 html.android .sy.ay-ic-acik>.bas,html.android .sy.ay-ic-acik>.ay-liste{display:none}
 html.android .ay-sayfa .ay-ic{border-top:0;padding:0 0 14px}
+html.android .ay-ic-satir{padding:12px 16px;position:relative}
+html.android .ay-ic-satir+.ay-ic-satir::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+html.android .ay-ic-satir label.f{margin:0 0 6px;font-size:15px}
+html.android .ay-ic-satir label.f:last-child{margin-bottom:0}
+html.android .ay-ic-satir label.f:has(>input[type=checkbox]){min-height:36px;margin:0}
+html.android .ay-ic-satir .ip{margin:0}
+html.android .ay-ic-satir .ekoz{margin:4px 0 0}
+html.android .ay-sayfa .kutu{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:16px}
 html.android .sy>.ay-kaydet{display:none}
 
 /* dokunmatikte :hover ilk dokunulan sekmede takili kaliyordu (surukleme sonrasi iz) */
 html.android #rail .nv:not(.on):not(.ay-uz):hover{background:none;color:var(--mut)}
 html.android #rail .nv:not(.on):not(.ay-uz):hover .ic{stroke-width:1.7}
 
-/* Soz akisi gorunur satiri kaydirirken ust ekrani da kaydiriyordu (oynatici yukari kayiyor, kapali pencere gorunuyordu): ust kaplar programatik kaydirmaya kapali */
+/* Soz akisi gorunur satiri kaydirirken ust ekrani da kaydiriyordu: ust kaplar programatik kaydirmaya kapali */
 html.android #odak,html.android .o-ana{overflow:clip}
-/* kapali pencere hic gorunmesin, kapanis animasyonu bitince gizlensin */
-html.android #oSag{visibility:hidden;transition:transform .34s cubic-bezier(.22,1,.36,1),visibility 0s linear .34s}
-html.android #odak.ay-sheet #oSag{visibility:visible;transition:transform .34s cubic-bezier(.22,1,.36,1),visibility 0s}
 
 
 /* dalga modunda satir daha yuksek: kapak kuculur, oneri dugmeleri kirpilmaz */
@@ -268,4 +287,143 @@ html.android #odak:not(.ay-duz) .o-sol .cv.buyuk{max-height:42vh}
 /* klavye acikken alt hap ve kart gizli; pencere ekrana siger */
 html.android.ay-klavye #rail,html.android.ay-klavye #ayKart{display:none!important}
 html.android .mk{max-height:94vh}
+
+/* ---- Apple Music iOS 18/26 Yerlesim & Tipografi Uyumu (renk dili korunur) ---- */
+html.android #ust{padding:10px 18px 4px}
+html.android #aramaForm{height:40px;border-radius:12px;background:var(--s2);padding:0 12px}
+html.android #main{padding:6px 18px 24px}
+
+/* Buyuk Sayfa Basliklari & Bolumler */
+html.android .bas{padding:10px 0 2px}
+html.android .eyebrow{font-size:11.5px;letter-spacing:.06em}
+html.android h1.b{font-size:32px;font-weight:800;letter-spacing:-.035em;line-height:1.12}
+html.android h2.b{font-size:21px;font-weight:700;letter-spacing:-.022em;margin:26px 0 12px}
+
+/* Ana Sayfa: "Kaldigin yer" Apple Music Top Pick Karti */
+html.android .devam{flex-direction:column;align-items:stretch;gap:14px;margin-top:16px;padding:16px;border-radius:18px;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--tint) 18%,var(--s1)),var(--s1) 72%);border:1px solid var(--line)}
+html.android .devam .cv{width:100%;height:auto;aspect-ratio:16/10;border-radius:12px}
+html.android .devam>div:last-child{display:flex;flex-direction:column}
+html.android .devam h2{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:2px 0 2px}
+html.android .devam p{font-size:14px;margin-bottom:14px}
+html.android .devam .bt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html.android .devam .bt .btn{justify-content:center;border-radius:12px;height:44px;font-weight:600}
+
+/* Yatay Karuseller (Son dinlediklerim & Oneriler) */
+html.android .satir{gap:14px;margin:0 -18px;padding:2px 18px 8px;scroll-snap-type:x proximity}
+html.android .kt{flex:0 0 152px;scroll-snap-align:start}
+html.android .kt .cvw>.cv,html.android .kt .cvw>.mz{width:152px;height:152px;border-radius:10px}
+html.android .kt .cvw::after{border-radius:10px}
+html.android .kt h3{margin-top:8px;font-size:14px;font-weight:600;letter-spacing:-.01em}
+html.android .kt p{font-size:13px;margin-top:1px}
+
+/* Sik Dinlediklerim & Parca Satirlari (iOS Table View hiyerarsisi) */
+html.android .sk1{height:60px;gap:12px;padding:0 2px;border-bottom:0;position:relative}
+html.android .sk1+.sk1::before{content:"";position:absolute;left:56px;right:0;top:0;height:1px;background:var(--line)}
+html.android .sk1 .nm{display:none}
+html.android .sk1 .cv{width:46px;height:46px;border-radius:7px}
+html.android .sk1 .mt b{font-size:15px;font-weight:600}
+html.android .sk1 .mt span{font-size:13px}
+html.android .sr{height:62px;gap:12px;padding:0 2px;border-bottom:0;position:relative}
+html.android .sr+.sr::before{content:"";position:absolute;left:58px;right:0;top:0;height:1px;background:var(--line)}
+html.android .sr .cv{width:46px;height:46px;border-radius:7px}
+html.android .sr .mt b{font-size:15px;font-weight:600}
+html.android .sr .mt span{font-size:13px}
+
+/* Kutuphane & Playlist Detay (Apple Music merkezlenmis kapak + 2 esit dugme) */
+html.android .pg{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px;margin-top:16px}
+html.android .pg .kt .cvw>.cv,html.android .pg .kt .cvw>.mz{border-radius:10px}
+html.android .ph{align-items:center;text-align:center;gap:14px;margin-top:10px}
+html.android .ph>.mz,html.android .ph>.cv{width:min(220px,60vw);height:min(220px,60vw);border-radius:14px;box-shadow:0 18px 46px color-mix(in srgb,var(--tint) 26%,#0008)}
+html.android .ph>div:last-child{width:100%}
+html.android .ph h1{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:4px 0 4px}
+html.android .ph p{font-size:14px}
+html.android .ph .bt{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:16px}
+html.android .ph .bt .btn{justify-content:center;border-radius:12px;height:46px;font-weight:600}
+html.android .ph .bt .btn:nth-child(n+3){grid-column:span 1}
+
+/* Oneri kartlari: Indir + (+) Listeye ekle tek satirda kompakt */
+html.android .kt-aks{display:flex;align-items:center;gap:6px;margin-top:8px}
+html.android .kt-aks .btn.k{height:32px;padding:0 10px;border-radius:999px;font-size:12px;margin:0;justify-content:center;flex:1;min-width:0}
+html.android .kt-aks .btn.k.kt-ekle{flex:none;width:32px;padding:0;border-radius:50%;gap:0}
+html.android .kt-aks .btn.k.kt-ekle span{display:none}
+
+/* Tam Ekran Calar (#odak): Apple Music 3 Modlu Mimari (cal / soz / sira) */
+html.android #odak{background:linear-gradient(175deg,color-mix(in srgb,var(--tint) 42%,var(--bg)) 0%,color-mix(in srgb,var(--tint) 16%,var(--bg)) 54%,var(--bg) 100%)}
+html.android #odak::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:3px;background:var(--hv4);z-index:4;pointer-events:none}
+html.android .o-ana{display:flex;flex-direction:column;height:100%;padding:38px 24px 22px;gap:0}
+html.android .o-sol{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:flex-start;gap:12px;width:100%}
+html.android .o-sol>*{width:100%;flex:none}
+html.android .o-sol .cv.buyuk{width:min(100%,44vh);margin:auto auto;border-radius:14px;box-shadow:none;transition:transform .38s cubic-bezier(.22,1.2,.36,1)}
+html.android body.durdu .o-sol .cv.buyuk{transform:scale(.88)}
+
+/* Baslik satiri + daire Begen / Menu dugmeleri */
+html.android .o-meta-row{display:flex;align-items:center;gap:12px;width:100%}
+html.android .o-meta{flex:1;min-width:0;text-align:left;margin-top:0}
+html.android .o-meta b{font-size:21px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.android .o-meta span{font-size:15.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.android .o-meta-aks{display:flex;align-items:center;gap:8px;flex:none}
+html.android .ay-daire{width:34px;height:34px;border-radius:50%;background:var(--hv2);color:var(--txt)}
+html.android .ay-daire .ic{width:17px;height:17px}
+html.android .ay-daire.ac{color:var(--ak);background:var(--ak-d)}
+html.android .ay-uyku-btn{position:relative}
+html.android .ay-uyku-rozet{position:absolute;bottom:-5px;right:-6px;min-width:22px;height:15px;padding:0 4px;border-radius:999px;background:var(--ak);color:var(--bg);font-size:9.5px;font-weight:700;line-height:15px;text-align:center;font-variant-numeric:tabular-nums}
+html.android #modal:has(.uyku-mk){align-items:end;padding:0}
+html.android .uyku-mk{width:100%;max-width:none;border-radius:24px 24px 0 0;padding:14px 18px 22px;border-bottom:0;animation:aySheetUp .25s cubic-bezier(.22,1,.36,1)}
+html.android .uyku-mk::before{content:"";display:block;width:38px;height:4px;border-radius:2px;background:var(--hv4);margin:0 auto 14px}
+@keyframes aySheetUp{from{transform:translateY(30px);opacity:.7}to{transform:none;opacity:1}}
+html.android .ay-mini-cv{display:none;width:46px;height:46px;border-radius:9px;flex:none;cursor:pointer}
+
+/* Scrubber + Transport + Alt 3 Ikonlu Cubuk */
+html.android .seekrow.o{margin-top:4px}
+html.android .ay-cubuk::before,html.android .ay-cubuk i{height:5px;border-radius:3px}
+html.android .ay-cubuk b{width:10px;height:10px;margin-left:-5px;top:9.5px}
+html.android .kont.o{justify-content:space-evenly;margin:14px 0 8px;padding:0 10px}
+html.android .kont.o .ib{width:54px;height:54px;color:var(--txt)}
+html.android .kont.o .ib .ic{width:30px;height:30px}
+html.android .kont.o .ib.cal{width:68px;height:68px;background:none;color:var(--txt)}
+html.android .kont.o .ib.cal:hover{background:var(--hv1)}
+html.android .kont.o .ib.cal .ic{width:38px;height:38px}
+html.android .ay-alt-bar{display:flex;align-items:center;justify-content:space-around;margin-top:34px;padding:4px 8px 4px}
+html.android .ay-alt-b{width:42px;height:38px;border-radius:11px;color:var(--mut);transition:background .18s,color .18s}
+html.android .ay-alt-b .ic{width:21px;height:21px}
+html.android .ay-alt-b.on{background:var(--hv3);color:var(--txt)}
+
+/* SOZ & SIRA MODLARI: Kucuk ust baslik + ortada icerik + altta sabit kontroller */
+html.android #odak[data-ay-mod="soz"] .o-sol,
+html.android #odak[data-ay-mod="sira"] .o-sol{display:contents}
+html.android #odak[data-ay-mod="soz"] .o-sol .cv.buyuk,
+html.android #odak[data-ay-mod="sira"] .o-sol .cv.buyuk{display:none}
+html.android #odak[data-ay-mod="soz"] .ay-mini-cv,
+html.android #odak[data-ay-mod="sira"] .ay-mini-cv{display:block}
+html.android #odak[data-ay-mod="soz"] .o-meta-row,
+html.android #odak[data-ay-mod="sira"] .o-meta-row{order:1;margin-bottom:8px}
+html.android #odak[data-ay-mod="soz"] .o-meta b,
+html.android #odak[data-ay-mod="sira"] .o-meta b{font-size:16px}
+html.android #odak[data-ay-mod="soz"] .o-meta span,
+html.android #odak[data-ay-mod="sira"] .o-meta span{font-size:13.5px}
+html.android #odak[data-ay-mod="soz"] #oSag,
+html.android #odak[data-ay-mod="sira"] #oSag{order:2;flex:1;min-height:0;overflow:hidden;margin:4px -6px}
+html.android #odak[data-ay-mod="soz"] .seekrow.o,
+html.android #odak[data-ay-mod="sira"] .seekrow.o{order:3}
+html.android #odak[data-ay-mod="soz"] .kont.o,
+html.android #odak[data-ay-mod="sira"] .kont.o{order:4}
+html.android #odak[data-ay-mod="soz"] .ay-alt-bar,
+html.android #odak[data-ay-mod="sira"] .ay-alt-bar{order:5}
+
+/* Sira modunda ustte 3 esit hap dugme (Karistir / Tekrar / Benzer) */
+html.android .ay-sira-kont{display:none;gap:10px;padding:4px 6px 10px;flex:none}
+html.android #odak[data-ay-mod="sira"] .ay-sira-kont{display:flex}
+html.android .ay-sira-kont .ib{flex:1;height:40px;border-radius:999px;background:var(--hv2);color:var(--txt);width:auto}
+html.android .ay-sira-kont .ib .ic{width:20px;height:20px}
+html.android .ay-sira-kont .ib.ac{background:var(--txt);color:var(--bg)}
+
+/* Senkron Sozler: Apple Music buyuk cesur tipografi, aktif satir parlak, digerleri soluk */
+html.android #sozKutu{padding:8px 8px 24px}
+html.android .soz-liste{padding:18vh 4px}
+html.android .sl2{font-size:25px;font-weight:700;line-height:1.3;padding:9px 4px;letter-spacing:-.02em;color:var(--txt);opacity:.34;transition:opacity .25s,transform .25s}
+html.android .sl2.on{opacity:1;transform:scale(1.02)}
+html.android #kuyrukListe,html.android #benzerKutu{padding:0 4px 12px}
+
+
 

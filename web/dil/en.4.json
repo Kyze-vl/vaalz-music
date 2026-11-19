@@ -1,8 +1,8 @@
 [
  {
   "file": "web/app.js",
-  "old": "title=\"İndir ve bu listeye ekle\">${I(\"plus\")}Listeye ekle</button>",
-  "new": "title=\"Download and add to this list\">${I(\"plus\")}Add to list</button>"
+  "old": "title=\"İndir ve bu listeye ekle\">${I(\"plus\")}<span>Listeye ekle</span></button>",
+  "new": "title=\"Download and add to this list\">${I(\"plus\")}<span>Add to list</span></button>"
  },
  {
   "file": "web/app.js",

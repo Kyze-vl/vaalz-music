@@ -681,7 +681,7 @@ def parca_indir(vid):
         # YouTube kaynaklari zaten kayiplidir; FLAC'a cevirmek kaliteyi artirmaz, yalnizca dosyayi sisirir.
         bicim = ["-f", "bestaudio/best", "-x", "--audio-format", "best"]
     yolf = os.path.join(ham, vid + ".yol.txt")           # yt-dlp'nin bildirdigi gercek cikti yolu
-    args = bicim + ["--write-info-json", "--write-thumbnail", "--convert-thumbnails", "jpg",
+    args = bicim + ["--concurrent-fragments", "4", "--write-info-json", "--write-thumbnail", "--convert-thumbnails", "jpg",
                     "--no-playlist", "--no-warnings", "--newline", "--windows-filenames",
                     "--print-to-file", "after_move:filepath", yolf,
                     "-o", os.path.join(cikis, "%(title).120B [%(id)s].%(ext)s"),
@@ -1189,10 +1189,61 @@ def kapaksiz():
 # YouTube aramasi (sadece acik istekle; API anahtari / hesap gerekmez: yt-dlp'nin arama ozelligi)
 # ---------------------------------------------------------------------------
 
+def _sure_coz(metin):
+    parca = [int(x) for x in re.findall(r"\d+", metin or "")]
+    if len(parca) == 3:
+        return parca[0] * 3600 + parca[1] * 60 + parca[2]
+    if len(parca) == 2:
+        return parca[0] * 60 + parca[1]
+    return parca[0] if len(parca) == 1 else 0
+
+
+def _innertube_ara(q):
+    govde = json.dumps({
+        "context": {"client": {"clientName": "WEB", "clientVersion": "2.20241101.00.00", "hl": "tr", "gl": "TR"}},
+        "query": q,
+        "params": "EgIQAQ%3D%3D",
+    }).encode("utf-8")
+    istek = urllib.request.Request(
+        "https://www.youtube.com/youtubei/v1/search?prettyPrint=false",
+        data=govde,
+        headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
+    )
+    with urllib.request.urlopen(istek, timeout=8) as r:
+        ham = r.read()
+    ag_say(len(ham))
+    veri = json.loads(ham.decode("utf-8"))
+    bolumler = (veri.get("contents", {}).get("twoColumnSearchResultsRenderer", {})
+                .get("primaryContents", {}).get("sectionListRenderer", {}).get("contents") or [])
+    sonuc = []
+    for b in bolumler:
+        for oge in (b.get("itemSectionRenderer", {}).get("contents") or []):
+            v = oge.get("videoRenderer")
+            if not v:
+                continue
+            vid = v.get("videoId")
+            sure = _sure_coz((v.get("lengthText") or {}).get("simpleText"))
+            if not vid or not re.fullmatch(r"[\w-]{11}", vid) or sure <= 0 or sure > 900:
+                continue
+            baslik = "".join(r.get("text", "") for r in ((v.get("title") or {}).get("runs") or [])) or vid
+            kanal = "".join(r.get("text", "") for r in ((v.get("ownerText") or {}).get("runs") or []))
+            sonuc.append({"id": vid, "title": baslik, "artist": temiz_sanatci(kanal),
+                          "duration": sure, "var": bool(dosya_yolu(vid))})
+            if len(sonuc) >= 20:
+                return sonuc
+    return sonuc
+
+
 def ara(q):
     q = re.sub(r"\s+", " ", (q or "")).strip()[:120]
     if len(q) < 2:
         raise RuntimeError("Aramak icin en az 2 harf yaz")
+    try:
+        hizli = _innertube_ara(q)
+        if hizli:
+            return hizli
+    except Exception:
+        pass
     veri = ytdlp_json(["--flat-playlist", "-J", "--no-warnings", f"ytsearch25:{q}"])
     sonuc = []
     for e in veri.get("entries") or []:

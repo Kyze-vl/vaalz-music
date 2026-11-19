@@ -97,7 +97,7 @@ const TEMALAR = [
 ];
 const GRAD = new Set(["gece", "retro", "lofi", "elma", "mavimor", "alaca"]);
 const VURGULAR = [["Kum", 35, 38], ["Mercan", 10, 70], ["Adaçayı", 105, 26], ["Gök", 210, 65], ["Lavanta", 260, 60], ["Gül", 335, 60]];
-let TEMA = { mod: "sistem", vurgu: "oto" }, TEMA_ISIK = false, AK = "#d9c2a0";
+let TEMA = { mod: "sistem", vurgu: "35,38" }, TEMA_ISIK = false, AK = "#d9c2a0";
 try { Object.assign(TEMA, JSON.parse(localStorage.getItem("tema") || "{}")); } catch { }
 const hsl = (h, s) => `hsl(${Math.round(h)} ${Math.round(s)}% ${TEMA_ISIK ? 40 : 72}%)`;
 function hexHS(hex) {
@@ -177,7 +177,7 @@ function oneriKart(o, listeli, listeId) {
   const var_ = T(o.id) && T(o.id).var;
   return `<div class="kt" style="cursor:default"><div class="cvw"><div class="cv" style="--h:${hue(o.id)}"><img loading="lazy" decoding="async" src="/api/kapak/${encodeURIComponent(o.id)}?uzak=1" alt="" onerror="this.remove()"></div><div class="pl onz" data-act="onizle" data-onz="${esc(o.id)}" data-id="${esc(o.id)}" data-d="${o.duration || 0}" title="Önizle (30 sn)">${I("play")}${I("pause")}</div></div>
    <h3 title="${esc(o.title)}">${esc(o.title)}</h3><p>${esc(o.artist)}${o.duration ? " · " + sure(o.duration) : ""}</p>
-   <button class="btn k" data-act="indir" ${var_ ? "disabled" : ""} data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}">${var_ ? "İndirildi" : I("dl") + "İndir"}</button>${listeId ? `<button class="btn k" style="margin-left:6px" data-act="listeyeIndirEkle" data-liste="${esc(listeId)}" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bu listeye ekle">${I("plus")}Listeye ekle</button>` : listeli ? `<button class="btn k" style="margin-left:6px" data-act="araListe" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bir playlist'e ekle">${I("plus")}Playlist</button>` : ""}</div>`;
+   <div class="kt-aks"><button class="btn k" data-act="indir" ${var_ ? "disabled" : ""} data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}">${var_ ? "İndirildi" : I("dl") + "İndir"}</button>${listeId ? `<button class="btn k kt-ekle" data-act="listeyeIndirEkle" data-liste="${esc(listeId)}" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bu listeye ekle">${I("plus")}<span>Listeye ekle</span></button>` : listeli ? `<button class="btn k kt-ekle" data-act="araListe" data-id="${esc(o.id)}" data-t="${esc(o.title)}" data-a="${esc(o.artist)}" data-d="${o.duration || 0}" title="İndir ve bir playlist'e ekle">${I("plus")}<span>Playlist</span></button>` : ""}</div></div>`;
 }
 
 // =============================================================== sayfalar
@@ -700,7 +700,7 @@ for (const el of ELEM) {
   el.addEventListener("pause", AKT(() => { butonlar(); dalgaBaslat(); if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"; }));
   el.addEventListener("seeked", AKT(dalgaCiz));
   el.addEventListener("loadedmetadata", AKT(() => { zamanYaz(audio.currentTime); dalgaCiz(); }));
-  el.addEventListener("ended", AKT(() => sonraki(true)));
+  el.addEventListener("ended", AKT(() => { if (uykuSon) { uykuBitir(false); return; } sonraki(true); }));
   el.addEventListener("error", AKT(() => {
     if (!audio.getAttribute("src")) return; const id = S.queue[S.qi]; toast("Çalınamadı: " + ((T(id) && T(id).title) || "dosya bozuk olabilir"));
     if (++hataSay > 4) { hataSay = 0; audio.pause(); return; }
@@ -724,13 +724,128 @@ if ("mediaSession" in navigator) {
   ms.setActionHandler("seekto", e => { audio.currentTime = e.seekTime; });
 }
 
-// uyku zamanlayicisi
-let uykuZ = null;
-function uykuKur(dk) {
-  clearTimeout(uykuZ); $("#btnUyku").classList.toggle("ac", !!dk); if (!dk) return toast("Uyku zamanlayıcısı kapalı");
-  toast(`${dk} dakika sonra müzik duracak`);
-  uykuZ = setTimeout(() => { const v = V; let n = 20; const z = setInterval(() => { V = Math.max(0, v * (--n / 20)); sesUygula(); if (n <= 0) { clearInterval(z); durdurHepsi(); V = v; sesUygula(); $("#btnUyku").classList.remove("ac"); } }, 150); }, dk * 60000);
+// uyku zamanlayicisi (YT Music tarzi detayli mod: hazir sureler, parca sonu, ozel sure, canli geri sayim, yumusak kisilma)
+let uykuZ = null, uykuBitis = 0, uykuSon = false, uykuFadeZ = null, uykuTick = null;
+let uykuYumusak = localStorage.getItem("uykuYumusak") !== "0";
+function uykuBitir(yumusak = uykuYumusak) {
+  clearTimeout(uykuZ); clearInterval(uykuFadeZ); clearInterval(uykuTick);
+  uykuZ = null; uykuBitis = 0; uykuSon = false;
+  $("#btnUyku").classList.remove("ac");
+  window.dispatchEvent(new CustomEvent("vaalz-uyku"));
+  if (!yumusak) { durdurHepsi(); toast("Uyku zamanlayıcısı müziği durdurdu"); return; }
+  const v = V; let n = 25;
+  uykuFadeZ = setInterval(() => {
+    V = Math.max(0, v * (--n / 25)); sesUygula();
+    if (n <= 0) { clearInterval(uykuFadeZ); durdurHepsi(); V = v; sesUygula(); toast("Uyku zamanlayıcısı müziği durdurdu"); }
+  }, 200);
 }
+function uykuKur(dk) {
+  clearTimeout(uykuZ); clearInterval(uykuFadeZ); clearInterval(uykuTick);
+  uykuZ = null; uykuBitis = 0; uykuSon = false;
+  if (dk === "son") {
+    uykuSon = true;
+    $("#btnUyku").classList.add("ac");
+    window.dispatchEvent(new CustomEvent("vaalz-uyku"));
+    toast("Bu parça bitince müzik duracak");
+    return;
+  }
+  const m = Number(dk) || 0;
+  $("#btnUyku").classList.toggle("ac", m > 0);
+  if (m <= 0) {
+    window.dispatchEvent(new CustomEvent("vaalz-uyku"));
+    return toast("Uyku zamanlayıcısı kapalı");
+  }
+  uykuBitis = Date.now() + m * 60000;
+  uykuZ = setTimeout(() => uykuBitir(), m * 60000);
+  window.dispatchEvent(new CustomEvent("vaalz-uyku"));
+  toast(`${m} dakika sonra müzik duracak`);
+}
+function uykuUzat(ekDk) {
+  if (!uykuBitis) return uykuKur(ekDk);
+  const kalanMs = Math.max(0, uykuBitis - Date.now()) + ekDk * 60000;
+  clearTimeout(uykuZ);
+  uykuBitis = Date.now() + kalanMs;
+  uykuZ = setTimeout(() => uykuBitir(), kalanMs);
+  window.dispatchEvent(new CustomEvent("vaalz-uyku"));
+  toast(`+${ekDk} dakika eklendi`);
+}
+function uykuKalanMetin() {
+  if (uykuSon) return "Parça bitince";
+  if (!uykuBitis) return "";
+  const sn = Math.max(0, Math.ceil((uykuBitis - Date.now()) / 1000));
+  const s = Math.floor(sn / 3600), d = Math.floor((sn % 3600) / 60), k = sn % 60;
+  return s > 0 ? `${s}:${String(d).padStart(2, "0")}:${String(k).padStart(2, "0")}` : `${d}:${String(k).padStart(2, "0")}`;
+}
+function uykuModalAc() {
+  let ozel = 20;
+  const aktifMi = () => uykuSon || uykuBitis > Date.now();
+  const ciz = () => {
+    const aktif = aktifMi();
+    const kalan = uykuKalanMetin();
+    modalAc(`
+      <div class="uyku-bas">
+        <div class="uyku-ikon">${I("moon")}</div>
+        <div>
+          <h3>Uyku zamanlayıcısı</h3>
+          <p class="not" id="uykuDurum">${aktif ? (uykuSon ? "Çalan parça bitince duracak" : "Kalan süre: " + kalan) : "Müzik belirlediğin sürede otomatik durur"}</p>
+        </div>
+      </div>
+      ${aktif ? `<div class="uyku-aktif">
+        <div class="uyku-sayac" id="uykuSayac">${kalan}</div>
+        <div class="uyku-aktif-bt">
+          ${!uykuSon ? `<button type="button" class="btn k" id="uykuUzat5">+5 dk uzat</button>` : ""}
+          <button type="button" class="btn k uyku-iptal" id="uykuIptal">İptal et</button>
+        </div>
+      </div>` : ""}
+      <div class="uyku-izgara">
+        ${[5, 10, 15, 30, 45, 60].map(m => `<button type="button" class="uyku-hap" data-uy="${m}"><b>${m === 60 ? "1 saat" : m + " dk"}</b></button>`).join("")}
+        <button type="button" class="uyku-hap uyku-son ${uykuSon ? "on" : ""}" data-uy="son"><b>Parça bitince</b><span>Şarkı sonunda durdur</span></button>
+      </div>
+      <div class="uyku-ozel">
+        <div class="uyku-ozel-u"><span>Özel süre</span><b id="uykuOzelDeger">${ozel} dk</b></div>
+        <div class="uyku-ozel-s">
+          <button type="button" class="ib kc" id="uykuEksi" title="-5 dk">−</button>
+          <input type="range" id="uykuRange" min="1" max="120" value="${ozel}">
+          <button type="button" class="ib kc" id="uykuArti" title="+5 dk">+</button>
+          <button type="button" class="btn k on" id="uykuOzelKur">Başlat</button>
+        </div>
+      </div>
+      <label class="uyku-fade">
+        <span>Süre dolunca sesi yavaşça kıs</span>
+        <input type="checkbox" id="uykuFadeChk" ${uykuYumusak ? "checked" : ""}>
+      </label>
+      <div class="ip"><button type="button" class="btn" data-act="modalKapat">Kapat</button></div>
+    `);
+    const mk = $("#modal .mk");
+    if (mk) mk.classList.add("uyku-mk");
+    $("#modal").querySelectorAll("[data-uy]").forEach(b => b.addEventListener("click", () => {
+      const v = b.dataset.uy;
+      uykuKur(v === "son" ? "son" : +v);
+      modalKapat();
+    }));
+    const rng = $("#uykuRange"), lbl = $("#uykuOzelDeger");
+    const setOzel = v => { ozel = Math.max(1, Math.min(120, v)); if (rng) rng.value = ozel; if (lbl) lbl.textContent = ozel + " dk"; };
+    if (rng) rng.addEventListener("input", () => setOzel(+rng.value));
+    if ($("#uykuEksi")) $("#uykuEksi").addEventListener("click", () => setOzel(ozel - 5));
+    if ($("#uykuArti")) $("#uykuArti").addEventListener("click", () => setOzel(ozel + 5));
+    if ($("#uykuOzelKur")) $("#uykuOzelKur").addEventListener("click", () => { uykuKur(ozel); modalKapat(); });
+    if ($("#uykuUzat5")) $("#uykuUzat5").addEventListener("click", () => { uykuUzat(5); ciz(); });
+    if ($("#uykuIptal")) $("#uykuIptal").addEventListener("click", () => { uykuKur(0); modalKapat(); });
+    if ($("#uykuFadeChk")) $("#uykuFadeChk").addEventListener("change", e => {
+      uykuYumusak = e.target.checked;
+      try { localStorage.setItem("uykuYumusak", uykuYumusak ? "1" : "0"); } catch { }
+    });
+    clearInterval(uykuTick);
+    if (uykuBitis) uykuTick = setInterval(() => {
+      if ($("#modal").hidden || !uykuBitis) return clearInterval(uykuTick);
+      const k = uykuKalanMetin();
+      if ($("#uykuSayac")) $("#uykuSayac").textContent = k;
+      if ($("#uykuDurum")) $("#uykuDurum").textContent = "Kalan süre: " + k;
+    }, 1000);
+  };
+  ciz();
+}
+window.__vaalzUykuKalan = uykuKalanMetin;
 
 // =============================================================== kuyruk / modal / menu
 let KTAB = "sira";
@@ -938,7 +1053,7 @@ const H = {
   oSoz: () => { },
   kuyrukKapat: () => { if ($("#kuyruk").classList.contains("gomulu")) return; $("#kuyruk").hidden = true; },
   kuyrukGit: t => { S.qi = +t.dataset.i; calIndex(); },
-  uyku: (t, e) => { e.stopPropagation(); const r = t.getBoundingClientRect(); menuAc(r.left - 90, r.top - 200, [["15", "15 dakika"], ["30", "30 dakika"], ["45", "45 dakika"], ["60", "1 saat"], ["0", "Kapalı"]], k => uykuKur(+k)); },
+  uyku: (t, e) => { e.stopPropagation(); uykuModalAc(); },
   modalKapat,
   yeniListe: t => girdiModal("Yeni playlist", "", async ad => {
     const { id } = await api("/api/liste/yeni", { title: ad, parca: t && t.dataset ? t.dataset.parca : undefined });

@@ -3,7 +3,7 @@
   {"file":"web/app.js","old":"e.title = [\"Döngü: kapalı\", \"Döngü: tüm liste\", \"Döngü: tek parça\"][S.tekrar];","new":"e.title = [\"Repeat: off\", \"Repeat: all\", \"Repeat: one\"][S.tekrar];"},
   {"file":"web/app.js","old":"toast(\"Çalınamadı: \" + ((T(id) && T(id).title) || \"dosya bozuk olabilir\"))","new":"toast(\"Could not play: \" + ((T(id) && T(id).title) || \"file may be corrupted\"))"},
   {"file":"web/app.js","old":"return toast(\"Uyku zamanlayıcısı kapalı\")","new":"return toast(\"Sleep timer off\")"},
-  {"file":"web/app.js","old":"toast(`${dk} dakika sonra müzik duracak`);","new":"toast(`Music will stop in ${dk} min`);"},
+  {"file":"web/app.js","old":"toast(`${m} dakika sonra müzik duracak`);","new":"toast(`Music will stop in ${m} min`);"},
   {"file":"web/app.js","old":"data-act=\"kuyrukCikar\" data-i=\"${i}\" title=\"Sıradan çıkar\"","new":"data-act=\"kuyrukCikar\" data-i=\"${i}\" title=\"Remove from queue\""},
   {"file":"web/app.js","old":"<p class=\"not\" style=\"padding:16px\">Kuyruk boş.</p>","new":"<p class=\"not\" style=\"padding:16px\">Queue is empty.</p>"},
   {"file":"web/app.js","old":"BZ.hata = e.message || \"alınamadı\"","new":"BZ.hata = e.message || \"unavailable\""},

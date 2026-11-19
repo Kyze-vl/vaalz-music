@@ -225,6 +225,32 @@ body.odakAcik .d-sag .ib:last-child .ic{transform:rotate(180deg)}
 .mk{width:min(420px,92vw);max-height:80vh;overflow:auto;background:var(--s2);border:1px solid var(--line2);border-radius:14px;padding:22px}
 .mk h3{margin-bottom:14px;font-size:16px;font-weight:600}
 .mk .ip{margin-top:16px;justify-content:flex-end}
+/* ---------- uyku zamanlayicisi modali (YT Music tarzi detayli) ---------- */
+.uyku-mk{width:min(440px,94vw);border-radius:20px;padding:22px}
+.uyku-bas{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.uyku-bas h3{margin:0 0 2px;font-size:17px}
+.uyku-bas .not{margin:0}
+.uyku-ikon{width:42px;height:42px;border-radius:12px;background:var(--ak-d);color:var(--ak);display:grid;place-items:center;flex:none}
+.uyku-ikon .ic{width:20px;height:20px}
+.uyku-aktif{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--ak) 12%,var(--s1));border:1px solid color-mix(in srgb,var(--ak) 35%,transparent);margin-bottom:14px}
+.uyku-sayac{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ak)}
+.uyku-aktif-bt{display:flex;gap:8px}
+.uyku-iptal{color:#e58a8a;border-color:#e58a8a44}
+.uyku-izgara{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.uyku-hap{padding:11px 10px;border-radius:12px;background:var(--s1);border:1px solid var(--line);text-align:center;transition:background .15s,border-color .15s}
+.uyku-hap:hover{background:var(--hv2);border-color:var(--line2)}
+.uyku-hap b{display:block;font-size:13.5px;font-weight:600}
+.uyku-hap.uyku-son{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;text-align:left}
+.uyku-hap.uyku-son span{font-size:12px;color:var(--mut)}
+.uyku-hap.on{border-color:var(--ak);background:var(--ak-d);color:var(--ak)}
+.uyku-ozel{padding:12px 14px;border-radius:14px;background:var(--s1);border:1px solid var(--line);margin-bottom:12px}
+.uyku-ozel-u{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px}
+.uyku-ozel-u b{color:var(--ak);font-variant-numeric:tabular-nums}
+.uyku-ozel-s{display:flex;align-items:center;gap:8px}
+.uyku-ozel-s input[type=range]{flex:1;accent-color:var(--ak);cursor:pointer}
+.uyku-ozel-s .ib.kc{background:var(--hv2);color:var(--txt);font-size:16px;font-weight:600}
+.uyku-fade{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px;font-size:13px;color:var(--mut);cursor:pointer}
+.uyku-fade input{accent-color:var(--ak);width:17px;height:17px;cursor:pointer}
 #menu{position:fixed;z-index:70;background:var(--pop);border:1px solid var(--line2);border-radius:10px;padding:5px;min-width:210px;box-shadow:0 12px 32px #000c}
 #menu button{display:block;width:100%;text-align:left;padding:8px 12px;border-radius:6px}
 #menu button:hover{background:var(--hv2)}
