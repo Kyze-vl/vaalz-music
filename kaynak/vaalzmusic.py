@@ -2050,6 +2050,17 @@ def chromium_bul():
     return None
 
 
+def qt_pencere_var():
+    """Linux: PySide6 + QtWebEngine kuruluysa arayuz tarayici olmadan kendi penceresinde acilir (pencere_qt.py)."""
+    if os.environ.get("VAALZ_PENCERE") in ("chromium", "tarayici"):
+        return False
+    try:
+        import importlib.util
+        return importlib.util.find_spec("PySide6.QtWebEngineWidgets") is not None
+    except (ImportError, ValueError):
+        return False
+
+
 def profil_temizle():
     """Edge/Chrome yeni profile ilk acilista yuzlerce MB uzanti, IndexedDB ve onbellek koyar; uygulamamiza gerekmez.
     Yalnizca yeniden uretilebilir klasorler silinir; ayarlar ('Local Storage') ve cerezler kalir."""
@@ -2079,6 +2090,11 @@ def pencere_ac(url):
                   "--autoplay-policy=no-user-gesture-required"]
     profil = f"--user-data-dir={os.path.join(VERI, 'pencere-profili')}"
     if LINUX:
+        if qt_pencere_var():
+            subprocess.Popen([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "pencere_qt.py"), url,
+                              os.path.join(VERI, "pencere-qt"), os.path.join(WEB, "icon.png")],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            return
         exe = chromium_bul()
         if exe:
             subprocess.Popen([exe, f"--app={url}", profil, "--class=VaalzMusic", "--name=VaalzMusic"] + secenekler,
